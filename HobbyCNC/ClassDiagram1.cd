@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="CNC_Assist.Controller">
+    <Position X="0.5" Y="0.5" Width="3.75" />
+    <NestedTypes>
+      <Delegate Name="CNC_Assist.Controller.DeviceEventNewMessage" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CNC_Assist.Controller.DeviceEventConnect" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CNC_Assist.Controller.DeviceEventDisconnect" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CNC_Assist.Controller.DeviceEventNewData" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BJVCABAIQBAgKABEAAMEAIBAgQSAAQAAFYAAJCAIAAo=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNC_Assist.deviceInfo" Collapsed="true">
+    <Position X="13.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgQEBCAAAgIACAADRIA4AAABEAAAAgAAgAQAIAASQ=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNC_Assist.DeviceEventArgsMessage" Collapsed="true">
+    <Position X="11.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNC_Assist.BinaryData" Collapsed="true">
+    <Position X="9.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIBOAAAAAAAAAACgfAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNC_Assist.decPoint" Collapsed="true">
+    <Position X="9.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAYAE=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNC_Assist.dobPoint" Collapsed="true">
+    <Position X="9.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAYAE=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNC_Assist.correctionPos" Collapsed="true">
+    <Position X="13.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACFAAAAA=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="CNC_Assist.EStatusDevice" Collapsed="true">
+    <Position X="9.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CONTROLLER.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

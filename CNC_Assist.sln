@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HobbyCNC", "HobbyCNC\HobbyCNC.csproj", "{5B5110D6-2B5B-4257-AFAF-834B46E83FBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolsImporterTextImage", "ToolsImporterTextImage\ToolsImporterTextImage.csproj", "{795986AB-8359-474C-A09B-9CFC6D6E663A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolsImporterVectors", "ToolsImporterVectors\ToolsImporterVectors.csproj", "{08A2CC71-CD59-4D55-ACFC-6FCD290B2BE6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Description = Набор программ для ЧПУ
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5B5110D6-2B5B-4257-AFAF-834B46E83FBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B5110D6-2B5B-4257-AFAF-834B46E83FBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B5110D6-2B5B-4257-AFAF-834B46E83FBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B5110D6-2B5B-4257-AFAF-834B46E83FBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{795986AB-8359-474C-A09B-9CFC6D6E663A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{795986AB-8359-474C-A09B-9CFC6D6E663A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{795986AB-8359-474C-A09B-9CFC6D6E663A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{795986AB-8359-474C-A09B-9CFC6D6E663A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A2CC71-CD59-4D55-ACFC-6FCD290B2BE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08A2CC71-CD59-4D55-ACFC-6FCD290B2BE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08A2CC71-CD59-4D55-ACFC-6FCD290B2BE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08A2CC71-CD59-4D55-ACFC-6FCD290B2BE6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

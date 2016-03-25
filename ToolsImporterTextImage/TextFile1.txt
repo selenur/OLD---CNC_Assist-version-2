@@ -1,0 +1,3 @@
+﻿Источники данных с примерами использования внешних шрифтов
+https://msdn.microsoft.com/en-us/library/y505zzfw(v=vs.110).aspx
+http://www.codeproject.com/Articles/107377/Load-And-Use-Custom-Font-Without-Installing-It
