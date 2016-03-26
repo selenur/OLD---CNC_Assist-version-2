@@ -12,9 +12,9 @@ namespace CNC_Assist.Constructor
 
         private void btGetPosition_Click(object sender, EventArgs e)
         {
-            numPosX.Value = Controller.Info.AxesX_PositionMM;
-            numPosY.Value = Controller.Info.AxesY_PositionMM;
-            numPosZ.Value = Controller.Info.AxesZ_PositionMM;
+            numPosX.Value = ControllerPlanetCNC.Info.AxesX_PositionMM;
+            numPosY.Value = ControllerPlanetCNC.Info.AxesY_PositionMM;
+            numPosZ.Value = ControllerPlanetCNC.Info.AxesZ_PositionMM;
         }
 
         private void frmPoint_Load(object sender, EventArgs e)

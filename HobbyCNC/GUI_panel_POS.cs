@@ -23,34 +23,34 @@ namespace CNC_Assist
 
         private void buttonXtoZero_Click(object sender, EventArgs e)
         {
-            Controller.ResetToZeroAxes("X");
+            ControllerPlanetCNC.ResetToZeroAxes("X");
         }
 
         private void buttonYtoZero_Click(object sender, EventArgs e)
         {
-            Controller.ResetToZeroAxes("Y");
+            ControllerPlanetCNC.ResetToZeroAxes("Y");
         }
 
         private void buttonZtoZero_Click(object sender, EventArgs e)
         {
-            Controller.ResetToZeroAxes("Z");
+            ControllerPlanetCNC.ResetToZeroAxes("Z");
        }
 
         private void buttonAtoZero_Click(object sender, EventArgs e)
         {
-            Controller.ResetToZeroAxes("A");
+            ControllerPlanetCNC.ResetToZeroAxes("A");
         }
 
         private void timer_Refresh_Tick(object sender, EventArgs e)
         {
-            if (Controller.IsConnectedToController)
+            if (ControllerPlanetCNC.IsConnectedToController)
             {
-                numPosX.Value = Controller.Info.AxesX_PositionMM;
-                numPosY.Value = Controller.Info.AxesY_PositionMM;
-                numPosZ.Value = Controller.Info.AxesZ_PositionMM;
-                numPosA.Value = Controller.Info.AxesA_PositionMM;
+                numPosX.Value = ControllerPlanetCNC.Info.AxesX_PositionMM;
+                numPosY.Value = ControllerPlanetCNC.Info.AxesY_PositionMM;
+                numPosZ.Value = ControllerPlanetCNC.Info.AxesZ_PositionMM;
+                numPosA.Value = ControllerPlanetCNC.Info.AxesA_PositionMM;
 
-                if (Controller.TestAllowActions)
+                if (ControllerPlanetCNC.IsAvailability)
                 {
                     Enabled = true;
                     buttonXtoZero.Enabled = true;

@@ -12,10 +12,10 @@ namespace CNC_Assist
 
         private void timerRefresh_Tick(object sender, EventArgs e)
         {
-            if (!Controller.IsConnectedToController) return;
+            if (!ControllerPlanetCNC.IsConnectedToController) return;
 
             //DEBUG:
-            SuperByte bb14 = new SuperByte(Controller.Info.RawData[14]);
+            SuperByte bb14 = new SuperByte(ControllerPlanetCNC.Info.RawData[14]);
 
             checkBoxB0.Checked = bb14.Bit0;
             checkBoxB1.Checked = bb14.Bit1;
@@ -27,7 +27,7 @@ namespace CNC_Assist
             checkBoxB7.Checked = bb14.Bit7;
 
 
-            SuperByte bb15 = new SuperByte(Controller.Info.RawData[15]);
+            SuperByte bb15 = new SuperByte(ControllerPlanetCNC.Info.RawData[15]);
 
             checkBox9.Checked = bb15.Bit7;
             checkBox8.Checked = bb15.Bit6;
@@ -39,7 +39,7 @@ namespace CNC_Assist
             checkBox2.Checked = bb15.Bit0;
 
 
-            SuperByte bb19 = new SuperByte(Controller.Info.RawData[19]);
+            SuperByte bb19 = new SuperByte(ControllerPlanetCNC.Info.RawData[19]);
 
             checkBox10.Checked = bb19.Bit0;
             checkBox11.Checked = bb19.Bit1;
@@ -51,7 +51,7 @@ namespace CNC_Assist
             checkBox17.Checked = bb19.Bit7;
 
 
-            label_FreeSizeBuffer.Text = Controller.Info.FreebuffSize.ToString();
+            label_FreeSizeBuffer.Text = ControllerPlanetCNC.Info.FreebuffSize.ToString();
 
             // end debug
         }

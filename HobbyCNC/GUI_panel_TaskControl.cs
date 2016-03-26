@@ -46,7 +46,7 @@ namespace CNC_Assist
 
         private void TaskTimer_Tick(object sender, EventArgs e)
         {
-            textBoxNumberLine.Text = @"Выполнена: " + Controller.Info.NuberCompleatedInstruction.ToString();
+            textBoxNumberLine.Text = @"Выполнена: " + ControllerPlanetCNC.Info.NuberCompleatedInstruction.ToString();
 
 
             // проверим не обновились ли данные
@@ -60,7 +60,16 @@ namespace CNC_Assist
                 _dateGetLastNewDataCode = DataLoader.dateGetNewDataCode;
             }
 
-            if (Controller.TaskStatus == ETaskStatus.Off)
+            if (ControllerPlanetCNC.StatusTThread == enumStatusThread.Off)
+            {
+                labelStatusTask.Image = Resources.ball_red;
+                labelStatusTask.Text = @"Нет связи";
+                buttonStartTask.Enabled = false;
+                buttonPauseTask.Enabled = false;
+                btStopTask.Enabled = false;
+            }
+
+            if (ControllerPlanetCNC.StatusTThread == enumStatusThread.Wait)
             {
                 labelStatusTask.Image = Resources.ball_red;
                 labelStatusTask.Text = @"Нет задания";
@@ -69,7 +78,7 @@ namespace CNC_Assist
                 btStopTask.Enabled = false;
             }
 
-            //if (Controller.TASK_STATUS == ETaskStatus.Start)
+            //if (Controller.StatusTThread == ETaskStatus.Start)
             //{
             //    labelStatusTask.Image = Resources.ball_yellow;
             //    labelStatusTask.Text = @"Запуск";
@@ -78,7 +87,7 @@ namespace CNC_Assist
             //    btStopTask.Enabled = true;
             //}
 
-            //if (Controller.TASK_STATUS == ETaskStatus.Stop)
+            //if (Controller.StatusTThread == ETaskStatus.Stop)
             //{
             //    labelStatusTask.Image = Resources.ball_yellow;
             //    labelStatusTask.Text = @"Остановка";
@@ -87,7 +96,7 @@ namespace CNC_Assist
             //    btStopTask.Enabled = false;
             //}
 
-            if (Controller.TaskStatus == ETaskStatus.Work)
+            if (ControllerPlanetCNC.StatusTThread == enumStatusThread.Work)
             {
                 labelStatusTask.Image = Resources.ball_green;
                 labelStatusTask.Text = @"ВЫПОЛНЕНИЕ";
@@ -96,7 +105,7 @@ namespace CNC_Assist
                 btStopTask.Enabled = true;
             }
 
-            if (Controller.TaskStatus == ETaskStatus.Pause)
+            if (ControllerPlanetCNC.StatusTThread == enumStatusThread.Pause)
             {
                 labelStatusTask.Image = Resources.ball_yellow;
                 labelStatusTask.Text = @"ПАУЗА";
@@ -105,7 +114,7 @@ namespace CNC_Assist
                 btStopTask.Enabled = true;
             }
 
-            if (!Controller.IsConnectedToController)
+            if (!ControllerPlanetCNC.IsConnectedToController)
             {
                 groupBoxManualSpeedGkode.Enabled = false;
                 groupBoxWorking.Enabled = false;
@@ -118,11 +127,10 @@ namespace CNC_Assist
 
         private void buttonStartTask_Click(object sender, EventArgs e)
         {
-            if (Controller.TaskStatus != ETaskStatus.Off) return;
 
-            Controller.TASK_CLEAR();
+            ControllerPlanetCNC.TASK_CLEAR();
 
-            Controller.TASK_SendStartData();
+            ControllerPlanetCNC.TASK_SendStartData();
 
             // Определимся с границами
             _nowPos = listGkodeCommand.SelectedIndex;
@@ -134,8 +142,7 @@ namespace CNC_Assist
             else
             {
                 _endPos = listGkodeCommand.SelectedIndex + listGkodeCommand.SelectedItems.Count;
-            } 
-
+            }
             
             if (_nowPos >= _endPos)
             {
@@ -163,7 +170,7 @@ namespace CNC_Assist
                 // В случае наличия изменений, отправим новые данные
                 if (dataRowNow.Machine.SpindelON != dataRowOld.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != dataRowOld.Machine.SpeedSpindel)
                 {
-                    Controller.AddBinaryDataToTask(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
+                    ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
                     //TODO: это нужно переделать!!!!! зафиксируем
                     PlanetCNC_Controller.LastStatus = dataRowNow;
                 }
@@ -198,30 +205,30 @@ namespace CNC_Assist
                     float pointZ = (float)dataRowNow.POS.Z;
 
                     //добавление смещения G-кода
-                    if (Controller.CorrectionPos.UseCorrection)
+                    if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
                     {
                         //// применение пропорций
                         //pointX *= Setting.koeffSizeX;
                         //pointY *= Setting.koeffSizeY;
 
                         //применение смещения
-                        pointX += (float)Controller.CorrectionPos.DeltaX;
-                        pointY += (float)Controller.CorrectionPos.DeltaY;
+                        pointX += (float)ControllerPlanetCNC.CorrectionPos.DeltaX;
+                        pointY += (float)ControllerPlanetCNC.CorrectionPos.DeltaY;
 
                         //применение матрицы поверхности детали
-                        if (Controller.CorrectionPos.UseMatrix)
+                        if (ControllerPlanetCNC.CorrectionPos.UseMatrix)
                         {
                             pointZ += ScanSurface.GetPosZ(pointX, pointY);
                         }
 
-                        pointZ += (float)Controller.CorrectionPos.DeltaZ;
+                        pointZ += (float)ControllerPlanetCNC.CorrectionPos.DeltaZ;
 
                     }
 
-                    Controller.AddBinaryDataToTask(BinaryData.pack_CA(Controller.Info.CalcPosPulse("X", (decimal)pointX),
-                                                                    Controller.Info.CalcPosPulse("Y", (decimal)pointY),
-                                                                    Controller.Info.CalcPosPulse("Z", (decimal)pointZ),
-                                                                    Controller.Info.CalcPosPulse("A", dataRowNow.POS.A),
+                    ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_CA(ControllerPlanetCNC.Info.CalcPosPulse("X", (decimal)pointX),
+                                                                    ControllerPlanetCNC.Info.CalcPosPulse("Y", (decimal)pointY),
+                                                                    ControllerPlanetCNC.Info.CalcPosPulse("Z", (decimal)pointZ),
+                                                                    ControllerPlanetCNC.Info.CalcPosPulse("A", dataRowNow.POS.A),
                                                                     speedToSend,
                                                                     dataRowNow.numberRow));
 
@@ -238,9 +245,9 @@ namespace CNC_Assist
 
             // данные переданы для выполнения, запустим....
 
-            Controller.TASK_SendStopData();
+            ControllerPlanetCNC.TASK_SendStopData();
 
-            Controller.TASK_START();
+            ControllerPlanetCNC.TASK_START();
 
 
 
@@ -286,12 +293,12 @@ namespace CNC_Assist
 
         private void buttonPauseTask_Click(object sender, EventArgs e)
         {
-            Controller.TASK_PAUSE();
+            ControllerPlanetCNC.TASK_PAUSE();
         }
 
         private void btStopTask_Click(object sender, EventArgs e)
         {
-            Controller.TASK_STOP();
+            ControllerPlanetCNC.TASK_STOP();
         }
 
         /// <summary>

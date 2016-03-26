@@ -25,16 +25,16 @@ namespace CNC_Assist
 
         private void timerCheckStatus_Tick(object sender, EventArgs e)
         {
-            this.Enabled = Controller.IsConnectedToController;
+            this.Enabled = ControllerPlanetCNC.IsConnectedToController;
             Bitmap bGrey = Properties.Resources.draw_ellipse;
             Bitmap bRed = Properties.Resources.ball_red;
 
-            labelXmax.Image = Controller.Info.AxesXLimitMax ? bRed : bGrey;
-            labelXmin.Image = Controller.Info.AxesXLimitMin ? bRed : bGrey;
-            labelYmax.Image = Controller.Info.AxesYLimitMax ? bRed : bGrey;
-            labelYmin.Image = Controller.Info.AxesYLimitMin ? bRed : bGrey;
-            labelZmax.Image = Controller.Info.AxesZLimitMax ? bRed : bGrey;
-            labelZmin.Image = Controller.Info.AxesZLimitMin ? bRed : bGrey;
+            labelXmax.Image = ControllerPlanetCNC.Info.AxesXLimitMax ? bRed : bGrey;
+            labelXmin.Image = ControllerPlanetCNC.Info.AxesXLimitMin ? bRed : bGrey;
+            labelYmax.Image = ControllerPlanetCNC.Info.AxesYLimitMax ? bRed : bGrey;
+            labelYmin.Image = ControllerPlanetCNC.Info.AxesYLimitMin ? bRed : bGrey;
+            labelZmax.Image = ControllerPlanetCNC.Info.AxesZLimitMax ? bRed : bGrey;
+            labelZmin.Image = ControllerPlanetCNC.Info.AxesZLimitMin ? bRed : bGrey;
             //TODO: add AxesA
         }
     }

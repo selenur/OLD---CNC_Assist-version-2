@@ -61,7 +61,6 @@
             this.toolStripDropDownadditionally = new System.Windows.Forms.ToolStripDropDownButton();
             this.additionallyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainStatusStrip = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel_AvailableController = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage3D = new System.Windows.Forms.TabPage();
@@ -451,7 +450,6 @@
             // MainStatusStrip
             // 
             this.MainStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel_AvailableController,
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
             this.MainStatusStrip.Location = new System.Drawing.Point(0, 582);
@@ -459,14 +457,6 @@
             this.MainStatusStrip.Size = new System.Drawing.Size(864, 22);
             this.MainStatusStrip.TabIndex = 2;
             this.MainStatusStrip.Text = "statusStrip1";
-            // 
-            // toolStripStatusLabel_AvailableController
-            // 
-            this.toolStripStatusLabel_AvailableController.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.toolStripStatusLabel_AvailableController.ForeColor = System.Drawing.Color.Red;
-            this.toolStripStatusLabel_AvailableController.Name = "toolStripStatusLabel_AvailableController";
-            this.toolStripStatusLabel_AvailableController.Size = new System.Drawing.Size(225, 17);
-            this.toolStripStatusLabel_AvailableController.Text = "!!!Нет подключенного контроллера!!!";
             // 
             // toolStripStatusLabel1
             // 
@@ -1149,7 +1139,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolsConstructorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsImporterTextImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsImporterVectorsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_AvailableController;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
     }
 }

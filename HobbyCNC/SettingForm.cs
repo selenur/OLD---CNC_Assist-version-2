@@ -58,9 +58,9 @@ namespace CNC_Assist.SettingApp
             GlobalSetting.SaveToFile();
             RefreshElements();
 
-            if (Controller.IsConnectedToController)
+            if (ControllerPlanetCNC.IsConnectedToController)
             {
-                Controller.Reconnect();
+                ControllerPlanetCNC.Reconnect();
             }
         }
 

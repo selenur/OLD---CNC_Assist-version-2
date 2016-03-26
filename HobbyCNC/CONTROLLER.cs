@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using CNC_Assist.PlanetCNC;
 using LibUsbDotNet;
 using LibUsbDotNet.Main;
@@ -13,14 +14,9 @@ namespace CNC_Assist
     /// <summary>
     /// Класс работы с контроллером
     /// </summary>
-    public static class Controller
+    public static class ControllerPlanetCNC
     {
         #region Переменные
-
-        /// <summary>
-        /// Наличие установленной связи между контроллером и компьтером
-        /// </summary>
-        private static bool _isAvailableController;
 
         /// <summary>
         /// Наличие установленной связи между контроллером и программой
@@ -28,10 +24,9 @@ namespace CNC_Assist
         private static bool _isConnectedController;
 
         /// <summary>
-        /// Параметр за которым следит поток поиска контроллера, т.к. при закрытии основной программы, данный поток нужно завершить заранее. 
-        /// TRUE - нужно завершить поток
+        /// Информация о параметрах контроллера
         /// </summary>
-        private static bool _exitprogramm;
+        public static volatile DeviceInfo Info = new DeviceInfo();
 
         /// <summary>
         /// Для монопольного доступа записи на диск, файла логов
@@ -39,121 +34,80 @@ namespace CNC_Assist
         private static readonly object Locker;
 
         /// <summary>
-        /// Массив данных для посылки в контроллер, при выполнении программы из G-кодов
-        /// </summary>
-        private static readonly List<byte[]> DataForSend;
-
-        /// <summary>
-        /// Массив данных для посылки в контроллер, при ручном управлении
-        /// </summary>
-        private static readonly List<byte[]> ManualDataForSend;
-
-
-        /// <summary>
-        /// Массив данных для посылки в контроллер, С ВЫСШИМ ПРИОРИТЕТОМ!!!
-        /// </summary>
-        private static readonly List<byte[]> ImportantDataForSend;
-
-        /// <summary>
-        /// Локер для Массива данных
-        /// </summary>
-        static readonly object LockDataForSend = new object();
-
-        /// <summary>
-        /// Информация о параметрах контроллера
-        /// </summary>
-        public static volatile DeviceInfo Info = new DeviceInfo();
-
-
-        /// <summary>
         /// Информация о применении смещения
         /// </summary>
         public static volatile CorrectionPos CorrectionPos = new CorrectionPos();
 
         /// <summary>
-        /// Для контроля доступности контроллера, значение равно TRUE если шпиндель движется, в режиме простоя FALSE
+        /// Статус работы потока
         /// </summary>
-        private static volatile bool _controllerIsLock;
+        private static volatile enumStatusThread _StatusThread;
 
         /// <summary>
-        /// Статус выполнения обычных данных
+        /// Поток который работает с контроллером
         /// </summary>
-        private static volatile ETaskStatus _taskStatus;
+        private static volatile Thread thController;
+
+        /// <summary>
+        /// необходимость работы потока
+        /// </summary>
+        private static volatile bool ThreadneedLoop;
 
 
+        // Доступ к контроллеру - vid 2121 pid 2130 в десятичной системе будет как 8481 и 8496 соответственно
+        private static volatile UsbDeviceFinder myUsbFinder;
+        private static volatile UsbDevice tmpUsbDevice;
+        private static volatile UsbEndpointReader usbReader;
+        private static volatile UsbEndpointWriter usbWriter;
+        private static volatile IUsbDevice wholeUsbDevice;
+
+        /// <summary>
+        /// Для отслеживания изменений в полученных данных от контроллера,
+        /// что-бы не парсить данные которые не изменились
+        /// </summary>
+        private static volatile byte[] oldInfoFromController;
+
+        /// <summary>
+        /// Массив данных для посылки в контроллер, при выполнении программы из G-кодов
+        /// </summary>
+        private static volatile readonly List<byte[]> DataForSend;
+        /// <summary>
+        /// Локер для Массива данных
+        /// </summary>
+        private static volatile readonly object LockDataForSend;
 
         #endregion
 
-        // ИНИЦИАЛИЗАЦИЯ
-        static Controller()
+        /// <summary>
+        /// Инициализация класса
+        /// </summary>
+        static ControllerPlanetCNC()
         {
-            _isAvailableController = false;
             _isConnectedController = false;
-            _exitprogramm = false;
-            ImportantDataForSend = new List<byte[]>();
-            DataForSend = new List<byte[]>();
-            ManualDataForSend = new List<byte[]>();
-            _controllerIsLock = false;
-            _taskStatus = ETaskStatus.Off;
+            _StatusThread = enumStatusThread.Off;
+
+            myUsbFinder = new UsbDeviceFinder(8481, 8496);
+            tmpUsbDevice = null;
+            usbReader = null;
+            usbWriter = null;
+            wholeUsbDevice = null;
 
             Locker = new object();
 
-            //запустим поток, который будет периодически проверять наличие подключенного контроллера к компьютеру
-            new Thread(ThreadController).Start();
-        }
+            thController = null;
 
-        #region Свойства
+            ThreadneedLoop = false;
 
-        /// <summary>
-        /// Свойство - показывающее о подключенном контроллере к компьютеру
-        /// </summary>
-        /// <value>булево - Доступен ли для использования</value>
-        public static bool IsAvailableController
-        {
-            get { return _isAvailableController; }
+            oldInfoFromController = new byte[64];
+
+            DataForSend = new List<byte[]>();
+            LockDataForSend = new object();
         }
 
         /// <summary>
-        /// Свойство - показывающее о подключении программы к контроллеру
+        /// Рассылка уведомлений
         /// </summary>
-        public static bool IsConnectedToController
-        {
-            get { return _isConnectedController; }
-        }
-
-        /// <summary>
-        /// Проверка наличия связи, и незанятости контроллера
-        /// </summary>
-        /// <returns>булево, возможно ли посылать контроллеру задачи</returns>
-        public static bool TestAllowActions
-        {
-            get {
-
-            if (!IsConnectedToController) return false;
-
-            if (_controllerIsLock) return false;
-
-            return true;
-
-            }
-
-        }
-
-        /// <summary>
-        /// Свойство получения статуса
-        /// </summary>
-        public static ETaskStatus TaskStatus
-        {
-            get { return _taskStatus; }
-        }
-
-        #endregion
-
-        #region События от контроллера
-
-        // для посылки главному потоку сообщений, о статусе работы, отладочных сообщений
-        public delegate void DeviceEventNewMessage(object sender, DeviceEventArgsMessage e); 
-        public static event DeviceEventNewMessage Message;
+        /// <param name="stringMessage">Текст сообщения</param>
         private static void AddMessage(string stringMessage)
         {
             if (Message != null) Message(null, new DeviceEventArgsMessage(stringMessage));
@@ -169,6 +123,48 @@ namespace CNC_Assist
                 }
             }
         }
+
+        #region Свойства
+
+        /// <summary>
+        /// Свойство - показывающее о подключении программы к контроллеру
+        /// </summary>
+        public static bool IsConnectedToController
+        {
+            get { return _isConnectedController; }
+        }
+
+
+        public static enumStatusThread StatusTThread
+        {
+            get { return _StatusThread; }
+        }
+
+        /// <summary>
+        /// Проверка возможности использования контроллера, есть ли связь, и не занят ли он
+        /// </summary>
+        /// <returns>булево, возможно ли посылать контроллеру задачи</returns>
+        public static bool IsAvailability
+        {
+            get 
+            {
+                if (!IsConnectedToController) return false;
+
+                if (_StatusThread == enumStatusThread.Work) return false;
+
+                if (Info.NuberCompleatedInstruction > 0) return false;
+
+                return true;
+            }
+        }
+        
+        #endregion
+
+        #region События от контроллера
+
+        // для посылки главному потоку сообщений, о статусе работы, отладочных сообщений
+        public delegate void DeviceEventNewMessage(object sender, DeviceEventArgsMessage e); 
+        public static event DeviceEventNewMessage Message;
 
         /// <summary>
         /// Событие при успешном подключении к контроллеру
@@ -199,18 +195,71 @@ namespace CNC_Assist
         {
             if (IsConnectedToController)
             {
-                AddMessage("Команда ПОДКЛЮЧЕНИЕ: Попытка установить соединение, когда оно уже установлено, действие отменено!");
+                AddMessage("Попытка установить соединение, когда оно уже установлено, действие отменено!");
                 return;
             }
 
-            AddMessage("Команда ПОДКЛЮЧЕНИЕ: активация");
+            //если поток ещё не завершился, то остановим его:
+            if (thController != null)
+            {
+                if (thController.IsAlive)
+                {
+                    //пошлем завершение
+                    thController.Abort();
+                    //и дождемся пока завершиться
+                    thController.Join();
+                }
+            }
 
-            //инициализация запуска
-            _isConnectedController = true;
+            AddMessage("Начало попытки подключиться к контроллеру.");
 
-            //вызовем событие что подключились
-            if (WasConnected != null) WasConnected(null);
+            _isConnectedController = false;
 
+            // проверим наличие физического подключения контроллера
+            if (tmpUsbDevice == null)
+            {
+                // Попытаемся установить связь
+                tmpUsbDevice = UsbDevice.OpenUsbDevice(myUsbFinder);
+
+                wholeUsbDevice = tmpUsbDevice as IUsbDevice;
+                if (!ReferenceEquals(wholeUsbDevice, null))
+                {
+                    // This is a "whole" USB device. Before it can be used, 
+                    // the desired configuration and interface must be selected.
+
+                    // Select config #1
+                    wholeUsbDevice.SetConfiguration(1);
+
+                    // Claim interface #0.
+                    wholeUsbDevice.ClaimInterface(0);
+
+                    // open read endpoint 1.
+                    usbReader = tmpUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
+                    usbWriter = tmpUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
+
+                    _isConnectedController = true;
+
+                    if (WasConnected != null) WasConnected(null);
+
+                }
+                else
+                {
+                    AddMessage(@" <-- Ошибка установки связи с контроллером!");
+
+                    //запустим событие о разрыве связи
+                    if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage("Ошибка"));
+
+                    _isConnectedController = false;
+                    tmpUsbDevice = null;
+                    return;
+                }
+            }  //if (tmpUsbDevice == null) //попытка установки связи
+
+            ThreadneedLoop = true;
+
+            //запустим поток, который будет работать с контроллером
+            thController = new Thread(ThreadController);
+            thController.Start();
         }
 
         /// <summary>
@@ -219,8 +268,52 @@ namespace CNC_Assist
         public static void Disconnect()
         {
             AddMessage("Команда ОТКЛЮЧЕНИЕ: программы от контроллера!");
-           
+
+            //если поток ещё не завершился, то остановим его:
+            if (thController != null)
+            {
+                if (thController.IsAlive)
+                {
+                    ThreadneedLoop = false;
+                    //пошлем завершение
+                    //thController.Abort();
+                    //и дождемся пока завершиться
+                    bool theend = thController.Join(2000);
+
+                    if (!theend)
+                        MessageBox.Show(
+                            @"Ошибка завершения потока, для поиска и исправления ошибки, желательно обратиться по адресу: zheigurov@gmail.com");
+                }
+            }
+
+            thController = null;
+            //tmpUsbDevice = null;
             _isConnectedController = false;
+
+            if (tmpUsbDevice != null)
+            {
+                if (tmpUsbDevice.IsOpen)
+                {
+                    // If this is a "whole" usb device (libusb-win32, linux libusb-1.0)
+                    // it exposes an IUsbDevice interface. If not (WinUSB) the
+                    // 'wholeUsbDevice' variable will be null indicating this is
+                    // an interface of a device; it does not require or support
+                    // configuration and interface selection.
+                    //IUsbDevice wholeUsbDevice = tmpUsbDevice as IUsbDevice;
+                    if (!ReferenceEquals(wholeUsbDevice, null))
+                    {
+                        // Release interface
+                        wholeUsbDevice.ReleaseInterface(1);
+                    }
+
+                    tmpUsbDevice.Close();
+                }
+                tmpUsbDevice = null;
+
+                // Free usb resources
+                UsbDevice.Exit();
+
+            }
         }
 
         /// <summary>
@@ -234,13 +327,12 @@ namespace CNC_Assist
         }
 
         /// <summary>
-        /// Активация завершения, перед завершением работы программы
+        /// Посылка аварийной остановки
         /// </summary>
-        public static void PreparingForExit()
+        public static void EnergyStop()
         {
-            _exitprogramm = true;
+            DirectPostToController(BinaryData.pack_AA());
         }
-
 
         #endregion
         
@@ -251,276 +343,239 @@ namespace CNC_Assist
         {
             AddMessage(@" <-- Запуск потока работы с контроллером");
 
-            // Для отслеживания, предыдущего значения
-            bool lastStatusConnected = false;
-
-            //vid 2121 pid 2130 в десятичной системе будет как 8481 и 8496 соответственно
-            UsbDeviceFinder myUsbFinder = new UsbDeviceFinder(8481, 8496);
-
-            UsbDevice tmpUsbDevice = null;
-
-            UsbEndpointReader usbReader = null;
-            UsbEndpointWriter usbWriter = null;
-
-            // Для отслеживания изменений в полученных данных от контроллера 
-            byte[] oldInfoFromController = new byte[64];
-
-            while (!_exitprogramm)
+            try
             {
+                _StatusThread = enumStatusThread.Wait;
 
-                // уснем, что-бы работа выполнялась 1000 раз в секунду
-                Thread.Sleep(1);
-
-                #region Проверка наличия связи
-
-                // 1) проверим наличие физического подключения контроллера
-                if (tmpUsbDevice == null)
+                // цикл будет работать постоянно до исключения
+                while (ThreadneedLoop)
                 {
+                    // получение данных от контроллера, в случае ошибки, завершаем работу
+                    if (!GET_FROM_CONTROLLER_INFO()) ThreadneedLoop = false;
 
-                    // Попытаемся установить связь
-                    tmpUsbDevice = UsbDevice.OpenUsbDevice(myUsbFinder);
+                    if (!SEND_TO_CONTROLLER()) ThreadneedLoop = false;
 
-                    var wholeUsbDevice = tmpUsbDevice as IUsbDevice;
-                    if (!ReferenceEquals(wholeUsbDevice, null))
-                    {
-                        // This is a "whole" USB device. Before it can be used, 
-                        // the desired configuration and interface must be selected.
+                    // небольшая остановочка для снижения нагрузки
+                    Thread.Sleep(1);
+                }//while (true)
 
-                        // Select config #1
-                        wholeUsbDevice.SetConfiguration(1);
+                _StatusThread = enumStatusThread.Off;
 
-                        // Claim interface #0.
-                        wholeUsbDevice.ClaimInterface(0);
+            }//try
+            catch (Exception ex)
+            {
+                //Thread.ResetAbort(); //если нужно то можем отменить отмену потока
+                // остановка потока....
 
-                        // open read endpoint 1.
-                        usbReader = tmpUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
-                        usbWriter = tmpUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
-
-                        _isAvailableController = true;
-
-                    }
-                    else
-                    {
-                        //AddMessage(@" <-- Ошибка установки связи с контроллером!");
-
-                        //запустим событие о разрыве связи
-                        //if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage("Ошибка"));
-                        
-                        _isConnectedController = false;
-                        _isAvailableController = false;
-                        //tmpUsbDevice = null;
-                    }
-                }  //if (tmpUsbDevice == null) //попытка установки связи
-
-
-                if (lastStatusConnected != _isAvailableController)
-                {
-                    lastStatusConnected = _isAvailableController;
-
-                    if (_isAvailableController)
-                    {
-                        AddMessage(@" <-- СОЕДИНЕНИЕ: Контроллер подключен к компьютеру!");
-                        if (WasConnected != null) WasConnected(null);
-                        
-                    }
-                    else
-                    {
-                        AddMessage(@" <-- СОЕДИНЕНИЕ: Контроллер отключен от компьютера!");
-                        if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage("Ошибка"));
-
-
-                    }
-                }
-
-
-
-                if (tmpUsbDevice == null || !_isAvailableController)
-                {
-                    _isConnectedController = false;
-                    _isAvailableController = false;
-
-                    continue;
-                }
-
-
-                #endregion
-
-                #region Получение данных от контроллера
-
-                //1) Проверим не прислал ли нам контроллер каких либо данных
-                byte[] readBuffer = new byte[64];
-                int bytesRead;
-
-                ErrorCode ec;
-                try
-                {
-                    ec = usbReader.Read(readBuffer, 2000, out bytesRead);
-                }
-                catch (Exception)
-                {
-                    AddMessage(@" <-- СОЕДИНЕНИЕ: Контроллер отключен от компьютера!");
-                    if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage("Ошибка"));
-                    _isConnectedController = false;
-                    _isAvailableController = false;
-                    tmpUsbDevice = null;
-                    continue;
-                }
-                
-                
-                if (ec != ErrorCode.None)
-                {
-                    _isConnectedController = false;
-                    AddMessage(" <-- Ошибка получения данных с контроллера, связь разорвана!");
-                    if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage(@" <-- Ошибка получения данных с контроллера, связь разорвана!"));
-                    _isConnectedController = false;
-                    _isAvailableController = false;
-                    tmpUsbDevice = null;
-                    continue;
-                }
-
-                if (bytesRead > 0 && readBuffer[0] == 0x01 && !CompareArray(oldInfoFromController, readBuffer))
-                {
-                    Info.RawData = readBuffer;
-
-                    ParseInfo(readBuffer);
-
-
-
-                    //if (GlobalSetting.AppSetting.debugLevel > 1)
-                    //{
-                    //    //добавим запись в файл
-
-                    //    string fileDebug = string.Format("{0}\\debugIN.log",
-                    //        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-
-                    //    string ss = GetTextFromBinary(readBuffer);
-                    //    File.AppendAllText(fileDebug, ss, Encoding.UTF8);
-                    //}
-
-                    oldInfoFromController = readBuffer;
-
-                    if (NewDataFromController != null) 
-                    {
-                        NewDataFromController(null); //событие о получении новых данных
-                    }
-                }
-
-                //Если значение не равно нулю, значит контроллер выполняет задание
-                if (Info.Byte6 == 0)
-                {
-                    // тут простаивает
-                    _controllerIsLock = false;
-                }
-                else
-                {
-                    // Если активированна пауза, то позволим управлять в ручном режиме
-                    _controllerIsLock = _taskStatus != ETaskStatus.Pause;
-                }
-
-                #endregion
-
-                #region Посылка данных в контроллер
-
-                // получим монопольный доступ
-                lock (LockDataForSend)
-                {
-                    // В начале отправим все высокоприоритетные данные
-                    while (ImportantDataForSend.Count > 0)
-                    {
-                        try
-                        {
-                            byte[] data = ImportantDataForSend[ImportantDataForSend.Count - 1];
-
-                            int bytesWritten;
-                            usbWriter.Write(data, 200, out bytesWritten);
-
-                            ImportantDataForSend.Remove(data);
-                        }
-                        catch (Exception e)
-                        {
-                            AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
-                        }
-                    }
-
-                    //потом ручные команды
-                    while (ManualDataForSend.Count > 0)
-                    {
-                        try
-                        {
-                            byte[] data = ManualDataForSend[ManualDataForSend.Count - 1];
-
-                            int bytesWritten;
-                            usbWriter.Write(data, 200, out bytesWritten);
-
-                            ManualDataForSend.Remove(data);
-                        }
-                        catch (Exception e)
-                        {
-                            AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
-                        }
-                    }
-
-                    // а потом обычные данные
-                    if (DataForSend.Count > 0 && _taskStatus == ETaskStatus.Work)
-                    {
-
-                        ////while ((int)INFO.FreebuffSize > GlobalSetting.ControllerSetting.MinBuffSize)
-                        ////{
-                        ////    int bytesWritten = 64;
-
-                        ////    try
-                        ////    {
-                        ////        byte[] data = dataForSend[dataForSend.Count - 1];
-
-                        ////        _ec = _usbWriter.Write(data, 200, out bytesWritten);
-
-                        ////        //AddMessage(@" <-- посылка комманды");
-
-                        ////        dataForSend.Remove(data);
-                        ////    }
-                        ////    catch (Exception e)
-                        ////    {
-                        ////        AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e.ToString());
-                        ////    }
-                        ////}
-
-                        if (Info.FreebuffSize > GlobalSetting.ControllerSetting.MinBuffSize)
-                        {
-                            try
-                            {
-                                byte[] data = DataForSend[DataForSend.Count - 1];
-
-                                int bytesWritten;
-                                usbWriter.Write(data, 200, out bytesWritten);
-
-                                DataForSend.Remove(data);
-                            }
-                            catch (Exception e)
-                            {
-                                AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
-                            }
-                        }
-                    }
-
-                    if (DataForSend.Count == 0) _taskStatus = ETaskStatus.Off;
-                }
-
-                #endregion
-
+               // throw;
             }
-            AddMessage(@" <-- Завершение потока работы с контроллером");
-
-            UsbDevice.Exit();
         }
 
-        
+        private static bool GET_FROM_CONTROLLER_INFO()
+        {
+            #region Получение данных от контроллера
+
+            //1) Проверим не прислал ли нам контроллер каких либо данных
+            byte[] readBuffer = new byte[64];
+            int bytesRead;
+
+            ErrorCode ec;
+
+            try
+            {
+                ec = usbReader.Read(readBuffer, 2000, out bytesRead);
+            }
+            catch (Exception)
+            {
+                AddMessage(@" <-- СОЕДИНЕНИЕ: Контроллер отключен от компьютера!");
+                if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage("Ошибка"));
+
+                return false;
+            }
+
+            if (ec != ErrorCode.None)
+            {
+                _isConnectedController = false;
+                AddMessage(" <-- Ошибка получения данных с контроллера, связь разорвана!");
+                if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage(@" <-- Ошибка получения данных с контроллера, связь разорвана!"));
+
+                return false;
+            }
+
+            if (bytesRead > 0 && readBuffer[0] == 0x01 && !CompareArray(oldInfoFromController, readBuffer))
+            {
+                Info.RawData = readBuffer;
+
+                ParseInfo(readBuffer);
+
+                //if (GlobalSetting.AppSetting.debugLevel > 1)
+                //{
+                //    //добавим запись в файл
+
+                //    string fileDebug = string.Format("{0}\\debugIN.log",
+                //        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+
+                //    string ss = GetTextFromBinary(readBuffer);
+                //    File.AppendAllText(fileDebug, ss, Encoding.UTF8);
+                //}
+
+                oldInfoFromController = readBuffer;
+
+                if (NewDataFromController != null)
+                {
+                    NewDataFromController(null); //событие о получении новых данных
+                }
+            }
+
+            if (Info.NuberCompleatedInstruction > 0) _StatusThread = enumStatusThread.Work;
+
+            return true;
+           
+
+        }
+
+        private static bool SEND_TO_CONTROLLER()
+        {
+
+
+
+            // TODO: Для начала у контроллера узнаем текущее положение, которое будем использовать в качестве текущего положения в программе.
+
+
+
+
+
+
+
+            // Для отслеживания, предыдущего значения
+            // bool lastStatusConnected = false;
+
+
+
+
+            //while (!_exitprogramm)
+            //{
+
+            // уснем, что-бы работа выполнялась 1000 раз в секунду
+            //Thread.Sleep(1);
+
+
+
+
+            // 
+
+            // #region Посылка данных в контроллер
+
+            //// получим монопольный доступ
+            //lock (LockDataForSend)
+            //{
+            //    //// В начале отправим все высокоприоритетные данные
+            //    //while (ImportantDataForSend.Count > 0)
+            //    //{
+            //    //    try
+            //    //    {
+            //    //        byte[] data = ImportantDataForSend[ImportantDataForSend.Count - 1];
+
+            //    //        int bytesWritten;
+            //    //        usbWriter.Write(data, 200, out bytesWritten);
+
+            //    //        ImportantDataForSend.Remove(data);
+            //    //    }
+            //    //    catch (Exception e)
+            //    //    {
+            //    //        AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
+            //    //    }
+            //    //}
+
+            //    ////потом ручные команды
+            //    //while (ManualDataForSend.Count > 0)
+            //    //{
+            //    //    try
+            //    //    {
+            //    //        byte[] data = ManualDataForSend[ManualDataForSend.Count - 1];
+
+            //    //        int bytesWritten;
+            //    //        usbWriter.Write(data, 200, out bytesWritten);
+
+            //    //        ManualDataForSend.Remove(data);
+            //    //    }
+            //    //    catch (Exception e)
+            //    //    {
+            //    //        AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
+            //    //    }
+            //    //}
+
+            //    // а потом обычные данные
+            //    if (DataForSend.Count > 0 && _taskStatus == ETaskStatus.Work)
+            //    {
+
+            //        ////while ((int)INFO.FreebuffSize > GlobalSetting.ControllerSetting.MinBuffSize)
+            //        ////{
+            //        ////    int bytesWritten = 64;
+
+            //        ////    try
+            //        ////    {
+            //        ////        byte[] data = dataForSend[dataForSend.Count - 1];
+
+            //        ////        _ec = _usbWriter.Write(data, 200, out bytesWritten);
+
+            //        ////        //AddMessage(@" <-- посылка комманды");
+
+            //        ////        dataForSend.Remove(data);
+            //        ////    }
+            //        ////    catch (Exception e)
+            //        ////    {
+            //        ////        AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e.ToString());
+            //        ////    }
+            //        ////}
+
+            //        if (Info.FreebuffSize > GlobalSetting.ControllerSetting.MinBuffSize)
+            //        {
+            //            try
+            //            {
+            //                byte[] data = DataForSend[DataForSend.Count - 1];
+
+            //                int bytesWritten;
+            //                usbWriter.Write(data, 200, out bytesWritten);
+
+            //                DataForSend.Remove(data);
+            //            }
+            //            catch (Exception e)
+            //            {
+            //                AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
+            //            }
+            //        }
+            //    }
+
+            //    if (DataForSend.Count == 0) _taskStatus = ETaskStatus.Off;
+            //}
+
+            //  #endregion
+
+            // }
+            //AddMessage(@" <-- Завершение потока работы с контроллером");
+
+
+
+            //_isConnectedController = false;
+            // _StatusThread = enumStatusThread.Off;
+            
+
+
+
+            return true;
+        }
+
+        #endregion
+
+
+
 
         public static void TASK_SendStartData()
         {
             AddBinaryDataToTask(BinaryData.pack_9E(0x05));
             AddBinaryDataToTask(BinaryData.pack_BF(GlobalSetting.ControllerSetting.AxleX.MaxSpeed, GlobalSetting.ControllerSetting.AxleY.MaxSpeed, GlobalSetting.ControllerSetting.AxleZ.MaxSpeed, GlobalSetting.ControllerSetting.AxleA.MaxSpeed));
             AddBinaryDataToTask(BinaryData.pack_C0());
-            //посылка настроек
             AddBinaryDataToTask(BinaryData.pack_D3());
             AddBinaryDataToTask(BinaryData.pack_AB());
             AddBinaryDataToTask(BinaryData.pack_9F(GlobalSetting.ControllerSetting.allowMotorUse, GlobalSetting.ControllerSetting.useSensorTools, GlobalSetting.ControllerSetting.AxleX.CountPulse, GlobalSetting.ControllerSetting.AxleY.CountPulse, GlobalSetting.ControllerSetting.AxleZ.CountPulse, GlobalSetting.ControllerSetting.AxleA.CountPulse));
@@ -550,7 +605,7 @@ namespace CNC_Assist
 
         public static void TASK_START()
         {
-            _taskStatus = ETaskStatus.Work;
+            //_taskStatus = ETaskStatus.Work;
         }
 
         public static void TASK_STOP()
@@ -562,14 +617,14 @@ namespace CNC_Assist
         public static void TASK_PAUSE()
         {
 
-            if (_taskStatus == ETaskStatus.Work) //нужно остановить
-            {
-                _taskStatus = ETaskStatus.Pause;
-            } 
-            else if (_taskStatus == ETaskStatus.Pause) //нужно запустить
-            {
-                _taskStatus = ETaskStatus.Work;
-            }
+            //if (_taskStatus == ETaskStatus.Work) //нужно остановить
+            //{
+            //    _taskStatus = ETaskStatus.Pause;
+            //} 
+            //else if (_taskStatus == ETaskStatus.Pause) //нужно запустить
+            //{
+            //    _taskStatus = ETaskStatus.Work;
+            //}
 
         }
 
@@ -635,14 +690,6 @@ namespace CNC_Assist
                 Info.ShpindelMoveSpeed = (int)(((readBuffer[22] * 65536) + (readBuffer[21] * 256) + (readBuffer[20])) / 1.341);
             }
 
-
-
-            Info.ShpindelMoveSpeedSumm = (Info.ShpindelMoveSpeedSumm + Info.ShpindelMoveSpeed)/2;
-
-            Info.ShpindelStopped = Info.ShpindelMoveSpeedSumm == 0;
-
-            Info.Byte6 = readBuffer[6];
-
             Info.AxesXPositionPulse = (readBuffer[27] * 16777216) + (readBuffer[26] * 65536) + (readBuffer[25] * 256) + (readBuffer[24]);
             Info.AxesYPositionPulse = (readBuffer[31] * 16777216) + (readBuffer[30] * 65536) + (readBuffer[29] * 256) + (readBuffer[28]);
             Info.AxesZPositionPulse = (readBuffer[35] * 16777216) + (readBuffer[34] * 65536) + (readBuffer[33] * 256) + (readBuffer[32]);
@@ -694,96 +741,51 @@ namespace CNC_Assist
 
         #region Послания данных в контроллер
 
+        private static void DirectPostToController(byte[] _data)
+        {
+            if (tmpUsbDevice != null)
+            {
+                if (tmpUsbDevice.IsOpen)
+                {
+                    try
+                    {
+                        int bytesWritten;
+                        usbWriter.Write(_data, 200, out bytesWritten);
+                    }
+                    catch (Exception e)
+                    {
+                        AddMessage(@" <-- ОШИБКА посылки команды 'DirectPostToController'! -> " + e);
+                    }
+                }
+            }
 
+        }
    
 
         /// <summary>
         /// Посылка в контроллер двоичных данных
         /// </summary>
         /// <param name="data">массив даных</param>
-        /// <param name="outOfTurn">Необходимость послать данные вне очереди</param>
         /// <param name="insertFirst">В обычной очереди добавить запись в начало очереди для выполнения типа LIFO, по умолчанию FIFO применяется</param>
-        public static void AddBinaryDataToTask(byte[] data, bool outOfTurn = false, bool insertFirst = false)
+        public static void AddBinaryDataToTask(byte[] data, bool insertFirst = false)
         {
-            if (outOfTurn) 
+            // добавление обычные данных в очередь
+            lock (LockDataForSend)
             {
-                //В неочереди отправим сообщение
-
-           //     lock (lockDataForSend)
-           //     {
-                    //Добавим приоритетные данные
-                    ImportantDataForSend.Insert(0, data);
-           //     }
-            }
-            else
-            {
-                // добавление обычные данных в очередь
-             //   lock (lockDataForSend)
-             //   {
-                    if (insertFirst)
-                    {
-                        DataForSend.Add(data);
-                    }
-                    else
-                    {
-                        // добавляем запись в начало, т.к. выполнение производится от последней записи к первой
-                        DataForSend.Insert(0,data);
-                    }
-                    
-              //  }
+                if (insertFirst)
+                {
+                    DataForSend.Add(data);
+                }
+                else
+                {
+                    // добавляем запись в начало, т.к. выполнение производится от последней записи к первой
+                    DataForSend.Insert(0,data);
+                }
             }
         }
 
-        private static void AddBinaryManualTask(byte[] data)
-        {
-            ManualDataForSend.Add(data);
-        }
 
 
-
-        /// <summary>
-        /// Посылка аварийной остановки
-        /// </summary>
-        public static void EnergyStop()
-        {
-            //Controller.TASK_STOP();
-            TASK_CLEAR();
-            AddBinaryDataToTask(BinaryData.pack_AA(), true);
-            AddBinaryDataToTask(BinaryData.pack_AA(), true);
-            AddBinaryDataToTask(BinaryData.pack_AA(), true);
-        }
-
-        /// <summary>
-        /// Запуск движения без остановки
-        /// </summary>
-        /// <param name="x">Ось Х (доступные значения "+" "0" "-")</param>
-        /// <param name="y">Ось Y (доступные значения "+" "0" "-")</param>
-        /// <param name="z">Ось Z (доступные значения "+" "0" "-")</param>
-        /// <param name="speed"></param>
-        public static void StartManualMove(string x, string y, string z, int speed)
-        {
-            if (!TestAllowActions) return;
-
-            SuperByte axesDirection = new SuperByte(0x00);
-            //поставим нужные биты
-            if (x == "-") axesDirection.SetBit(0, true);
-            if (x == "+") axesDirection.SetBit(1, true);
-            if (y == "-") axesDirection.SetBit(2, true);
-            if (y == "+") axesDirection.SetBit(3, true);
-            if (z == "-") axesDirection.SetBit(4, true);
-            if (z == "+") axesDirection.SetBit(5, true);
-
-            AddBinaryManualTask(BinaryData.pack_BE(axesDirection.ValueByte, speed,x,y,z));
-        }
-
-        public static void StopManualMove()
-        {
-            byte[] buff = BinaryData.pack_BE(0x00, 0);
-            
-            buff[22] = 0x01;//TODO: разобраться для чего, этот байт
-
-            AddBinaryManualTask(buff);
-        }
 
         /// <summary>
         /// Установка в контроллер, нового положения по осям
@@ -794,7 +796,7 @@ namespace CNC_Assist
         /// <param name="a">Положение в импульсах</param>
         private static void DeviceNewPosition(int x, int y, int z, int a)
         {
-            if (!TestAllowActions) return;
+            if (!IsAvailability) return;
 
             AddBinaryDataToTask(BinaryData.pack_C8(x, y, z,a),true);
         }
@@ -806,17 +808,15 @@ namespace CNC_Assist
         /// <param name="y">в миллиметрах</param>
         /// <param name="z">в миллиметрах</param>
         /// <param name="a">в миллиметрах</param>
-        // ReSharper disable once UnusedMember.Global
         public static void DeviceNewPosition(decimal x, decimal y, decimal z, decimal a)
         {
-            if (!TestAllowActions) return;
-
-            AddBinaryDataToTask(BinaryData.pack_C8(Info.CalcPosPulse("X", x), Info.CalcPosPulse("Y", y), Info.CalcPosPulse("Z", z), Info.CalcPosPulse("A", a)),true);
+            DirectPostToController(BinaryData.pack_C8(Info.CalcPosPulse("X", x), Info.CalcPosPulse("Y", y), Info.CalcPosPulse("Z", z), Info.CalcPosPulse("A", a)));
         }
 
-
-
-
+        /// <summary>
+        /// Установка нуля у указанной оси
+        /// </summary>
+        /// <param name="nameAxes"></param>
         public static void ResetToZeroAxes(string nameAxes)
         {
             switch (nameAxes)
@@ -839,18 +839,53 @@ namespace CNC_Assist
             }
         }
 
- 
+        /// <summary>
+        /// Запуск движения без остановки
+        /// </summary>
+        /// <param name="x">Ось Х (доступные значения "+" "0" "-")</param>
+        /// <param name="y">Ось Y (доступные значения "+" "0" "-")</param>
+        /// <param name="z">Ось Z (доступные значения "+" "0" "-")</param>
+        /// <param name="speed"></param>
+        public static void StartManualMove(string x, string y, string z, int speed)
+        {
+            if (!IsAvailability) return;
 
+            SuperByte axesDirection = new SuperByte(0x00);
+            //поставим нужные биты
+            if (x == "-") axesDirection.SetBit(0, true);
+            if (x == "+") axesDirection.SetBit(1, true);
+            if (y == "-") axesDirection.SetBit(2, true);
+            if (y == "+") axesDirection.SetBit(3, true);
+            if (z == "-") axesDirection.SetBit(4, true);
+            if (z == "+") axesDirection.SetBit(5, true);
+
+            DirectPostToController(BinaryData.pack_BE(axesDirection.ValueByte, speed, x, y, z));
+        }
+
+        /// <summary>
+        /// Послание контроллеру, комманды для остановки
+        /// </summary>
+        public static void StopManualMove()
+        {
+            byte[] buff = BinaryData.pack_BE(0x00, 0);
+            
+            buff[22] = 0x01;//TODO: разобраться для чего, этот байт
+
+            DirectPostToController(buff);
+            DirectPostToController(buff);
+            DirectPostToController(buff);
+        }
 
         #endregion
-    
-    
-    
-
-
 
         #region разбор
 
+
+ 
+        /// <summary>
+        /// Временная переменная для процедуры ExecuteCommand, что-бы помнить последние настройки
+        /// </summary>
+        private static PropMaсhine ExecuteCommandLastMachine = new PropMaсhine();
 
         /// <summary>
         /// Выполнение G-кода
@@ -858,32 +893,44 @@ namespace CNC_Assist
         /// <param name="command">строка с G-кодом</param>
         public static void ExecuteCommand(string command)
         {
+            if (_StatusThread != enumStatusThread.Wait) return;
+
+            // сюда запишем текущие координаты
+            Position POS = new Position();
+
+            POS.A = Info.AxesA_PositionMM;
+            POS.X = Info.AxesX_PositionMM;
+            POS.Y = Info.AxesY_PositionMM;
+            POS.Z = Info.AxesZ_PositionMM;
+
+            DataRow dataRowLast = new DataRow(0, "");
+
+            dataRowLast.POS = POS;
+            dataRowLast.Machine = ExecuteCommandLastMachine;
 
             DataRow dataRowNow = new DataRow(0, command);
 
-            DataLoader.FillStructure(PlanetCNC_Controller.LastStatus, ref dataRowNow);
-
-            if (dataRowNow.Machine.SpindelON != PlanetCNC_Controller.LastStatus.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != PlanetCNC_Controller.LastStatus.Machine.SpeedSpindel)
+            DataLoader.FillStructure(dataRowLast, ref dataRowNow);
+            
+            if (dataRowNow.Machine.SpindelON != dataRowLast.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != dataRowLast.Machine.SpeedSpindel)
             {
-                AddBinaryManualTask(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
+                DirectPostToController(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
             }
 
-
-            if (dataRowNow.POS.X != PlanetCNC_Controller.LastStatus.POS.X || dataRowNow.POS.Y != PlanetCNC_Controller.LastStatus.POS.Y || dataRowNow.POS.Z != PlanetCNC_Controller.LastStatus.POS.Z || dataRowNow.POS.Z != PlanetCNC_Controller.LastStatus.POS.Z)
+            if (dataRowNow.POS.X != dataRowLast.POS.X || dataRowNow.POS.Y != dataRowLast.POS.Y || dataRowNow.POS.Z != dataRowLast.POS.Z || dataRowNow.POS.Z != dataRowLast.POS.Z)
             {
-                AddBinaryManualTask(BinaryData.pack_CA(Info.CalcPosPulse("X", dataRowNow.POS.X),
+                DirectPostToController(BinaryData.pack_CA(Info.CalcPosPulse("X", dataRowNow.POS.X),
                                                                 Info.CalcPosPulse("Y", dataRowNow.POS.Y),
                                                                 Info.CalcPosPulse("Z", dataRowNow.POS.Z),
                                                                 Info.CalcPosPulse("A", dataRowNow.POS.A),
                                                                 dataRowNow.Machine.SpeedMaсhine,
                                                                 dataRowNow.numberRow));
             }
+            
+            dataRowLast = dataRowNow;
         }
 
-
         #endregion
-
-    
     
     }
 
@@ -891,11 +938,12 @@ namespace CNC_Assist
     /// <summary>
     /// Варианты статусов выполнения задания
     /// </summary>
-    public enum ETaskStatus
+    public enum enumStatusThread
     {
         Off = 0,
-        Work = 1,
-        Pause = 2
+        Wait = 1,
+        Work = 2,
+        Pause = 3
     };
 
     public class DeviceInfo
@@ -931,80 +979,85 @@ namespace CNC_Assist
         /// </summary>
         public int AxesAPositionPulse;
 
-        //public static int AxesX_PulsePerMm = 400;
-        //public static int AxesY_PulsePerMm = 400;
-        //public static int AxesZ_PulsePerMm = 400;
-
-        //срабатывание сенсора
+        /// <summary>
+        /// Сработал концевик
+        /// </summary>
         public bool AxesXLimitMax;
+        /// <summary>
+        /// Сработал концевик
+        /// </summary>
         public bool AxesXLimitMin;
+        /// <summary>
+        /// Сработал концевик
+        /// </summary>
         public bool AxesYLimitMax;
+        /// <summary>
+        /// Сработал концевик
+        /// </summary>
         public bool AxesYLimitMin;
+        /// <summary>
+        /// Сработал концевик
+        /// </summary>
         public bool AxesZLimitMax;
+        /// <summary>
+        /// Сработал концевик
+        /// </summary>
         public bool AxesZLimitMin;
-
-
-
+        /// <summary>
+        /// Скорость движения шпинделя
+        /// </summary>
         public int ShpindelMoveSpeed;
+        /// <summary>
+        /// Включен ли шпиндель
+        /// </summary>
         public bool ShpindelEnable;
+        /// <summary>
+        /// Активированна ли аварийная остановка
+        /// </summary>
         public bool Estop;
 
         /// <summary>
-        /// Данный параметр вычисляется усредненнием значений скорости, из выборки последних 10 значенией
-        /// Если это значение равно 0 то "shpindel_STOPPED = true" иначе значение равно "ложь"
+        /// Получение положения в милиметрах
         /// </summary>
-        private bool _shpindelStopped = true;
-        public int ShpindelMoveSpeedSumm;
-
-
-        public byte Byte6;
-
-        
-
-
-
-
         public decimal AxesX_PositionMM
         {
             get
             {
-                return (decimal)Controller.Info.AxesXPositionPulse / GlobalSetting.ControllerSetting.AxleX.CountPulse;
+                return (decimal)ControllerPlanetCNC.Info.AxesXPositionPulse / GlobalSetting.ControllerSetting.AxleX.CountPulse;
             }
         }
-
+        /// <summary>
+        /// Получение положения в милиметрах
+        /// </summary>
         public decimal AxesY_PositionMM
         {
             get
             {
-                return (decimal)Controller.Info.AxesYPositionPulse / GlobalSetting.ControllerSetting.AxleY.CountPulse;
+                return (decimal)ControllerPlanetCNC.Info.AxesYPositionPulse / GlobalSetting.ControllerSetting.AxleY.CountPulse;
             }
         }
-
+        /// <summary>
+        /// Получение положения в милиметрах
+        /// </summary>
         public decimal AxesZ_PositionMM
         {
             get
             {
-                return (decimal)Controller.Info.AxesZPositionPulse / GlobalSetting.ControllerSetting.AxleZ.CountPulse;
+                return (decimal)ControllerPlanetCNC.Info.AxesZPositionPulse / GlobalSetting.ControllerSetting.AxleZ.CountPulse;
             }
         }
-
+        /// <summary>
+        /// Получение положения в милиметрах
+        /// </summary>
         public decimal AxesA_PositionMM
         {
             get
             {
-                return (decimal)Controller.Info.AxesAPositionPulse / GlobalSetting.ControllerSetting.AxleA.CountPulse;
+                return (decimal)ControllerPlanetCNC.Info.AxesAPositionPulse / GlobalSetting.ControllerSetting.AxleA.CountPulse;
             }
         }
 
-        /// <summary>
-        /// Данный параметр вычисляется усредненнием значений скорости, из выборки последних 10 значенией
-        /// Если это значение равно 0 то "shpindel_STOPPED = true" иначе значение равно "ложь"
-        /// </summary>
-        public bool ShpindelStopped
-        {
-            get { return _shpindelStopped; }
-            set { _shpindelStopped = value; }
-        }
+
 
         /// <summary>
         /// Вычисление положения в импульсах, при указании оси, и положения в миллиметрах
@@ -1022,9 +1075,6 @@ namespace CNC_Assist
         }
     }
 
-
-
-
     /// <summary>
     /// Аргументы для события
     /// </summary>
@@ -1038,16 +1088,6 @@ namespace CNC_Assist
             
         }
     }
-
-    /////// <summary>
-    /////// Статусы работы с устройством
-    /////// </summary>
-    ////public enum EStatusDevice { Connect = 0, Disconnect };
-
-
-
-
-
 
     /// <summary>
     /// Класс для получиния бинарных данных
@@ -2034,7 +2074,7 @@ namespace CNC_Assist
 
 
     /// <summary>
-    /// Хласс для хранения данных о смещении координат, пропорций и прочего
+    /// Класс для хранения данных о применении смещений координат, пропорций, при посылке данных в контроллер
     /// </summary>
     public class CorrectionPos
     {

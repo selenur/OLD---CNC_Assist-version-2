@@ -12,8 +12,8 @@ namespace CNC_Assist
 
         private void timerRefresh_Tick(object sender, EventArgs e)
         {
-            this.Enabled = Controller.IsConnectedToController;
-            labelSpeed.Text = Controller.Info.ShpindelMoveSpeed.ToString() + @" мм./мин.";
+            this.Enabled = ControllerPlanetCNC.IsConnectedToController;
+            labelSpeed.Text = ControllerPlanetCNC.Info.ShpindelMoveSpeed.ToString() + @" мм./мин.";
         }
     }
 }

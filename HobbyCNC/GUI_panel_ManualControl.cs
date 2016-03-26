@@ -37,9 +37,9 @@ namespace CNC_Assist
 
         private void timerRefresh_Tick(object sender, EventArgs e)
         {
-            if (Controller.IsConnectedToController)
+            if (ControllerPlanetCNC.IsConnectedToController)
             {
-                this.Enabled = Controller.TestAllowActions;
+                this.Enabled = ControllerPlanetCNC.IsAvailability;
             }
             else
             {
@@ -55,11 +55,11 @@ namespace CNC_Assist
         private void Execute()
         {
 
-            if (!Controller.TestAllowActions) return;
+            if (!ControllerPlanetCNC.IsAvailability) return;
 
             if (tbSendGKode.Text.Trim() == "") return;
 
-            Controller.ExecuteCommand(tbSendGKode.Text);
+            ControllerPlanetCNC.ExecuteCommand(tbSendGKode.Text);
 
             tbSendGKode.Text = "";
         }

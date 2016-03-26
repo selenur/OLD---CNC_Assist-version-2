@@ -14,11 +14,11 @@ namespace CNC_Assist
         private void EditGkode_Load(object sender, EventArgs e)
         {
 
-            cbCorrection.Checked = Controller.CorrectionPos.UseCorrection;
-            numPosX.Value = (decimal)Controller.CorrectionPos.DeltaX;
-            numPosY.Value = (decimal)Controller.CorrectionPos.DeltaY;
-            numPosZ.Value = (decimal)Controller.CorrectionPos.DeltaZ;
-            numPosA.Value = (decimal)Controller.CorrectionPos.DeltaA;
+            cbCorrection.Checked = ControllerPlanetCNC.CorrectionPos.UseCorrection;
+            numPosX.Value = (decimal)ControllerPlanetCNC.CorrectionPos.DeltaX;
+            numPosY.Value = (decimal)ControllerPlanetCNC.CorrectionPos.DeltaY;
+            numPosZ.Value = (decimal)ControllerPlanetCNC.CorrectionPos.DeltaZ;
+            numPosA.Value = (decimal)ControllerPlanetCNC.CorrectionPos.DeltaA;
 
             //checkBox6.Checked = Setting.deltaFeed;
 
@@ -32,7 +32,7 @@ namespace CNC_Assist
 
         private void ccbCorrection_CheckedChanged(object sender, EventArgs e)
         {
-            Controller.CorrectionPos.UseCorrection = cbCorrection.Checked;
+            ControllerPlanetCNC.CorrectionPos.UseCorrection = cbCorrection.Checked;
 
             //groupBox1.Enabled = cbCorrection.Checked;
             groupBox2.Enabled = cbCorrection.Checked;
@@ -41,22 +41,22 @@ namespace CNC_Assist
 
         private void numPosX_ValueChanged(object sender, EventArgs e)
         {
-            Controller.CorrectionPos.DeltaX = numPosX.Value;
+            ControllerPlanetCNC.CorrectionPos.DeltaX = numPosX.Value;
         }
 
         private void numPosY_ValueChanged(object sender, EventArgs e)
         {
-            Controller.CorrectionPos.DeltaY = numPosY.Value;
+            ControllerPlanetCNC.CorrectionPos.DeltaY = numPosY.Value;
         }
 
         private void numPosZ_ValueChanged(object sender, EventArgs e)
         {
-            Controller.CorrectionPos.DeltaZ = numPosZ.Value;
+            ControllerPlanetCNC.CorrectionPos.DeltaZ = numPosZ.Value;
         }
 
         private void checkBoxUseMatrix_CheckedChanged(object sender, EventArgs e)
         {
-            Controller.CorrectionPos.UseMatrix = checkBoxUseMatrix.Checked;
+            ControllerPlanetCNC.CorrectionPos.UseMatrix = checkBoxUseMatrix.Checked;
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
@@ -72,7 +72,7 @@ namespace CNC_Assist
 
         private void numPosA_ValueChanged(object sender, EventArgs e)
         {
-            Controller.CorrectionPos.DeltaA = numPosA.Value;
+            ControllerPlanetCNC.CorrectionPos.DeltaA = numPosA.Value;
         }
     }
 }

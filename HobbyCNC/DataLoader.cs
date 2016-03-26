@@ -378,32 +378,32 @@ namespace CNC_Assist
                 if (code == "G92")
                 {
                     //TODO: пока применим простое смещение с переносом в точку ноль
-                    Controller.CorrectionPos.UseCorrection = true;
-                    Controller.CorrectionPos.DeltaX = Controller.Info.AxesX_PositionMM;
-                    Controller.CorrectionPos.DeltaY = Controller.Info.AxesY_PositionMM;
-                    Controller.CorrectionPos.DeltaZ = Controller.Info.AxesZ_PositionMM;
-                    Controller.CorrectionPos.DeltaA = Controller.Info.AxesA_PositionMM;
+                    ControllerPlanetCNC.CorrectionPos.UseCorrection = true;
+                    ControllerPlanetCNC.CorrectionPos.DeltaX = ControllerPlanetCNC.Info.AxesX_PositionMM;
+                    ControllerPlanetCNC.CorrectionPos.DeltaY = ControllerPlanetCNC.Info.AxesY_PositionMM;
+                    ControllerPlanetCNC.CorrectionPos.DeltaZ = ControllerPlanetCNC.Info.AxesZ_PositionMM;
+                    ControllerPlanetCNC.CorrectionPos.DeltaA = ControllerPlanetCNC.Info.AxesA_PositionMM;
                 }
 
                 if (code == "G92.1")
                 {
-                    Controller.CorrectionPos.UseCorrection = false;
-                    Controller.CorrectionPos.DeltaX = 0;
-                    Controller.CorrectionPos.DeltaY = 0;
-                    Controller.CorrectionPos.DeltaZ = 0;
-                    Controller.CorrectionPos.DeltaA = 0;
+                    ControllerPlanetCNC.CorrectionPos.UseCorrection = false;
+                    ControllerPlanetCNC.CorrectionPos.DeltaX = 0;
+                    ControllerPlanetCNC.CorrectionPos.DeltaY = 0;
+                    ControllerPlanetCNC.CorrectionPos.DeltaZ = 0;
+                    ControllerPlanetCNC.CorrectionPos.DeltaA = 0;
                 }
 
 
                 if (code == "G92.2")
                 {
-                    Controller.CorrectionPos.UseCorrection = false;
+                    ControllerPlanetCNC.CorrectionPos.UseCorrection = false;
                 }
 
 
                 if (code == "G92.3")
                 {
-                    Controller.CorrectionPos.UseCorrection = true;
+                    ControllerPlanetCNC.CorrectionPos.UseCorrection = true;
                 }
 
                 #endregion

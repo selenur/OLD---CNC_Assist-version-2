@@ -44,10 +44,10 @@ namespace CNC_Assist
             MouseWheel += this_MouseWheel;
 
             // Подключение событий от контроллера
-            Controller.WasConnected         += CncConnect;
-            Controller.WasDisconnected      += CncDisconnect;
-            Controller.NewDataFromController+= CncNewData;
-            Controller.Message              += CncMessage;
+            ControllerPlanetCNC.WasConnected         += CncConnect;
+            ControllerPlanetCNC.WasDisconnected      += CncDisconnect;
+            ControllerPlanetCNC.NewDataFromController+= CncNewData;
+            ControllerPlanetCNC.Message              += CncMessage;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -58,7 +58,7 @@ namespace CNC_Assist
             Language.Init();
 
             // Подключение к контроллеру
-            if (GlobalSetting.AppSetting.Autoconnect) Controller.Connect();
+            if (GlobalSetting.AppSetting.Autoconnect) ControllerPlanetCNC.Connect();
 
             RefreshElementsForms(true);
 
@@ -87,22 +87,22 @@ namespace CNC_Assist
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Controller.PreparingForExit(); //сообщим что пора завершать все дела
+            //ControllerPlanetCNC.PreparingForExit(); //сообщим что пора завершать все дела
 
-            if (Controller.IsConnectedToController)
+            if (ControllerPlanetCNC.IsConnectedToController)
             {
                 MessageBox.Show(@"Для завершения работы с программой, необходимо отключиться от ЧПУ контроллера!");
                 e.Cancel = true; // запретим закрытие формы
                 DataLoader.RequestStop(); //если вдруг в этот момент выполняется загрузка данных, то прервем её
-                Controller.Disconnect(); //завершим связь с контроллером
+                ControllerPlanetCNC.Disconnect(); //завершим связь с контроллером
             }
             else
             {
                 //Отменим подписки
-                Controller.WasConnected         -= CncConnect;
-                Controller.WasDisconnected      -= CncDisconnect;
-                Controller.NewDataFromController-= CncNewData;
-                Controller.Message              -= CncMessage;
+                ControllerPlanetCNC.WasConnected         -= CncConnect;
+                ControllerPlanetCNC.WasDisconnected      -= CncDisconnect;
+                ControllerPlanetCNC.NewDataFromController-= CncNewData;
+                ControllerPlanetCNC.Message              -= CncMessage;
                 MouseWheel -= this_MouseWheel;
             }
         }
@@ -140,8 +140,8 @@ namespace CNC_Assist
             double GrateYmax = GlobalSetting.ControllerSetting.WorkSizeYp;
             
             //текущие координаты
-            double x = (double)Controller.Info.AxesX_PositionMM;
-            double y = (double)Controller.Info.AxesY_PositionMM;
+            double x = (double)ControllerPlanetCNC.Info.AxesX_PositionMM;
+            double y = (double)ControllerPlanetCNC.Info.AxesY_PositionMM;
 
 
             // При каждом получении новых данных от контроллера, проверим необходимость расширения рабочей области
@@ -442,7 +442,7 @@ namespace CNC_Assist
 
             if (!_panelManualControl.checkBoxManualMove.Checked) return;  //проверка флажка "управление с NUM-pad"
 
-            if (!Controller.TestAllowActions) return; //Проверка что контроллер доступен
+            if (!ControllerPlanetCNC.IsAvailability) return; //Проверка что контроллер доступен
 
             if (Task.StatusTask != statusVariant.Waiting) return; //Проверка что нет выполняемых задач в данный момент
 
@@ -486,13 +486,13 @@ namespace CNC_Assist
                 // +z
                 if (num5) _z = "+";
 
-                Controller.StartManualMove(_x, _y, _z, (int)_panelManualControl.numericUpDownManualSpeed.Value);
+                ControllerPlanetCNC.StartManualMove(_x, _y, _z, (int)_panelManualControl.numericUpDownManualSpeed.Value);
             }
             else
             {
                 //нет ни одной нажатой
                 if (!_manualMoveButtonPressed) return;
-                Controller.StopManualMove();
+                ControllerPlanetCNC.StopManualMove();
                 _manualMoveButtonPressed = false;
             }
         }
@@ -546,7 +546,7 @@ namespace CNC_Assist
 
         private void RefreshElementsForms(bool _reloadPanel = false)
         {
-            if (Controller.IsConnectedToController)
+            if (ControllerPlanetCNC.IsConnectedToController)
             {
                 bt_ConnDiskonect.Image = Resources.connect;
                 bt_ConnDiskonect.Text = @"Отключиться от контроллера";
@@ -557,10 +557,10 @@ namespace CNC_Assist
                 bt_ConnDiskonect.Text = @"Подключиться к контроллеру";
             }
 
-            buttonESTOP.Enabled = Controller.IsConnectedToController;
-            buttonSpindel.Enabled = Controller.IsConnectedToController;
+            buttonESTOP.Enabled = ControllerPlanetCNC.IsConnectedToController;
+            buttonSpindel.Enabled = ControllerPlanetCNC.IsConnectedToController;
 
-            if (Controller.Info.Estop)
+            if (ControllerPlanetCNC.Info.Estop)
             {
                 buttonESTOP.BackColor = Color.Red;
                 buttonESTOP.ForeColor = Color.White;
@@ -572,7 +572,7 @@ namespace CNC_Assist
             }
 
 
-            if (Controller.Info.ShpindelEnable)
+            if (ControllerPlanetCNC.Info.ShpindelEnable)
             {
                 buttonSpindel.BackColor = Color.Green;
                 buttonSpindel.ForeColor = Color.White;
@@ -833,13 +833,13 @@ namespace CNC_Assist
 
         private void bt_ConnDiskonect_Click(object sender, EventArgs e)
         {
-            if (Controller.IsConnectedToController)
+            if (ControllerPlanetCNC.IsConnectedToController)
             {
-                Controller.Disconnect();
+                ControllerPlanetCNC.Disconnect();
             }
             else
             {
-                Controller.Connect();
+                ControllerPlanetCNC.Connect();
             }
         }
 
@@ -884,7 +884,7 @@ namespace CNC_Assist
 
         private void buttonSpindel_Click(object sender, EventArgs e)
         {
-            if (Controller.Info.ShpindelEnable)
+            if (ControllerPlanetCNC.Info.ShpindelEnable)
             {
                 PlanetCNC_Controller.Spindel_OFF();
             }
@@ -896,7 +896,7 @@ namespace CNC_Assist
 
         private void toolStripButtonEnergyStop_Click(object sender, EventArgs e)
         {
-            Controller.EnergyStop();
+            ControllerPlanetCNC.EnergyStop();
         }
 
         private void Feed()
@@ -1103,9 +1103,7 @@ namespace CNC_Assist
 
         private void RenderTimer_Tick(object sender, EventArgs e)
         {
-            toolStripStatusLabel_AvailableController.Visible = !Controller.IsAvailableController;
-
-            toolStripStatusLabel2.Text = Controller.Info.Byte6.ToString();
+            toolStripStatusLabel2.Text = ControllerPlanetCNC.StatusTThread.ToString();
             
             // обработка "тика" таймера - вызов функции отрисовки 
             _dtStart = DateTime.Now;
@@ -1367,9 +1365,9 @@ namespace CNC_Assist
             {
 
                 //нарисуем курсор
-                double startX = (double)Controller.Info.AxesX_PositionMM;
-                double startY = (double)Controller.Info.AxesY_PositionMM;
-                double startZ = (double)Controller.Info.AxesZ_PositionMM;
+                double startX = (double)ControllerPlanetCNC.Info.AxesX_PositionMM;
+                double startY = (double)ControllerPlanetCNC.Info.AxesY_PositionMM;
+                double startZ = (double)ControllerPlanetCNC.Info.AxesZ_PositionMM;
 
                 Gl.glColor3f(1.000f, 1.000f, 0.000f);
                 Gl.glLineWidth(3);
@@ -1418,23 +1416,23 @@ namespace CNC_Assist
                     float pointZ = (float)vv.POS.Z;
 
                     //добавление смещения G-кода
-                    if (Controller.CorrectionPos.UseCorrection)
+                    if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
                     {
                         //// применение пропорций
                         //pointX *= Setting.koeffSizeX;
                         //pointY *= Setting.koeffSizeY;
 
                         //применение смещения
-                        pointX += (float)Controller.CorrectionPos.DeltaX;
-                        pointY += (float)Controller.CorrectionPos.DeltaY;
+                        pointX += (float)ControllerPlanetCNC.CorrectionPos.DeltaX;
+                        pointY += (float)ControllerPlanetCNC.CorrectionPos.DeltaY;
 
                         //применение матрицы поверхности детали
-                        if (Controller.CorrectionPos.UseMatrix)
+                        if (ControllerPlanetCNC.CorrectionPos.UseMatrix)
                         {
                             pointZ += ScanSurface.GetPosZ(pointX, pointY);
                         }
 
-                        pointZ += (float)Controller.CorrectionPos.DeltaZ;
+                        pointZ += (float)ControllerPlanetCNC.CorrectionPos.DeltaZ;
 
                     }
 
@@ -1462,16 +1460,16 @@ namespace CNC_Assist
                     double pointZ = (double)vv.POS.Z;
 
                     //добавление смещения G-кода
-                    if (Controller.CorrectionPos.UseCorrection)
+                    if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
                     {
                         //// применение пропорций
                         //pointX *= Setting.koeffSizeX;
                         //pointY *= Setting.koeffSizeY;
 
                         //применение смещения
-                        pointX += (double)Controller.CorrectionPos.DeltaX;
-                        pointY += (double)Controller.CorrectionPos.DeltaY;
-                        pointZ += (double)Controller.CorrectionPos.DeltaZ;
+                        pointX += (double)ControllerPlanetCNC.CorrectionPos.DeltaX;
+                        pointY += (double)ControllerPlanetCNC.CorrectionPos.DeltaY;
+                        pointZ += (double)ControllerPlanetCNC.CorrectionPos.DeltaZ;
 
                         ////применение матрицы поверхности детали
                         //if (Setting.deltaFeed)
@@ -1757,17 +1755,17 @@ namespace CNC_Assist
         {
             if (radioButton_off.Checked)
             {
-                Controller.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.None, (int)numericUpDown8.Value));
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.None, (int)numericUpDown8.Value));
             }
 
             if (radioButton_Hz.Checked)
             {
-                Controller.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Hz, (int)numericUpDown8.Value));
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Hz, (int)numericUpDown8.Value));
             }
 
             if (radioButton_RC.Checked)
             {
-                Controller.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Rc, (int)numericUpDown8.Value));
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Rc, (int)numericUpDown8.Value));
             }            
 
         }
@@ -1902,14 +1900,14 @@ namespace CNC_Assist
 
         private void SendSetting()
         {
-            Controller.AddBinaryDataToTask(BinaryData.pack_D3());
-            Controller.AddBinaryDataToTask(BinaryData.pack_AB());
-            Controller.AddBinaryDataToTask(BinaryData.pack_9F(GlobalSetting.ControllerSetting.allowMotorUse,
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_D3());
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_AB());
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_9F(GlobalSetting.ControllerSetting.allowMotorUse,
                 GlobalSetting.ControllerSetting.useSensorTools, GlobalSetting.ControllerSetting.AxleX.CountPulse,
                 GlobalSetting.ControllerSetting.AxleY.CountPulse, GlobalSetting.ControllerSetting.AxleZ.CountPulse,
                 GlobalSetting.ControllerSetting.AxleA.CountPulse));
 
-            Controller.AddBinaryDataToTask(BinaryData.pack_A0(GlobalSetting.ControllerSetting.AxleX.Acceleration,
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_A0(GlobalSetting.ControllerSetting.AxleX.Acceleration,
                 GlobalSetting.ControllerSetting.AxleY.Acceleration,
                 GlobalSetting.ControllerSetting.AxleZ.Acceleration,
                 GlobalSetting.ControllerSetting.AxleA.Acceleration,
@@ -1922,21 +1920,21 @@ namespace CNC_Assist
                 GlobalSetting.ControllerSetting.AxleZ.reversSignal,
                 GlobalSetting.ControllerSetting.AxleA.reversSignal));
 
-            Controller.AddBinaryDataToTask(BinaryData.pack_A1(GlobalSetting.ControllerSetting.UseLimitSwichXmin, GlobalSetting.ControllerSetting.UseLimitSwichXmax,
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_A1(GlobalSetting.ControllerSetting.UseLimitSwichXmin, GlobalSetting.ControllerSetting.UseLimitSwichXmax,
                                                          GlobalSetting.ControllerSetting.UseLimitSwichYmin, GlobalSetting.ControllerSetting.UseLimitSwichYmax,
                                                          GlobalSetting.ControllerSetting.UseLimitSwichZmin, GlobalSetting.ControllerSetting.UseLimitSwichZmax,
                                                          false, false));
 
 
-            Controller.AddBinaryDataToTask(BinaryData.pack_BF(GlobalSetting.ControllerSetting.AxleX.MaxSpeed,
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_BF(GlobalSetting.ControllerSetting.AxleX.MaxSpeed,
                 GlobalSetting.ControllerSetting.AxleY.MaxSpeed, GlobalSetting.ControllerSetting.AxleZ.MaxSpeed,
                 GlobalSetting.ControllerSetting.AxleA.MaxSpeed));
 
-            Controller.AddBinaryDataToTask(BinaryData.pack_B5());
-            Controller.AddBinaryDataToTask(BinaryData.pack_B6());
-            Controller.AddBinaryDataToTask(BinaryData.pack_C2());
-            Controller.AddBinaryDataToTask(BinaryData.pack_9D());
-            Controller.AddBinaryDataToTask(BinaryData.pack_9E(0x01));
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5());
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B6());
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C2());
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_9D());
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_9E(0x01));
 
             /*
              *  D3 - ok

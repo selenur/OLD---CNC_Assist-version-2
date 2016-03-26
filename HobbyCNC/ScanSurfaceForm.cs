@@ -83,9 +83,9 @@ namespace CNC_Assist
             //}
 
             //фиксируем точку
-            numStartPosX.Value = Controller.Info.AxesX_PositionMM;
-            numStartPosY.Value = Controller.Info.AxesY_PositionMM;
-            numZforStart.Value = Controller.Info.AxesZ_PositionMM;
+            numStartPosX.Value = ControllerPlanetCNC.Info.AxesX_PositionMM;
+            numStartPosY.Value = ControllerPlanetCNC.Info.AxesY_PositionMM;
+            numZforStart.Value = ControllerPlanetCNC.Info.AxesZ_PositionMM;
 
             //// 2) поднимаемся обратно
             //Controller.SendBinaryData(BinaryData.pack_C0(0x01)); //вкл
@@ -99,9 +99,9 @@ namespace CNC_Assist
         {
             if (_ScanningNow) return; //небудем вклиниваться если что....
 
-            Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
-            Controller.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, numReturn.Value));      // + настройка отхода, и скорости
-            Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, numReturn.Value));      // + настройка отхода, и скорости
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
         }
 
         /// <summary>
@@ -267,25 +267,25 @@ namespace CNC_Assist
         private void button6_MouseDown(object sender, MouseEventArgs e)
         {
             button6.BackColor = Color.DarkGreen;
-            Controller.StartManualMove("0", "0", "+", 100);       
+            ControllerPlanetCNC.StartManualMove("0", "0", "+", 100);       
         }
 
         private void button6_MouseUp(object sender, MouseEventArgs e)
         {
             button6.BackColor = Color.FromName("Control");
-            Controller.StopManualMove();        
+            ControllerPlanetCNC.StopManualMove();        
         }
 
         private void button5_MouseDown(object sender, MouseEventArgs e)
         {
             button5.BackColor = Color.DarkGreen;
-            Controller.StartManualMove("0", "0", "-", 100);
+            ControllerPlanetCNC.StartManualMove("0", "0", "-", 100);
         }
 
         private void button5_MouseUp(object sender, MouseEventArgs e)
         {
             button5.BackColor = Color.FromName("Control");
-            Controller.StopManualMove();
+            ControllerPlanetCNC.StopManualMove();
         }
 
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
@@ -358,7 +358,7 @@ namespace CNC_Assist
             }
             else
             {
-                if (Controller.IsConnectedToController)
+                if (ControllerPlanetCNC.IsConnectedToController)
                 {
                     Thread ScanThread = new Thread(DoWork);
                     ScanThread.Start("");
@@ -370,7 +370,7 @@ namespace CNC_Assist
         private void WaitStop()
         {
             Thread.Sleep(500);
-            while (Controller.Info.ShpindelMoveSpeed != 0)
+            while (ControllerPlanetCNC.Info.ShpindelMoveSpeed != 0)
             {
                 Thread.Sleep(100);
             }
@@ -392,7 +392,7 @@ namespace CNC_Assist
                 SurfacePoint mp = ScanSurface.Matrix[_indexScanX, _indexScanY];
 
                 //Дальше не двигаемся, т.к. контроллер занят какой-то другой задачей
-                if (Controller.TestAllowActions) continue;
+                if (ControllerPlanetCNC.IsAvailability) continue;
 
                 // подходим к точке сканирования
                 //Controller.TestAllowActions = true;
@@ -406,34 +406,34 @@ namespace CNC_Assist
                 //WaitStop();
 
                 Thread.Sleep(500); //задержка небольшая, что-бы станок успел разогнаться
-                while (Controller.Info.ShpindelMoveSpeed != 0)
+                while (ControllerPlanetCNC.Info.ShpindelMoveSpeed != 0)
                 {
                     Thread.Sleep(100);
                 }
 
                 //запускаем сканирование, с остановкой при касании
-                Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
-                Controller.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, 0));      // + настройка отхода, и скорости
-                Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, 0));      // + настройка отхода, и скорости
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
 
                 //WaitStop(); //ждем остановки
 
                 Thread.Sleep(1000); //задержка небольшая, что-бы станок успел разогнаться
-                while (Controller.Info.ShpindelMoveSpeed != 0)
+                while (ControllerPlanetCNC.Info.ShpindelMoveSpeed != 0)
                 {
                     Thread.Sleep(100);
                 }
 
                 //фиксируем точку
-                mp.PosZ = (float)Controller.Info.AxesZ_PositionMM;
+                mp.PosZ = (float)ControllerPlanetCNC.Info.AxesZ_PositionMM;
 
                 // установим флаг что можно обновлять таблицу на форме
                 _refreshDataFromMatrix = true;
 
                 // 2) поднимаемся обратно
-                Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
-                Controller.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, numReturn.Value));      // + настройка отхода, и скорости
-                Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, numReturn.Value));      // + настройка отхода, и скорости
+                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
 
                 WaitStop(); //ждем остановки
 
@@ -475,16 +475,16 @@ namespace CNC_Assist
 
         private void buttonSTOP_Click(object sender, EventArgs e)
         {
-            Controller.EnergyStop(); //Аварийная остановка
+            ControllerPlanetCNC.EnergyStop(); //Аварийная остановка
         }
 
         private void buttonToTouch_Click(object sender, EventArgs e)
         {
             if (_ScanningNow) return; //небудем вклиниваться если что....
 
-            Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
-            Controller.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, 0));      // + настройка отхода, и скорости
-            Controller.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x01)); //вкл
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_D2((int)numSpeedScan.Value, 0));      // + настройка отхода, и скорости
+            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_C0(0x00)); //выкл
         }
 
     }

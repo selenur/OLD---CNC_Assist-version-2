@@ -12,20 +12,20 @@ namespace CNC_Assist
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (!Controller.TestAllowActions) return;
+            if (!ControllerPlanetCNC.IsAvailability) return;
 
             string sGcode = @"G0 F" + (int)numericUpDown3.Value + " X" + numericUpDown6.Value + " Y" + numericUpDown5.Value + " Z" + numericUpDown4.Value;
 
-            if (!Controller.TestAllowActions) return;
+            if (!ControllerPlanetCNC.IsAvailability) return;
 
-            Controller.ExecuteCommand(sGcode);
+            ControllerPlanetCNC.ExecuteCommand(sGcode);
         }
 
         private void timerRefresh_Tick(object sender, EventArgs e)
         {
-            if (Controller.IsConnectedToController)
+            if (ControllerPlanetCNC.IsConnectedToController)
             {
-                Enabled = Controller.TestAllowActions;
+                Enabled = ControllerPlanetCNC.IsAvailability;
             }
             else
             {
