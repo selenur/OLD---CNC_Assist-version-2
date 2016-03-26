@@ -70,11 +70,11 @@ namespace CNC_Assist
         /// <summary>
         /// Массив данных для посылки в контроллер, при выполнении программы из G-кодов
         /// </summary>
-        private static volatile readonly List<byte[]> DataForSend;
+        private static List<byte[]> DataForSend;
         /// <summary>
         /// Локер для Массива данных
         /// </summary>
-        private static volatile readonly object LockDataForSend;
+        private static object LockDataForSend;
 
         #endregion
 
@@ -351,9 +351,15 @@ namespace CNC_Assist
                 while (ThreadneedLoop)
                 {
                     // получение данных от контроллера, в случае ошибки, завершаем работу
-                    if (!GET_FROM_CONTROLLER_INFO()) ThreadneedLoop = false;
+                    if (!GET_FROM_CONTROLLER_INFO())
+                    {
+                        ThreadneedLoop = false;
+                    }
 
-                    if (!SEND_TO_CONTROLLER()) ThreadneedLoop = false;
+                    if (!SEND_TO_CONTROLLER())
+                    {
+                        //ThreadneedLoop = false;
+                    }
 
                     // небольшая остановочка для снижения нагрузки
                     Thread.Sleep(1);
@@ -427,7 +433,7 @@ namespace CNC_Assist
                 }
             }
 
-            if (Info.NuberCompleatedInstruction > 0) _StatusThread = enumStatusThread.Work;
+            //if (Info.NuberCompleatedInstruction > 0) _StatusThread = enumStatusThread.Work;
 
             return true;
            
@@ -437,138 +443,36 @@ namespace CNC_Assist
         private static bool SEND_TO_CONTROLLER()
         {
 
+            if (_StatusThread != enumStatusThread.Work) return true; //всё нормально, но дальше продолжать не нужно
 
+            if (DataForSend.Count == 0) _StatusThread = enumStatusThread.Wait; //данные для передачи закончились
 
-            // TODO: Для начала у контроллера узнаем текущее положение, которое будем использовать в качестве текущего положения в программе.
+            if ((Info.FreebuffSize < GlobalSetting.ControllerSetting.MinBuffSize)) return true; //всё нормально, но дальше продолжать пока не нужно
 
+            // получим монопольный доступ
+            lock (LockDataForSend)
+            {
+                int bytesWritten = 64;
 
+                try
+                {
+                    byte[] data = DataForSend[DataForSend.Count - 1];
 
+                    usbWriter.Write(data, 200, out bytesWritten);
 
-
-
-
-            // Для отслеживания, предыдущего значения
-            // bool lastStatusConnected = false;
-
-
-
-
-            //while (!_exitprogramm)
-            //{
-
-            // уснем, что-бы работа выполнялась 1000 раз в секунду
-            //Thread.Sleep(1);
-
-
-
-
-            // 
-
-            // #region Посылка данных в контроллер
-
-            //// получим монопольный доступ
-            //lock (LockDataForSend)
-            //{
-            //    //// В начале отправим все высокоприоритетные данные
-            //    //while (ImportantDataForSend.Count > 0)
-            //    //{
-            //    //    try
-            //    //    {
-            //    //        byte[] data = ImportantDataForSend[ImportantDataForSend.Count - 1];
-
-            //    //        int bytesWritten;
-            //    //        usbWriter.Write(data, 200, out bytesWritten);
-
-            //    //        ImportantDataForSend.Remove(data);
-            //    //    }
-            //    //    catch (Exception e)
-            //    //    {
-            //    //        AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
-            //    //    }
-            //    //}
-
-            //    ////потом ручные команды
-            //    //while (ManualDataForSend.Count > 0)
-            //    //{
-            //    //    try
-            //    //    {
-            //    //        byte[] data = ManualDataForSend[ManualDataForSend.Count - 1];
-
-            //    //        int bytesWritten;
-            //    //        usbWriter.Write(data, 200, out bytesWritten);
-
-            //    //        ManualDataForSend.Remove(data);
-            //    //    }
-            //    //    catch (Exception e)
-            //    //    {
-            //    //        AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
-            //    //    }
-            //    //}
-
-            //    // а потом обычные данные
-            //    if (DataForSend.Count > 0 && _taskStatus == ETaskStatus.Work)
-            //    {
-
-            //        ////while ((int)INFO.FreebuffSize > GlobalSetting.ControllerSetting.MinBuffSize)
-            //        ////{
-            //        ////    int bytesWritten = 64;
-
-            //        ////    try
-            //        ////    {
-            //        ////        byte[] data = dataForSend[dataForSend.Count - 1];
-
-            //        ////        _ec = _usbWriter.Write(data, 200, out bytesWritten);
-
-            //        ////        //AddMessage(@" <-- посылка комманды");
-
-            //        ////        dataForSend.Remove(data);
-            //        ////    }
-            //        ////    catch (Exception e)
-            //        ////    {
-            //        ////        AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e.ToString());
-            //        ////    }
-            //        ////}
-
-            //        if (Info.FreebuffSize > GlobalSetting.ControllerSetting.MinBuffSize)
-            //        {
-            //            try
-            //            {
-            //                byte[] data = DataForSend[DataForSend.Count - 1];
-
-            //                int bytesWritten;
-            //                usbWriter.Write(data, 200, out bytesWritten);
-
-            //                DataForSend.Remove(data);
-            //            }
-            //            catch (Exception e)
-            //            {
-            //                AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
-            //            }
-            //        }
-            //    }
-
-            //    if (DataForSend.Count == 0) _taskStatus = ETaskStatus.Off;
-            //}
-
-            //  #endregion
-
-            // }
-            //AddMessage(@" <-- Завершение потока работы с контроллером");
-
-
-
-            //_isConnectedController = false;
-            // _StatusThread = enumStatusThread.Off;
-            
-
-
+                    DataForSend.Remove(data);
+                }
+                catch (Exception e)
+                {
+                    AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e.ToString());
+                    return false;
+                }
+            }
 
             return true;
         }
 
         #endregion
-
-
 
 
         public static void TASK_SendStartData()
@@ -589,7 +493,6 @@ namespace CNC_Assist
             AddBinaryDataToTask(BinaryData.pack_9E(0x01));            
         }
 
-
         public static void TASK_SendStopData()
         {
             AddBinaryDataToTask(BinaryData.pack_FF());
@@ -605,7 +508,7 @@ namespace CNC_Assist
 
         public static void TASK_START()
         {
-            //_taskStatus = ETaskStatus.Work;
+            _StatusThread = enumStatusThread.Work;
         }
 
         public static void TASK_STOP()
@@ -617,14 +520,14 @@ namespace CNC_Assist
         public static void TASK_PAUSE()
         {
 
-            //if (_taskStatus == ETaskStatus.Work) //нужно остановить
-            //{
-            //    _taskStatus = ETaskStatus.Pause;
-            //} 
-            //else if (_taskStatus == ETaskStatus.Pause) //нужно запустить
-            //{
-            //    _taskStatus = ETaskStatus.Work;
-            //}
+            if (_StatusThread == enumStatusThread.Work) //нужно остановить
+            {
+                _StatusThread = enumStatusThread.Pause;
+            }
+            else if (_StatusThread == enumStatusThread.Pause) //нужно запустить
+            {
+                _StatusThread = enumStatusThread.Work;
+            }
 
         }
 

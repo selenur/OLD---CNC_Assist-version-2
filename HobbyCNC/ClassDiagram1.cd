@@ -1,80 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
-  <Class Name="CNC_Assist.Controller">
-    <Position X="0.5" Y="0.5" Width="3.75" />
+  <Class Name="CNC_Assist.ControllerPlanetCNC">
+    <Position X="1.75" Y="0.5" Width="4.75" />
+    <Compartments>
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
     <NestedTypes>
-      <Delegate Name="CNC_Assist.Controller.DeviceEventNewMessage" Collapsed="true">
+      <Delegate Name="CNC_Assist.ControllerPlanetCNC.DeviceEventNewMessage" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
-      <Delegate Name="CNC_Assist.Controller.DeviceEventConnect" Collapsed="true">
+      <Delegate Name="CNC_Assist.ControllerPlanetCNC.DeviceEventConnect" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
-      <Delegate Name="CNC_Assist.Controller.DeviceEventDisconnect" Collapsed="true">
+      <Delegate Name="CNC_Assist.ControllerPlanetCNC.DeviceEventDisconnect" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
-      <Delegate Name="CNC_Assist.Controller.DeviceEventNewData" Collapsed="true">
+      <Delegate Name="CNC_Assist.ControllerPlanetCNC.DeviceEventNewData" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
         </TypeIdentifier>
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>BJVCABAIQBAgKABEAAMEAIBAgQSAAQAAFYAAJCAIAAo=</HashCode>
+      <HashCode>D4VAiFAoQBBACAAUEAMEQYBAgAGQIAAANYAAIEAIECA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CNC_Assist.deviceInfo" Collapsed="true">
-    <Position X="13.25" Y="3.25" Width="1.5" />
+  <Class Name="CNC_Assist.DeviceInfo">
+    <Position X="7" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAgQEBCAAAgIACAADRIA4AAABEAAAAgAAgAQAIAASQ=</HashCode>
+      <HashCode>EgAgAEAIAAAAIACgQChCAgAAABAAAAABQAgAAhAAAAA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CNC_Assist.DeviceEventArgsMessage" Collapsed="true">
-    <Position X="11.5" Y="3.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
-      <FileName>CONTROLLER.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="CNC_Assist.BinaryData" Collapsed="true">
-    <Position X="9.75" Y="2.25" Width="1.5" />
+  <Class Name="CNC_Assist.BinaryData">
+    <Position X="11" Y="1.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="CNC_Assist.BinaryData.TypeSignal" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CONTROLLER.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAIBOAAAAAAAAAACgfAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CNC_Assist.decPoint" Collapsed="true">
-    <Position X="9.75" Y="3.25" Width="1.5" />
+  <Class Name="CNC_Assist.CorrectionPos">
+    <Position X="8.75" Y="1.25" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAYAE=</HashCode>
+      <HashCode>QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAACAAAAAA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CNC_Assist.dobPoint" Collapsed="true">
-    <Position X="9.75" Y="4.25" Width="1.5" />
+  <Enum Name="CNC_Assist.enumStatusThread">
+    <Position X="9.25" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAYAE=</HashCode>
-      <FileName>CONTROLLER.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="CNC_Assist.correctionPos" Collapsed="true">
-    <Position X="13.25" Y="2.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACFAAAAA=</HashCode>
-      <FileName>CONTROLLER.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Enum Name="CNC_Assist.EStatusDevice" Collapsed="true">
-    <Position X="9.75" Y="5.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAQAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAggAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Enum>
