@@ -2031,6 +2031,12 @@ namespace ToolsImporterVectors
             // тут проверим
         }
 
+        private void button9_Click(object sender, EventArgs e)
+        {
+            About abfrm = new About();
+            abfrm.ShowDialog();
+        }
+
 
         //---------------------------------------------------------------------
 

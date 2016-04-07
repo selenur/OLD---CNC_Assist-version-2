@@ -7,6 +7,7 @@ using System.Drawing.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Cyotek.Windows.Forms;
 
 namespace CNCImporterGkode
 {
@@ -1016,26 +1017,26 @@ namespace CNCImporterGkode
 
             labelTextSize.Text = @"Размер рисунка: " + tmp.Width.ToString() + " x " + tmp.Height.ToString() + " пикселей";
 
-            if (checkBoxStep1Refresh.Checked)
-            {
-                pictureBoxPreview.Image = tmp;
+            //if (checkBoxStep1Refresh.Checked)
+            //{
+            //    pictureBoxPreview.Image = tmp;
 
-                if (radioButton_Zoom.Checked)
-                {
-                    pictureBoxPreview.Width = panel1.ClientSize.Width - 2;
-                    pictureBoxPreview.Height = panel1.ClientSize.Height - 26;
-                    panel1.AutoScrollMinSize = new Size(0, 0);
-                    panel1.AutoScroll = false;
-                }
-                else
-                {
-                    pictureBoxPreview.Width = pictureBoxPreview.Image.Width;
-                    pictureBoxPreview.Height = pictureBoxPreview.Image.Height;
+            //    if (radioButton_Zoom.Checked)
+            //    {
+            //        pictureBoxPreview.Width = panel1.ClientSize.Width - 2;
+            //        pictureBoxPreview.Height = panel1.ClientSize.Height - 26;
+            //        panel1.AutoScrollMinSize = new Size(0, 0);
+            //        panel1.AutoScroll = false;
+            //    }
+            //    else
+            //    {
+            //        pictureBoxPreview.Width = pictureBoxPreview.Image.Width;
+            //        pictureBoxPreview.Height = pictureBoxPreview.Image.Height;
 
-                    panel1.AutoScrollMinSize = new Size(pictureBoxPreview.Width, pictureBoxPreview.Height);
-                    panel1.AutoScroll = true;
-                }
-            }
+            //        panel1.AutoScrollMinSize = new Size(pictureBoxPreview.Width, pictureBoxPreview.Height);
+            //        panel1.AutoScroll = true;
+            //    }
+            //}
         }
 
 
@@ -1711,12 +1712,12 @@ namespace CNCImporterGkode
 
         private void radioButton_Zoom_CheckedChanged(object sender, EventArgs e)
         {
-            RefreshStep1();
+            pictureBoxPreview.SizeMode = ImageBoxSizeMode.Fit;
         }
 
         private void radioButton_FullSize_CheckedChanged(object sender, EventArgs e)
         {
-            RefreshStep1();
+            pictureBoxPreview.SizeMode = ImageBoxSizeMode.Normal;
         }
 
         private void checkBoxStep1Refresh_CheckedChanged(object sender, EventArgs e)
@@ -1855,6 +1856,28 @@ namespace CNCImporterGkode
                 externFileFont = openFileDialog1.FileName;
                 RefreshStep1();
             }
+        }
+
+
+        private void RefreshInfo()
+        {
+
+            labelZoomSize.Text = @"Масштаб " + pictureBoxPreview.Zoom + @"%";
+
+            if (pictureBoxPreview.Image != null)
+            {
+                labelZoomSize.Text += @" размер: " + pictureBoxPreview.Image.Width + "x" + pictureBoxPreview.Image.Height + " пикселей";
+            }
+        }
+
+        private void pictureBoxPreview_ZoomChanged(object sender, EventArgs e)
+        {
+            RefreshInfo();
+        }
+
+        private void pictureBoxPreview_ImageChanged(object sender, EventArgs e)
+        {
+            RefreshInfo();
         }
     }
 

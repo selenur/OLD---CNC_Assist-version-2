@@ -67,6 +67,7 @@
             this.button5 = new System.Windows.Forms.Button();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.button8 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
             this.label18 = new System.Windows.Forms.Label();
             this.numericUpDownYY = new System.Windows.Forms.NumericUpDown();
@@ -80,7 +81,7 @@
             this.comboBoxTypeFile = new System.Windows.Forms.ComboBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
-            this.button8 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownKoefX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownY)).BeginInit();
@@ -631,6 +632,16 @@
             this.tabPage4.Text = "отладка 2";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(224, 32);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(71, 23);
+            this.button8.TabIndex = 14;
+            this.button8.Text = "sample";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
             // button6
             // 
             this.button6.Location = new System.Drawing.Point(14, 36);
@@ -774,7 +785,7 @@
             "GBR  - gerber"});
             this.comboBoxTypeFile.Location = new System.Drawing.Point(69, 10);
             this.comboBoxTypeFile.Name = "comboBoxTypeFile";
-            this.comboBoxTypeFile.Size = new System.Drawing.Size(381, 21);
+            this.comboBoxTypeFile.Size = new System.Drawing.Size(233, 21);
             this.comboBoxTypeFile.TabIndex = 31;
             this.comboBoxTypeFile.Text = "НЕВЫБРАН ФОРМАТ";
             this.comboBoxTypeFile.SelectedIndexChanged += new System.EventHandler(this.comboBoxTypeFile_SelectedIndexChanged);
@@ -797,21 +808,22 @@
             this.label14.TabIndex = 34;
             this.label14.Text = "Файл:";
             // 
-            // button8
+            // button9
             // 
-            this.button8.Location = new System.Drawing.Point(224, 32);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(71, 23);
-            this.button8.TabIndex = 14;
-            this.button8.Text = "sample";
-            this.button8.UseVisualStyleBackColor = true;
-            this.button8.Click += new System.EventHandler(this.button8_Click);
+            this.button9.Location = new System.Drawing.Point(340, 6);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(140, 25);
+            this.button9.TabIndex = 35;
+            this.button9.Text = "О программе";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(489, 555);
+            this.Controls.Add(this.button9);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.label12);
             this.Controls.Add(this.comboBoxTypeFile);
@@ -907,6 +919,7 @@
         private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button9;
     }
 }
 

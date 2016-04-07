@@ -1,4 +1,4 @@
-﻿namespace CNCImporterGkode
+﻿namespace ToolsImporterVectors
 {
     partial class About
     {
@@ -51,8 +51,9 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(376, 104);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Программа для генерации G-кода, из текста или рисунка.\r\nЕсли есть пожелания к про" +
-    "грамме, сообщения об ошибках, \r\nпрошу напрявлять письмо на: zheigurov@gmail.com";
+            this.label1.Text = "Программа для генерации G-кода, из векторных файлов.\r\nЕсли есть пожелания к прогр" +
+    "амме, сообщения об ошибках, \r\nпрошу напрявлять письмо на: zheigurov@gmail.com";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // linkLabel1
             // 
@@ -91,6 +92,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "About";
             this.Text = "О программе";
+            this.Load += new System.EventHandler(this.About_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

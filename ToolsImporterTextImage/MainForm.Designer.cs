@@ -99,6 +99,9 @@
             this.labelInfoX = new System.Windows.Forms.Label();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label26 = new System.Windows.Forms.Label();
+            this.numericUpDownSpeedLaser = new System.Windows.Forms.NumericUpDown();
+            this.checkBoxForLaser = new System.Windows.Forms.CheckBox();
             this.label15 = new System.Windows.Forms.Label();
             this.numericUpDownZ0 = new System.Windows.Forms.NumericUpDown();
             this.label13 = new System.Windows.Forms.Label();
@@ -144,12 +147,9 @@
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.radioButton_FullSize = new System.Windows.Forms.RadioButton();
             this.radioButton_Zoom = new System.Windows.Forms.RadioButton();
-            this.pictureBoxPreview = new System.Windows.Forms.PictureBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.checkBoxForLaser = new System.Windows.Forms.CheckBox();
-            this.numericUpDownSpeedLaser = new System.Windows.Forms.NumericUpDown();
-            this.label26 = new System.Windows.Forms.Label();
+            this.labelZoomSize = new System.Windows.Forms.Label();
+            this.pictureBoxPreview = new Cyotek.Windows.Forms.ImageBox();
             ((System.ComponentModel.ISupportInitialize)(this.textSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownKoefPalitra)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -173,6 +173,7 @@
             this.groupBox2.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSpeedLaser)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownZ0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownZ1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownCalcY)).BeginInit();
@@ -185,10 +186,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownlaserSpeed)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownLazerY)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownLazerX)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPreview)).BeginInit();
             this.groupBox7.SuspendLayout();
-            this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSpeedLaser)).BeginInit();
             this.SuspendLayout();
             // 
             // textString
@@ -208,7 +206,7 @@
             // 
             this.textSize.Location = new System.Drawing.Point(71, 86);
             this.textSize.Maximum = new decimal(new int[] {
-            400,
+            4000,
             0,
             0,
             0});
@@ -994,6 +992,50 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Желаемый размер в мм";
             // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.ForeColor = System.Drawing.Color.Navy;
+            this.label26.Location = new System.Drawing.Point(7, 233);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(58, 13);
+            this.label26.TabIndex = 22;
+            this.label26.Text = "Скорость:";
+            // 
+            // numericUpDownSpeedLaser
+            // 
+            this.numericUpDownSpeedLaser.ForeColor = System.Drawing.Color.Navy;
+            this.numericUpDownSpeedLaser.Location = new System.Drawing.Point(71, 231);
+            this.numericUpDownSpeedLaser.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownSpeedLaser.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownSpeedLaser.Name = "numericUpDownSpeedLaser";
+            this.numericUpDownSpeedLaser.Size = new System.Drawing.Size(116, 20);
+            this.numericUpDownSpeedLaser.TabIndex = 21;
+            this.numericUpDownSpeedLaser.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // checkBoxForLaser
+            // 
+            this.checkBoxForLaser.AutoSize = true;
+            this.checkBoxForLaser.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxForLaser.Location = new System.Drawing.Point(9, 213);
+            this.checkBoxForLaser.Name = "checkBoxForLaser";
+            this.checkBoxForLaser.Size = new System.Drawing.Size(140, 17);
+            this.checkBoxForLaser.TabIndex = 20;
+            this.checkBoxForLaser.Text = "Генерация для лазера";
+            this.checkBoxForLaser.UseVisualStyleBackColor = true;
+            // 
             // label15
             // 
             this.label15.Location = new System.Drawing.Point(173, 46);
@@ -1538,10 +1580,12 @@
             // radioButton_FullSize
             // 
             this.radioButton_FullSize.AutoSize = true;
+            this.radioButton_FullSize.Checked = true;
             this.radioButton_FullSize.Location = new System.Drawing.Point(9, 19);
             this.radioButton_FullSize.Name = "radioButton_FullSize";
             this.radioButton_FullSize.Size = new System.Drawing.Size(117, 17);
             this.radioButton_FullSize.TabIndex = 17;
+            this.radioButton_FullSize.TabStop = true;
             this.radioButton_FullSize.Text = "Реальный размер";
             this.radioButton_FullSize.UseVisualStyleBackColor = true;
             this.radioButton_FullSize.CheckedChanged += new System.EventHandler(this.radioButton_FullSize_CheckedChanged);
@@ -1549,36 +1593,21 @@
             // radioButton_Zoom
             // 
             this.radioButton_Zoom.AutoSize = true;
-            this.radioButton_Zoom.Checked = true;
             this.radioButton_Zoom.Location = new System.Drawing.Point(149, 19);
             this.radioButton_Zoom.Name = "radioButton_Zoom";
             this.radioButton_Zoom.Size = new System.Drawing.Size(140, 17);
             this.radioButton_Zoom.TabIndex = 16;
-            this.radioButton_Zoom.TabStop = true;
             this.radioButton_Zoom.Text = "Растянуть на всё окно";
             this.radioButton_Zoom.UseVisualStyleBackColor = true;
             this.radioButton_Zoom.CheckedChanged += new System.EventHandler(this.radioButton_Zoom_CheckedChanged);
-            // 
-            // pictureBoxPreview
-            // 
-            this.pictureBoxPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBoxPreview.BackColor = System.Drawing.Color.MediumPurple;
-            this.pictureBoxPreview.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxPreview.Location = new System.Drawing.Point(3, 3);
-            this.pictureBoxPreview.Name = "pictureBoxPreview";
-            this.pictureBoxPreview.Size = new System.Drawing.Size(627, 232);
-            this.pictureBoxPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxPreview.TabIndex = 15;
-            this.pictureBoxPreview.TabStop = false;
             // 
             // groupBox7
             // 
             this.groupBox7.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox7.Controls.Add(this.panel1);
+            this.groupBox7.Controls.Add(this.labelZoomSize);
+            this.groupBox7.Controls.Add(this.pictureBoxPreview);
             this.groupBox7.Controls.Add(this.radioButton_FullSize);
             this.groupBox7.Controls.Add(this.radioButton_Zoom);
             this.groupBox7.Location = new System.Drawing.Point(4, 338);
@@ -1588,61 +1617,27 @@
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Предпросмотр";
             // 
-            // panel1
+            // labelZoomSize
             // 
-            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.labelZoomSize.AutoSize = true;
+            this.labelZoomSize.Location = new System.Drawing.Point(308, 21);
+            this.labelZoomSize.Name = "labelZoomSize";
+            this.labelZoomSize.Size = new System.Drawing.Size(85, 13);
+            this.labelZoomSize.TabIndex = 19;
+            this.labelZoomSize.Text = "Масштаб: 100%";
+            // 
+            // pictureBoxPreview
+            // 
+            this.pictureBoxPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            this.panel1.Controls.Add(this.pictureBoxPreview);
-            this.panel1.Location = new System.Drawing.Point(6, 53);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(633, 238);
-            this.panel1.TabIndex = 19;
-            // 
-            // checkBoxForLaser
-            // 
-            this.checkBoxForLaser.AutoSize = true;
-            this.checkBoxForLaser.ForeColor = System.Drawing.Color.Navy;
-            this.checkBoxForLaser.Location = new System.Drawing.Point(9, 213);
-            this.checkBoxForLaser.Name = "checkBoxForLaser";
-            this.checkBoxForLaser.Size = new System.Drawing.Size(140, 17);
-            this.checkBoxForLaser.TabIndex = 20;
-            this.checkBoxForLaser.Text = "Генерация для лазера";
-            this.checkBoxForLaser.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDownSpeedLaser
-            // 
-            this.numericUpDownSpeedLaser.ForeColor = System.Drawing.Color.Navy;
-            this.numericUpDownSpeedLaser.Location = new System.Drawing.Point(71, 231);
-            this.numericUpDownSpeedLaser.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDownSpeedLaser.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDownSpeedLaser.Name = "numericUpDownSpeedLaser";
-            this.numericUpDownSpeedLaser.Size = new System.Drawing.Size(116, 20);
-            this.numericUpDownSpeedLaser.TabIndex = 21;
-            this.numericUpDownSpeedLaser.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            // 
-            // label26
-            // 
-            this.label26.AutoSize = true;
-            this.label26.ForeColor = System.Drawing.Color.Navy;
-            this.label26.Location = new System.Drawing.Point(7, 233);
-            this.label26.Name = "label26";
-            this.label26.Size = new System.Drawing.Size(58, 13);
-            this.label26.TabIndex = 22;
-            this.label26.Text = "Скорость:";
+            this.pictureBoxPreview.Location = new System.Drawing.Point(4, 42);
+            this.pictureBoxPreview.Name = "pictureBoxPreview";
+            this.pictureBoxPreview.ShowPixelGrid = true;
+            this.pictureBoxPreview.Size = new System.Drawing.Size(632, 249);
+            this.pictureBoxPreview.TabIndex = 18;
+            this.pictureBoxPreview.ImageChanged += new System.EventHandler(this.pictureBoxPreview_ImageChanged);
+            this.pictureBoxPreview.ZoomChanged += new System.EventHandler(this.pictureBoxPreview_ZoomChanged);
             // 
             // MainForm
             // 
@@ -1694,6 +1689,7 @@
             this.tabPage1.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSpeedLaser)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownZ0)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownZ1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownCalcY)).EndInit();
@@ -1707,11 +1703,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownlaserSpeed)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownLazerY)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownLazerX)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPreview)).EndInit();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSpeedLaser)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1809,9 +1802,7 @@
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.RadioButton radioButton_FullSize;
         private System.Windows.Forms.RadioButton radioButton_Zoom;
-        public System.Windows.Forms.PictureBox pictureBoxPreview;
         private System.Windows.Forms.GroupBox groupBox7;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.CheckBox checkBoxStep1Refresh;
         private System.Windows.Forms.GroupBox groupBoxFilter1;
         private System.Windows.Forms.GroupBox groupBoxFilter3;
@@ -1840,6 +1831,8 @@
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.NumericUpDown numericUpDownSpeedLaser;
         private System.Windows.Forms.CheckBox checkBoxForLaser;
+        private Cyotek.Windows.Forms.ImageBox pictureBoxPreview;
+        private System.Windows.Forms.Label labelZoomSize;
     }
 }
 

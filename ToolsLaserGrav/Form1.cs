@@ -229,6 +229,9 @@ namespace ToolsLaserGrav
             return bmp;
         }
 
+
+
+
         private void button4_Click(object sender, EventArgs e)
         {
             //применим фильт преобразования в ЧБ
