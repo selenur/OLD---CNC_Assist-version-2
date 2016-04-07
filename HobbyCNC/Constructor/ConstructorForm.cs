@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using System.Drawing;
+using OpenTK.Graphics.OpenGL;
 
 namespace CNC_Assist.Constructor
 {
@@ -1040,7 +1041,13 @@ namespace CNC_Assist.Constructor
 
             code+= ParsePrimitivesToGkode(items);
 
-            Clipboard.SetText(code);
+            //Clipboard.Clear();
+
+            //Clipboard.SetText(code);
+
+            
+            
+            
             DataLoader.ReadFromBuffer(false);
             code = "";
         }
@@ -1510,6 +1517,17 @@ namespace CNC_Assist.Constructor
         private void arcToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             AddNewArc();
+        }
+
+        private void toClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string code = "%" + Environment.NewLine;
+
+            code += (string)ParsePrimitivesToGkode(items);
+
+            Clipboard.Clear();
+
+            Clipboard.SetText(code);
         }
 
  

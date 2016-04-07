@@ -53,9 +53,12 @@
             this.label19 = new System.Windows.Forms.Label();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.button7 = new System.Windows.Forms.Button();
+            this.previewBox1 = new ToolsImporterVectors.PreviewBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
+            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
+            this.label11 = new System.Windows.Forms.Label();
             this.button4 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button3 = new System.Windows.Forms.Button();
@@ -77,9 +80,7 @@
             this.comboBoxTypeFile = new System.Windows.Forms.ComboBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
-            this.previewBox1 = new ToolsImporterVectors.PreviewBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
+            this.button8 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownKoefX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownY)).BeginInit();
@@ -93,6 +94,7 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownYY)).BeginInit();
@@ -100,7 +102,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownZoom)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             this.SuspendLayout();
             // 
             // tbFile
@@ -439,6 +440,14 @@
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click_1);
             // 
+            // previewBox1
+            // 
+            this.previewBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.previewBox1.Location = new System.Drawing.Point(3, 3);
+            this.previewBox1.Name = "previewBox1";
+            this.previewBox1.Size = new System.Drawing.Size(471, 456);
+            this.previewBox1.TabIndex = 0;
+            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.splitContainer1);
@@ -480,6 +489,33 @@
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(236, 363);
             this.treeView1.TabIndex = 30;
+            // 
+            // numericUpDown3
+            // 
+            this.numericUpDown3.DecimalPlaces = 3;
+            this.numericUpDown3.Location = new System.Drawing.Point(96, 33);
+            this.numericUpDown3.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            196608});
+            this.numericUpDown3.Name = "numericUpDown3";
+            this.numericUpDown3.Size = new System.Drawing.Size(106, 20);
+            this.numericUpDown3.TabIndex = 35;
+            this.numericUpDown3.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(11, 39);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(79, 13);
+            this.label11.TabIndex = 34;
+            this.label11.Text = "коэффициент:";
             // 
             // button4
             // 
@@ -576,6 +612,7 @@
             // 
             // tabPage4
             // 
+            this.tabPage4.Controls.Add(this.button8);
             this.tabPage4.Controls.Add(this.button6);
             this.tabPage4.Controls.Add(this.label18);
             this.tabPage4.Controls.Add(this.numericUpDownYY);
@@ -760,40 +797,15 @@
             this.label14.TabIndex = 34;
             this.label14.Text = "Файл:";
             // 
-            // previewBox1
+            // button8
             // 
-            this.previewBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.previewBox1.Location = new System.Drawing.Point(3, 3);
-            this.previewBox1.Name = "previewBox1";
-            this.previewBox1.Size = new System.Drawing.Size(471, 456);
-            this.previewBox1.TabIndex = 0;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(11, 39);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(79, 13);
-            this.label11.TabIndex = 34;
-            this.label11.Text = "коэффициент:";
-            // 
-            // numericUpDown3
-            // 
-            this.numericUpDown3.DecimalPlaces = 3;
-            this.numericUpDown3.Location = new System.Drawing.Point(96, 33);
-            this.numericUpDown3.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            196608});
-            this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(106, 20);
-            this.numericUpDown3.TabIndex = 35;
-            this.numericUpDown3.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.button8.Location = new System.Drawing.Point(224, 32);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(71, 23);
+            this.button8.TabIndex = 14;
+            this.button8.Text = "sample";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
             // MainForm
             // 
@@ -825,6 +837,7 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
             this.tabPage4.ResumeLayout(false);
@@ -834,7 +847,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownZoom)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudOffset)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -894,6 +906,7 @@
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.NumericUpDown numericUpDown3;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Button button8;
     }
 }
 

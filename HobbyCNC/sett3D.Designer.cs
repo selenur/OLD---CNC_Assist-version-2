@@ -42,6 +42,8 @@
             this.label5 = new System.Windows.Forms.Label();
             this.ShowScanedGrid = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.ShowAxes = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -54,8 +56,7 @@
             this.labelposY = new System.Windows.Forms.Label();
             this.labelposX = new System.Windows.Forms.Label();
             this.checkBoxShowGrate = new System.Windows.Forms.CheckBox();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.showCompleatedTraectory = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -264,6 +265,30 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "                                                  ";
             // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Enabled = false;
+            this.radioButton2.Location = new System.Drawing.Point(25, 42);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(90, 17);
+            this.radioButton2.TabIndex = 13;
+            this.radioButton2.Text = "В виде точек";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Checked = true;
+            this.radioButton1.Enabled = false;
+            this.radioButton1.Location = new System.Drawing.Point(25, 19);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(92, 17);
+            this.radioButton1.TabIndex = 12;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "В виде линий";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            // 
             // ShowAxes
             // 
             this.ShowAxes.AutoSize = true;
@@ -431,35 +456,25 @@
             this.checkBoxShowGrate.UseVisualStyleBackColor = true;
             this.checkBoxShowGrate.CheckedChanged += new System.EventHandler(this.checkBoxShowGrate_CheckedChanged);
             // 
-            // radioButton1
+            // showCompleatedTraectory
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
-            this.radioButton1.Enabled = false;
-            this.radioButton1.Location = new System.Drawing.Point(25, 19);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(92, 17);
-            this.radioButton1.TabIndex = 12;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "В виде линий";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Enabled = false;
-            this.radioButton2.Location = new System.Drawing.Point(25, 42);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(90, 17);
-            this.radioButton2.TabIndex = 13;
-            this.radioButton2.Text = "В виде точек";
-            this.radioButton2.UseVisualStyleBackColor = true;
+            this.showCompleatedTraectory.AutoSize = true;
+            this.showCompleatedTraectory.Checked = true;
+            this.showCompleatedTraectory.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.showCompleatedTraectory.Location = new System.Drawing.Point(25, 274);
+            this.showCompleatedTraectory.Name = "showCompleatedTraectory";
+            this.showCompleatedTraectory.Size = new System.Drawing.Size(223, 17);
+            this.showCompleatedTraectory.TabIndex = 16;
+            this.showCompleatedTraectory.Text = "Отображать завершенную траекторию";
+            this.showCompleatedTraectory.UseVisualStyleBackColor = true;
+            this.showCompleatedTraectory.CheckedChanged += new System.EventHandler(this.showCompleatedTraectory_CheckedChanged);
             // 
             // Sett3D
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 440);
+            this.Controls.Add(this.showCompleatedTraectory);
             this.Controls.Add(this.ShowAxes);
             this.Controls.Add(this.ShowScanedGrid);
             this.Controls.Add(this.groupBox2);
@@ -519,5 +534,6 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.CheckBox showCompleatedTraectory;
     }
 }

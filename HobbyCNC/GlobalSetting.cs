@@ -154,6 +154,24 @@ namespace CNC_Assist
 
         }
 
+
+        /// <summary>
+        /// Режим работы
+        /// </summary>
+        private TypeWorks _TypeWorks = TypeWorks.Milling;
+        /// <summary>
+        /// Режим работы
+        /// </summary>
+        [DisplayName(@"Режим работы")]
+        [Description("В данном пункте выбирается методика работы станка, т.к. эта настройка значительно пеняет 3D представление данных")]
+        [Category("1. Настройки программы")]
+        [TypeConverter(typeof(EnumTypeConverter))]
+        public TypeWorks typeworks
+        {
+            get { return _TypeWorks; }
+            set { _TypeWorks = value; }
+        }
+
         /// <summary>
         /// Используемый язык
         /// </summary>
@@ -756,7 +774,27 @@ namespace CNC_Assist
             set { _gkodeshow = value; }
         }
 
-        
+
+
+        /// <summary>
+        /// Показывать выполненную траекторию
+        /// </summary>
+        private bool _showCompleatedTraectory = true;
+        /// <summary>
+        /// Показывать выполненную траекторию
+        /// </summary>
+        [DisplayName(@"Показывать выполненную траекторию")]
+        [Description("Показывать выполненную траекторию")]
+        [PropertyOrder(5)]
+        [Category("3.1 Настройки 3D")]
+        [TypeConverter(typeof(BooleanTypeConverter))]
+        public bool ShowCompleatedTraectory
+        {
+            get { return _showCompleatedTraectory; }
+            set { _showCompleatedTraectory = value; }
+        }
+
+
     }
 
     /// <summary>
@@ -987,7 +1025,41 @@ namespace CNC_Assist
             return "Не используется";
         }
 
-    } 
+    }
+
+
+
+
+
+
+    /// <summary>
+    /// Режим работы
+    /// </summary>
+    [Serializable]
+    public enum TypeWorks
+    {
+        /// <summary>
+        /// Фрезеровка
+        /// </summary>
+        [Description("Фрезеровка")]
+        Milling = 0,
+        /// <summary>
+        /// Выжигание мощностью
+        /// </summary>
+        [Description("Выжигание мощностью")]
+        BurningPower = 1,
+        /// <summary>
+        /// Выжигание скоростью
+        /// </summary>
+        [Description("Выжигание скоростью")]
+        BurningSpeed = 2,
+        /// <summary>
+        /// Выжигание вкл/выключением лазера
+        /// </summary>
+        [Description("Выжигание вкл/выключением лазера")]
+        BurningOnOff = 3
+    }
+
 
     /// <summary>
     /// Перечень поддерживающих контроллеров

@@ -1304,13 +1304,38 @@ namespace CNCImporterGkode
             float koefX = (_maxX - _minX) / (float)numericUpDownCalcX.Value;
             float koefY = (_maxY - _minY) / (float)numericUpDownCalcY.Value;
 
+            decimal dZ0 = numericUpDownZ0.Value;
+            decimal dZ1 = numericUpDownZ1.Value;
 
-            string sZ0 = numericUpDownZ0.Value.ToString("#0.###");
-            string sZ1 = numericUpDownZ1.Value.ToString("#0.###");
+            if (checkBoxForLaser.Checked)
+            {
+                dZ0 = 0;
+                dZ1 = 0;
+            }
 
-            textBoxGkod.Text = "";
+            string sZ0 = dZ0.ToString("#0.###");
+            string sZ1 = dZ1.ToString("#0.###");
 
-            textBoxGkod.AppendText("g0 x0 y0 z" + sZ1 + Environment.NewLine);
+            string Gkode =  "%" + Environment.NewLine;
+
+            if (checkBoxForLaser.Checked)
+            {
+                Gkode += "M5" + Environment.NewLine;
+
+                sZ0 = (0).ToString("#0.###");
+                sZ1 = (0).ToString("#0.###");
+
+                Gkode += "G0 F" + numericUpDownSpeedLaser.Value.ToString("00000") + Environment.NewLine;
+                Gkode += "G1 F" + numericUpDownSpeedLaser.Value.ToString("00000") + Environment.NewLine;
+
+            }
+            else
+            {
+                Gkode += "M3" + Environment.NewLine;
+            }
+
+
+            Gkode += "g0 x0 y0 z" + sZ1 + Environment.NewLine;
             
             foreach (List<PointF> line in _lines)
             {
@@ -1326,9 +1351,16 @@ namespace CNCImporterGkode
                 x = x / koefX;
                 y = y / koefY;
 
+                if (!checkBoxForLaser.Checked)
+                {
+                    //опускание с высоты подхода до высоты фрезеровки
+                    Gkode += "g0 x" + x.ToString("#0.###") + " y" + y.ToString("#0.###") + " z" + sZ1 + Environment.NewLine;                    
+                }
 
 
-                textBoxGkod.AppendText("g0 x" + x.ToString("#0.###") + " y" + y.ToString("#0.###") + " z" + sZ1 + Environment.NewLine);
+
+                bool firstPoint = true;
+
                 foreach (PointF point in line)
                 {
 
@@ -1344,7 +1376,23 @@ namespace CNCImporterGkode
                     y = y / koefY;
 
 
-                    textBoxGkod.AppendText("g1 x" + x.ToString("#0.###") + " y" + y.ToString("#0.###") + " z" + sZ0 + Environment.NewLine);
+                    Gkode += "g1 x" + x.ToString("#0.###") + " y" + y.ToString("#0.###") + " z" + sZ0 + Environment.NewLine;
+
+                    if (firstPoint)
+                    {
+                        //перед началом линии включим лазер
+                        if (checkBoxForLaser.Checked)
+                        {
+                            Gkode += "M3" + Environment.NewLine;
+                        }
+                        firstPoint = false;
+                    }
+                }
+
+                //после завершения линии выключим лазер
+                if (checkBoxForLaser.Checked)
+                {
+                    Gkode += "M5" + Environment.NewLine;
                 }
 
                 x = (line[line.Count - 1].X-deltaX);
@@ -1358,13 +1406,21 @@ namespace CNCImporterGkode
                 x = x / koefX;
                 y = y / koefY;
 
-                textBoxGkod.AppendText("g0 x" + x.ToString("#0.###") + " y" + y.ToString("#0.###") + " z" + sZ1 + Environment.NewLine);
+                if (!checkBoxForLaser.Checked)
+                {
+                    // поднятие на безопастную высоту
+                    Gkode += "g0 x" + x.ToString("#0.###") + " y" + y.ToString("#0.###") + " z" + sZ1 + Environment.NewLine;
+                }
             }
 
             if (checkBoxUsePoint.Checked)
             {
-                textBoxGkod.Text = textBoxGkod.Text.Replace(",", ".");
+                Gkode = Gkode.Replace(",", ".");
             }
+
+            Gkode += "M5" + Environment.NewLine;
+
+            textBoxGkod.Text = Gkode;
 
         }
 

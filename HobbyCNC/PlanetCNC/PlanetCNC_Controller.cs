@@ -49,7 +49,7 @@
         /// </summary>
         public static void Spindel_ON()
         {
-            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(true, 2, BinaryData.TypeSignal.Hz, PlanetCNC_Controller.ValueHz),true);
+            ControllerPlanetCNC.DirectPostToController(BinaryData.pack_B5(true, 2, BinaryData.TypeSignal.Hz, PlanetCNC_Controller.ValueHz));
 
             //зафиксируем
             PlanetCNC_Controller.LastStatus.Machine.SpindelON = true;
@@ -61,7 +61,7 @@
         /// </summary>
         public static void Spindel_OFF()
         {
-            ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(false, 2, BinaryData.TypeSignal.Hz, PlanetCNC_Controller.ValueHz),true);
+            ControllerPlanetCNC.DirectPostToController(BinaryData.pack_B5(false, 2, BinaryData.TypeSignal.Hz, PlanetCNC_Controller.ValueHz));
             //зафиксируем
             PlanetCNC_Controller.LastStatus.Machine.SpindelON = false;
         }

@@ -483,7 +483,7 @@ namespace CNC_Assist
             AddBinaryDataToTask(BinaryData.pack_D3());
             AddBinaryDataToTask(BinaryData.pack_AB());
             AddBinaryDataToTask(BinaryData.pack_9F(GlobalSetting.ControllerSetting.allowMotorUse, GlobalSetting.ControllerSetting.useSensorTools, GlobalSetting.ControllerSetting.AxleX.CountPulse, GlobalSetting.ControllerSetting.AxleY.CountPulse, GlobalSetting.ControllerSetting.AxleZ.CountPulse, GlobalSetting.ControllerSetting.AxleA.CountPulse));
-            AddBinaryDataToTask(BinaryData.pack_A0(GlobalSetting.ControllerSetting.AxleX.Acceleration, GlobalSetting.ControllerSetting.AxleY.Acceleration, GlobalSetting.ControllerSetting.AxleZ.Acceleration, GlobalSetting.ControllerSetting.AxleA.Acceleration, GlobalSetting.ControllerSetting.AxleX.reversAxle, GlobalSetting.ControllerSetting.AxleY.reversAxle, GlobalSetting.ControllerSetting.AxleZ.reversAxle, GlobalSetting.ControllerSetting.AxleA.reversAxle, GlobalSetting.ControllerSetting.AxleX.reversSignal, GlobalSetting.ControllerSetting.AxleY.reversSignal, GlobalSetting.ControllerSetting.AxleZ.reversSignal, GlobalSetting.ControllerSetting.AxleA.reversSignal));
+            //AddBinaryDataToTask(BinaryData.pack_A0(GlobalSetting.ControllerSetting.AxleX.Acceleration, GlobalSetting.ControllerSetting.AxleY.Acceleration, GlobalSetting.ControllerSetting.AxleZ.Acceleration, GlobalSetting.ControllerSetting.AxleA.Acceleration, GlobalSetting.ControllerSetting.AxleX.reversAxle, GlobalSetting.ControllerSetting.AxleY.reversAxle, GlobalSetting.ControllerSetting.AxleZ.reversAxle, GlobalSetting.ControllerSetting.AxleA.reversAxle, GlobalSetting.ControllerSetting.AxleX.reversSignal, GlobalSetting.ControllerSetting.AxleY.reversSignal, GlobalSetting.ControllerSetting.AxleZ.reversSignal, GlobalSetting.ControllerSetting.AxleA.reversSignal));
             AddBinaryDataToTask(BinaryData.pack_A1(GlobalSetting.ControllerSetting.UseLimitSwichXmin, GlobalSetting.ControllerSetting.UseLimitSwichXmax, GlobalSetting.ControllerSetting.UseLimitSwichYmin, GlobalSetting.ControllerSetting.UseLimitSwichYmax, GlobalSetting.ControllerSetting.UseLimitSwichZmin, GlobalSetting.ControllerSetting.UseLimitSwichZmax, false, false));
             AddBinaryDataToTask(BinaryData.pack_BF(GlobalSetting.ControllerSetting.AxleX.MaxSpeed, GlobalSetting.ControllerSetting.AxleY.MaxSpeed, GlobalSetting.ControllerSetting.AxleZ.MaxSpeed, GlobalSetting.ControllerSetting.AxleA.MaxSpeed));
             AddBinaryDataToTask(BinaryData.pack_B5());
@@ -644,7 +644,7 @@ namespace CNC_Assist
 
         #region Послания данных в контроллер
 
-        private static void DirectPostToController(byte[] _data)
+        public static void DirectPostToController(byte[] _data)
         {
             if (tmpUsbDevice != null)
             {
@@ -701,7 +701,7 @@ namespace CNC_Assist
         {
             if (!IsAvailability) return;
 
-            AddBinaryDataToTask(BinaryData.pack_C8(x, y, z,a),true);
+            DirectPostToController(BinaryData.pack_C8(x, y, z,a));
         }
 
         /// <summary>
@@ -815,20 +815,20 @@ namespace CNC_Assist
 
             DataLoader.FillStructure(dataRowLast, ref dataRowNow);
             
-            if (dataRowNow.Machine.SpindelON != dataRowLast.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != dataRowLast.Machine.SpeedSpindel)
-            {
+            //if (dataRowNow.Machine.SpindelON != dataRowLast.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != dataRowLast.Machine.SpeedSpindel)
+            //{
                 DirectPostToController(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
-            }
+           // }
 
-            if (dataRowNow.POS.X != dataRowLast.POS.X || dataRowNow.POS.Y != dataRowLast.POS.Y || dataRowNow.POS.Z != dataRowLast.POS.Z || dataRowNow.POS.Z != dataRowLast.POS.Z)
-            {
+           // if (dataRowNow.POS.X != dataRowLast.POS.X || dataRowNow.POS.Y != dataRowLast.POS.Y || dataRowNow.POS.Z != dataRowLast.POS.Z || dataRowNow.POS.Z != dataRowLast.POS.Z)
+           // {
                 DirectPostToController(BinaryData.pack_CA(Info.CalcPosPulse("X", dataRowNow.POS.X),
                                                                 Info.CalcPosPulse("Y", dataRowNow.POS.Y),
                                                                 Info.CalcPosPulse("Z", dataRowNow.POS.Z),
                                                                 Info.CalcPosPulse("A", dataRowNow.POS.A),
                                                                 dataRowNow.Machine.SpeedMaсhine,
                                                                 dataRowNow.numberRow));
-            }
+           // }
             
             dataRowLast = dataRowNow;
         }
@@ -1013,7 +1013,10 @@ namespace CNC_Assist
         }
 
 
-
+        /// <summary>
+        /// Данная команда пока непонятна....
+        /// </summary>
+        /// <returns></returns>
         public static byte[] pack_C2()
         {
             byte[] buf = new byte[64];
@@ -1127,7 +1130,12 @@ namespace CNC_Assist
         }
 
 
-
+        /// <summary>
+        /// Управление вкл/выключением 2, и 3-го канала
+        /// </summary>
+        /// <param name="chanel2On">второй канал</param>
+        /// <param name="chanel3On">третий канал</param>
+        /// <returns></returns>
         public static byte[] pack_B6(bool chanel2On = false,bool chanel3On = false)
         {
             byte[] buf = new byte[64];
@@ -1159,7 +1167,22 @@ namespace CNC_Assist
             return buf;
         }
 
-
+        /// <summary>
+        /// Установка параметров работы с драйверами моторов
+        /// </summary>
+        /// <param name="accelX">Максимальное ускорение по оси X</param>
+        /// <param name="accelY">Максимальное ускорение по оси Y</param>
+        /// <param name="accelZ">Максимальное ускорение по оси Z</param>
+        /// <param name="accelA">Максимальное ускорение по оси A</param>
+        /// <param name="reversAxeX">Смена направления движения по оси X</param>
+        /// <param name="reversAxeY">Смена направления движения по оси Y</param>
+        /// <param name="reversAxeZ">Смена направления движения по оси Z</param>
+        /// <param name="reversAxeA">Смена направления движения по оси A</param>
+        /// <param name="reversSignalX">Инверсия сигнала step для оси X</param>
+        /// <param name="reversSignalY">Инверсия сигнала step для оси Y</param>
+        /// <param name="reversSignalZ">Инверсия сигнала step для оси Z</param>
+        /// <param name="reversSignalA">Инверсия сигнала step для оси A</param>
+        /// <returns></returns>
         public static byte[] pack_A0(int accelX, int accelY, int accelZ, int accelA, bool reversAxeX, bool reversAxeY, bool reversAxeZ, bool reversAxeA, bool reversSignalX, bool reversSignalY, bool reversSignalZ, bool reversSignalA)
         {
             // A0 00 00 00 80 12 05 F5 01 00 05 F5 01 00 05 F5
@@ -1266,6 +1289,10 @@ namespace CNC_Assist
             return buf;
         }
 
+        /// <summary>
+        /// Данная команда пока непонятна....
+        /// </summary>
+        /// <returns></returns>
         public static byte[] pack_AB()
         {
             byte[] buf = new byte[64];
@@ -1367,7 +1394,10 @@ namespace CNC_Assist
         }
 
 
-
+        /// <summary>
+        /// Данная команда пока непонятна....
+        /// </summary>
+        /// <returns></returns>
         public static byte[] pack_D3()
         {
             byte[] buf = new byte[64];
@@ -1390,6 +1420,11 @@ namespace CNC_Assist
         /// <returns></returns>
         public static byte[] pack_BE(byte direction, int speed, string x = "_", string y = "_", string z = "_", string a = "_")
         {
+
+
+
+
+
             //TODO: переделать определения с направлениями движения
 
             byte[] buf = new byte[64];
@@ -1406,6 +1441,7 @@ namespace CNC_Assist
                 inewSpd = (int)dnewSpd;
             }
 
+
             //скорость
             buf[10] = (byte)(inewSpd);
             buf[11] = (byte)(inewSpd >> 8);
@@ -1417,9 +1453,11 @@ namespace CNC_Assist
 
                 if (speed != 0)
                 {
-                    double dnewSpd = (9000 / (double)speed) * 1000;
+                    double dnewSpd = (9000 / ((double)speed*2)) * 1000;
                     inewSpd = (int)dnewSpd;
                 }
+
+                
 
                 //скорость
                 buf[10] = (byte)(inewSpd);
@@ -1558,7 +1596,16 @@ namespace CNC_Assist
 
 
 
-
+        /// <summary>
+        /// Посылка настроек
+        /// </summary>
+        /// <param name="allowMotorUse">Разрежить использовать моторы</param>
+        /// <param name="useSensorTools">Разрешить использовать сенсор</param>
+        /// <param name="countPulseX">Количество импульсов по оси X</param>
+        /// <param name="countPulseY">Количество импульсов по оси Y</param>
+        /// <param name="countPulseZ">Количество импульсов по оси Z</param>
+        /// <param name="countPulseA">Количество импульсов по оси A</param>
+        /// <returns></returns>
         public static byte[] pack_9F(bool allowMotorUse, bool useSensorTools, int countPulseX, int countPulseY, int countPulseZ, int countPulseA)
         {
             // 9F 00 00 00 80 B3 90 01 00 00 90 01 00 00 90 01 
@@ -1690,37 +1737,18 @@ namespace CNC_Assist
         /// <param name="posX">положение X в импульсах</param>
         /// <param name="posY">положение Y в импульсах</param>
         /// <param name="posZ">положение Z в импульсах</param>
-        /// <param name="posA"></param>
+        /// <param name="posA">положение A в импульсах</param>
         /// <param name="speed">скорость мм/минуту</param>
         /// <param name="numberInstruction">Номер данной инструкции</param>
-        /// <param name="withoutpause"></param>
+        /// <param name="pauseTimeOut">!!! НЕКАЯ - длительность паузы после выполнения данной команды</param>
         /// <returns>набор данных для посылки</returns>
-        public static byte[] pack_CA(int posX, int posY, int posZ, int posA, int speed, int numberInstruction = 0, bool withoutpause = false)
+        public static byte[] pack_CA(int posX, int posY, int posZ, int posA, int speed, int numberInstruction = 0, byte pauseTimeOut = 0x39)
         {
             int newPosX = posX;
             int newPosY = posY;
             int newPosZ = posZ;
             int newPosA = posA;
             int newInst = numberInstruction;
-
-
-
-
-
-            ////корректировка положения
-            //if (Controller.CorrectionPos.useCorrection)
-            //{
-            //    newPosX += Controller.INFO.CalcPosPulse("X", Controller.CorrectionPos.deltaX);
-            //    newPosY += Controller.INFO.CalcPosPulse("Y", Controller.CorrectionPos.deltaY);
-            //    newPosZ += Controller.INFO.CalcPosPulse("Z", Controller.CorrectionPos.deltaZ);
-            //    newPosA += Controller.INFO.CalcPosPulse("A", Controller.CorrectionPos.deltaA);
-            //}
-
-
-
-
-
-
 
             byte[] buf = new byte[64];
 
@@ -1731,48 +1759,8 @@ namespace CNC_Assist
             buf[3] = (byte)(newInst >> 16);
             buf[4] = (byte)(newInst >> 24);
 
-            // Зная угол между 2-мя отрезками, вычислим необходимую паузу перехода, от отрезка к отрезку
-            //int deltaAngle = 180 - AngleVectors;
-
-            //buf[5] = 0x01;
-
-            //if (deltaAngle > 45) buf[5] = 0x39;
-
-
-            //if (deltaAngle <= 25) 
-            //buf[5] = 0x03;
-            //buf[5] = (byte)_valuePause;
-
-
-           // if (Distance >0 && Distance < 5) buf[5] = 0x03;
-
-            //if (deltaAngle < 15) buf[5] = 0x10;
-
-
-            //if (deltaAngle < 10) buf[5] = 0x02;
-
-
-            //if (deltaAngle < 3) buf[5] = 0x01;
-
-
-
-            //buf[5] = (byte)deltaAngle;
-
-            //if (buf[5] == 0x00) buf[5] = 0x01;
-
-            //if (buf[5] > 0x39) buf[5] = 0x39;
-
-            //TODO: старый алгоритм для удаления
-            //// 0х01 нет паузы, 0х39 есть пауза (при маленькой паузе, и большой скорости происходит срыв...)
-
-            if (withoutpause)
-            {
-                buf[5] = 0x01;
-            }
-            else
-            {
-                buf[5] = 0x39;
-            }
+            // !!! НЕКАЯ - длительность паузы после выполнения данной команды
+            buf[5] = pauseTimeOut;
 
             //сколько импульсов сделать
             buf[6] = (byte)(newPosX);
@@ -1814,42 +1802,6 @@ namespace CNC_Assist
                 buf[4] = 0x00; //TODO: непонятный байт
                 koef = 4500;
             }
-
-
-            //TODO: если дистанция = 0 то используем скорость....
-
-            //TODO: Учесть длину траектории, если она короткая то нельзя ставить большую скорость, т.к. легко можно сорвать вращение 
-            //int SpeedToSend = _speed;
-
-            //int SpeedToSend = 2328; 
-            ////старый код
-            //if (_speed != 0)
-            //{
-            //    SpeedToSend = _speed;
-            //}
-
-            //TODO: добавить ограничение скорости от дистанции!!!
-            //при большой дистанции используем скорость заданную G-кодом
-            //if (Distance > 50) SpeedToSend = _speed;
-            //else
-            //{
-            //    //иначе замедлим скорость
-            //    /* растояние 50мм скорость = 500мм/минуту
-            //     * растояние 30мм скорость = 300мм/минуту
-            //     * растояние 10мм скорость = 100мм/минуту
-            //     * и т.д....
-            //     */
-            //    //SpeedToSend = Distance * 10;
-            //    SpeedToSend = 500;
-            //    // не всегда имеем дистанцию 
-            //    //if (Distance == 0) SpeedToSend = 200;
-            //}
-
-            //////if (Distance < 10) SpeedToSend = 400;
-
-            //////if (_speed == 0) SpeedToSend = 200;
-
-
 
             int iSpeed = (int)(koef / speed) * 1000;
             //скорость ось х

@@ -16,6 +16,8 @@ namespace CNC_Assist
             ShowAxes.Checked = GlobalSetting.RenderSetting.ShowAxes;
             ShowScanedGrid.Checked = GlobalSetting.RenderSetting.ShowScanedGrid;
 
+            showCompleatedTraectory.Checked = GlobalSetting.RenderSetting.ShowCompleatedTraectory;
+
 
             ShowGrid.Checked = GlobalSetting.RenderSetting.ShowGrid;
             numericUpDown1.Value = GlobalSetting.RenderSetting.GridSize;
@@ -134,6 +136,12 @@ namespace CNC_Assist
             GlobalSetting.ControllerSetting.WorkSizeYm = 0;
             GlobalSetting.ControllerSetting.WorkSizeXp = 0;
             GlobalSetting.ControllerSetting.WorkSizeYp = 0;
+            GlobalSetting.SaveToFile();
+        }
+
+        private void showCompleatedTraectory_CheckedChanged(object sender, EventArgs e)
+        {
+            GlobalSetting.RenderSetting.ShowCompleatedTraectory = showCompleatedTraectory.Checked;
             GlobalSetting.SaveToFile();
         }
     }

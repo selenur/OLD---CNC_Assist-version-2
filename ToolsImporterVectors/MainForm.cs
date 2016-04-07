@@ -2016,6 +2016,7 @@ namespace ToolsImporterVectors
         private void button6_Click(object sender, EventArgs e)
         {
             //Read_File();
+            Read_GBR();
         }
 
 
@@ -2023,6 +2024,11 @@ namespace ToolsImporterVectors
         private void button7_Click_1(object sender, EventArgs e)
         {
             previewBox1.DRAW();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            // тут проверим
         }
 
 

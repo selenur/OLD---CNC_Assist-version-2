@@ -1403,12 +1403,44 @@ namespace CNC_Assist
             if (DataLoader.status == DataLoader.eDataSetStatus.none)
             {
                 Gl.glLineWidth(0.3f);
+
+                if (GlobalSetting.AppSetting.typeworks == TypeWorks.BurningOnOff)
+                {
+                    Gl.glLineWidth(5.0f);
+                }
+
+
+
                 Gl.glBegin(Gl.GL_LINE_STRIP);
                 //TODO: источником данных теперь будет являться другое место
                 foreach (DataRow vv in DataLoader.DataRows)
                 {
+
+
+                    if (!GlobalSetting.RenderSetting.ShowCompleatedTraectory)
+                    {
+                        //проверим необходимость отрисовки траектории
+                        if (vv.numberRow < ControllerPlanetCNC.Info.NuberCompleatedInstruction) continue;
+                    }
+
+
+
+                    if (GlobalSetting.AppSetting.typeworks == TypeWorks.Milling)
+                    {
+                        if (vv.Machine.NumGkode == 1) Gl.glColor3f(0, 255, 0); else Gl.glColor3f(255, 0, 0);
+                    }
+                    else if (GlobalSetting.AppSetting.typeworks == TypeWorks.BurningOnOff)
+                    {
+                        if (vv.Machine.SpindelON) Gl.glColor3f(0, 0, 0); else Gl.glColor3f(255, 255, 255);
+                    }
+
+
+
                     //Gl.glLineWidth(0.1f);
-                    if (vv.Machine.NumGkode == 1) Gl.glColor3f(0, 255, 0); else Gl.glColor3f(255, 0, 0);
+                    
+
+
+
 
                     //координаты следующей точки
                     float pointX = (float)vv.POS.X;
@@ -1437,7 +1469,19 @@ namespace CNC_Assist
                     }
 
                     Gl.glVertex3d((double)pointX, (double)pointY, (double)pointZ);
+
                     Gl.glLineWidth(0.4f);
+
+                    //debug
+                   // if (GlobalSetting.AppSetting.typeworks == TypeWorks.BurningOnOff)
+                   // {
+                   ////     if (vv.Machine.SpindelON) Gl.glColor3f(0, 0, 0); else Gl.glColor3f(255, 255, 255);
+                   //     Gl.glLineWidth(5.0f);
+                   // }
+
+
+
+                    
                 }
 
                 Gl.glEnd();                
@@ -1755,17 +1799,17 @@ namespace CNC_Assist
         {
             if (radioButton_off.Checked)
             {
-                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.None, (int)numericUpDown8.Value));
+                ControllerPlanetCNC.DirectPostToController(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.None, (int)numericUpDown8.Value));
             }
 
             if (radioButton_Hz.Checked)
             {
-                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Hz, (int)numericUpDown8.Value));
+                ControllerPlanetCNC.DirectPostToController(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Hz, (int)numericUpDown8.Value));
             }
 
             if (radioButton_RC.Checked)
             {
-                ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Rc, (int)numericUpDown8.Value));
+                ControllerPlanetCNC.DirectPostToController(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, BinaryData.TypeSignal.Rc, (int)numericUpDown8.Value));
             }            
 
         }
@@ -1782,7 +1826,6 @@ namespace CNC_Assist
 
             SendSignal();
 
-           // _cnc.SendBinaryData(BinaryData.pack_B5(checkBox18.Checked, (int)numericUpDown7.Value, checkBox19.Checked, (int)numericUpDown8.Value));
         }
 
 

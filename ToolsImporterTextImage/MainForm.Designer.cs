@@ -147,6 +147,9 @@
             this.pictureBoxPreview = new System.Windows.Forms.PictureBox();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.checkBoxForLaser = new System.Windows.Forms.CheckBox();
+            this.numericUpDownSpeedLaser = new System.Windows.Forms.NumericUpDown();
+            this.label26 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.textSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownKoefPalitra)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -185,6 +188,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPreview)).BeginInit();
             this.groupBox7.SuspendLayout();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSpeedLaser)).BeginInit();
             this.SuspendLayout();
             // 
             // textString
@@ -967,6 +971,9 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label26);
+            this.groupBox3.Controls.Add(this.numericUpDownSpeedLaser);
+            this.groupBox3.Controls.Add(this.checkBoxForLaser);
             this.groupBox3.Controls.Add(this.label15);
             this.groupBox3.Controls.Add(this.numericUpDownZ0);
             this.groupBox3.Controls.Add(this.label13);
@@ -1032,10 +1039,10 @@
             0,
             0});
             this.numericUpDownZ1.Minimum = new decimal(new int[] {
-            1,
+            10000,
             0,
             0,
-            327680});
+            -2147483648});
             this.numericUpDownZ1.Name = "numericUpDownZ1";
             this.numericUpDownZ1.Size = new System.Drawing.Size(77, 20);
             this.numericUpDownZ1.TabIndex = 16;
@@ -1593,6 +1600,50 @@
             this.panel1.Size = new System.Drawing.Size(633, 238);
             this.panel1.TabIndex = 19;
             // 
+            // checkBoxForLaser
+            // 
+            this.checkBoxForLaser.AutoSize = true;
+            this.checkBoxForLaser.ForeColor = System.Drawing.Color.Navy;
+            this.checkBoxForLaser.Location = new System.Drawing.Point(9, 213);
+            this.checkBoxForLaser.Name = "checkBoxForLaser";
+            this.checkBoxForLaser.Size = new System.Drawing.Size(140, 17);
+            this.checkBoxForLaser.TabIndex = 20;
+            this.checkBoxForLaser.Text = "Генерация для лазера";
+            this.checkBoxForLaser.UseVisualStyleBackColor = true;
+            // 
+            // numericUpDownSpeedLaser
+            // 
+            this.numericUpDownSpeedLaser.ForeColor = System.Drawing.Color.Navy;
+            this.numericUpDownSpeedLaser.Location = new System.Drawing.Point(71, 231);
+            this.numericUpDownSpeedLaser.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.numericUpDownSpeedLaser.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.numericUpDownSpeedLaser.Name = "numericUpDownSpeedLaser";
+            this.numericUpDownSpeedLaser.Size = new System.Drawing.Size(116, 20);
+            this.numericUpDownSpeedLaser.TabIndex = 21;
+            this.numericUpDownSpeedLaser.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.ForeColor = System.Drawing.Color.Navy;
+            this.label26.Location = new System.Drawing.Point(7, 233);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(58, 13);
+            this.label26.TabIndex = 22;
+            this.label26.Text = "Скорость:";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1660,6 +1711,7 @@
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
             this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSpeedLaser)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1785,6 +1837,9 @@
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.Button buttonЫSetFontFile;
         private System.Windows.Forms.CheckBox checkBoxFromFile;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.NumericUpDown numericUpDownSpeedLaser;
+        private System.Windows.Forms.CheckBox checkBoxForLaser;
     }
 }
 

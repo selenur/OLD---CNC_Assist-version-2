@@ -66,6 +66,7 @@
             this.arcToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
+            this.toClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.contextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -87,7 +88,8 @@
             this.menuLoadFromFileToolStripMenuItem,
             this.menuSaveToFileToolStripMenuItem,
             this.menuExportToGKodeToolStripMenuItem,
-            this.menuClearToolStripMenuItem});
+            this.menuClearToolStripMenuItem,
+            this.toClipboardToolStripMenuItem});
             this.menuFileToolStripMenuItem.Name = "menuFileToolStripMenuItem";
             this.menuFileToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.menuFileToolStripMenuItem.Text = "Файл";
@@ -266,7 +268,7 @@
             this.arcToolStripMenuItem1,
             this.toolStripMenuItem3});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(190, 330);
+            this.contextMenu.Size = new System.Drawing.Size(190, 308);
             this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
             // 
             // openDialogToolStripMenuItem
@@ -404,6 +406,13 @@
             this.imageList.Images.SetKeyName(6, "arrow_rotate_clockwise.png");
             this.imageList.Images.SetKeyName(7, "file_extension_sea.png");
             // 
+            // toClipboardToolStripMenuItem
+            // 
+            this.toClipboardToolStripMenuItem.Name = "toClipboardToolStripMenuItem";
+            this.toClipboardToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.toClipboardToolStripMenuItem.Text = "toClipboard";
+            this.toClipboardToolStripMenuItem.Click += new System.EventHandler(this.toClipboardToolStripMenuItem_Click);
+            // 
             // ConstructorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -463,5 +472,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem arcToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem arcToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem toClipboardToolStripMenuItem;
     }
 }

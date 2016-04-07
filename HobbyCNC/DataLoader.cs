@@ -127,7 +127,8 @@ namespace CNC_Assist
             }
 
             Thread workerThread = new Thread(DoWork1);
-            workerThread.Start(Clipboard.GetText());
+            string sss = Clipboard.GetText();
+            workerThread.Start(sss);
 
             return new ResultCommand(true, @"Запущена загрузка из буффера.");
         }
@@ -328,18 +329,30 @@ namespace CNC_Assist
                     nextDataRow.Machine.NumGkode = 0;
                 }
 
-                if (code == "G1") //рабочее движение
+                if (code.Length >=2 && code.Substring(0, 2) == "G1") //рабочее движение
                 {
                     nextDataRow.Machine.NumGkode = 1;
-                    nextDataRow.Machine.WithoutPause = false;
+
+                    if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK2)
+                    {
+                        if (code.Contains("."))
+                        {
+                            //извлечем значение после точки
+                            string stmp = code.Substring(code.IndexOf(".")+1);
+
+                            int inttmp = 57;
+
+                            int.TryParse(stmp, out inttmp);
+
+                            if (inttmp < 0) inttmp = 0;
+
+                            if (inttmp > 57) inttmp = 57;
+
+                            nextDataRow.Machine.TimeOutPause = (byte)inttmp;
+                        }
+                    }
                 }
 
-                // TODO: добавить условие при котором данная команда доступна только с контроллером MK2, или вместо неё просто срабатывает команда g1
-                if (code == "G1.1") //рабочее движение без дальнейшей остановки в конце отрезка
-                {
-                    nextDataRow.Machine.NumGkode = 1;
-                    nextDataRow.Machine.WithoutPause = true;
-                }
 
                 if (code == "G2") //TODO: не реализовано
                 {
@@ -688,11 +701,10 @@ namespace CNC_Assist
         public bool Chanel3ON;
 
         /// <summary>
-        /// Для planet-cnc отключать паузу командой G1.1
-        /// WithoutPause = true при G1.1
-        /// WithoutPause = false при G1
+        /// Для planet-cnc mk2, можно отключать паузу командой G1.хх где хх - значение от 0х00 до 0х39 
+        /// чем меньше значение тем меньше пауза
         /// </summary>
-        public bool WithoutPause;
+        public byte TimeOutPause;
 
         /// <summary>
         /// Установка параметров станка
@@ -701,7 +713,7 @@ namespace CNC_Assist
         /// <param name="_SpeedMaсhine">Скорость движения шпинделя</param>
         /// <param name="_SpindelON">Влючен ли шпиндель</param>
         /// <param name="_SpeedSpindel">Скорость вращения шпинделя, или значение PWM</param>
-        public PropMaсhine(int _NumGkode, int _SpeedMaсhine, bool _SpindelON, int _SpeedSpindel, bool _Chanel2ON, bool _Chanel3ON, bool _WithoutPause)
+        public PropMaсhine(int _NumGkode, int _SpeedMaсhine, bool _SpindelON, int _SpeedSpindel, bool _Chanel2ON, bool _Chanel3ON, byte _TimeOutPause = 0x39)
         {
             NumGkode = _NumGkode;
             SpeedMaсhine = _SpeedMaсhine;
@@ -709,7 +721,7 @@ namespace CNC_Assist
             SpeedSpindel = _SpeedSpindel;
             Chanel2ON = _Chanel2ON;
             Chanel3ON = _Chanel3ON;
-            WithoutPause = _WithoutPause;
+            TimeOutPause = _TimeOutPause;
         }
 
         /// <summary>
@@ -721,7 +733,7 @@ namespace CNC_Assist
             SpeedMaсhine = 100;
             SpindelON = false;
             SpeedSpindel = 0;
-            WithoutPause = false;
+            TimeOutPause = 0x39;
         }
 
     }
@@ -893,7 +905,7 @@ namespace CNC_Assist
         public void duplicate(DataRow tmp)
         {
             POS = new Position(tmp.POS.X, tmp.POS.Y, tmp.POS.Z, tmp.POS.A);
-            Machine = new PropMaсhine(tmp.Machine.NumGkode, tmp.Machine.SpeedMaсhine,tmp.Machine.SpindelON,tmp.Machine.SpeedSpindel,tmp.Machine.Chanel2ON,tmp.Machine.Chanel3ON,tmp.Machine.WithoutPause);
+            Machine = new PropMaсhine(tmp.Machine.NumGkode, tmp.Machine.SpeedMaсhine,tmp.Machine.SpindelON,tmp.Machine.SpeedSpindel,tmp.Machine.Chanel2ON,tmp.Machine.Chanel3ON,tmp.Machine.TimeOutPause);
             Tools = new ToolOptions(false, tmp.Tools.NumberTools, tmp.Tools.DiametrTools);
             Extra = new ExtraOtions(false, 0, tmp.Extra.useThisCommand); //не нужно копировать паузу....
         }

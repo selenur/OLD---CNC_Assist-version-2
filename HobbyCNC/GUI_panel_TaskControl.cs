@@ -168,12 +168,12 @@ namespace CNC_Assist
                 if (_nowPos != 0) dataRowOld = DataLoader.DataRows[_nowPos - 1];
 
                 // В случае наличия изменений, отправим новые данные
-                if (dataRowNow.Machine.SpindelON != dataRowOld.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != dataRowOld.Machine.SpeedSpindel)
-                {
+                //if (dataRowNow.Machine.SpindelON != dataRowOld.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != dataRowOld.Machine.SpeedSpindel)
+                //{
                     ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
                     //TODO: это нужно переделать!!!!! зафиксируем
                     PlanetCNC_Controller.LastStatus = dataRowNow;
-                }
+              //  }
 
 
                 if (dataRowNow.POS.X != dataRowOld.POS.X || dataRowNow.POS.Y != dataRowOld.POS.Y || dataRowNow.POS.Z != dataRowOld.POS.Z || dataRowNow.POS.Z != dataRowOld.POS.Z)
@@ -225,12 +225,13 @@ namespace CNC_Assist
 
                     }
 
+
                     ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_CA(ControllerPlanetCNC.Info.CalcPosPulse("X", (decimal)pointX),
                                                                     ControllerPlanetCNC.Info.CalcPosPulse("Y", (decimal)pointY),
                                                                     ControllerPlanetCNC.Info.CalcPosPulse("Z", (decimal)pointZ),
                                                                     ControllerPlanetCNC.Info.CalcPosPulse("A", dataRowNow.POS.A),
                                                                     speedToSend,
-                                                                    dataRowNow.numberRow));
+                                                                    dataRowNow.numberRow, dataRowNow.Machine.TimeOutPause));
 
                     //TODO: это нужно переделать!!!!! зафиксируем
                     PlanetCNC_Controller.LastStatus = dataRowNow;
@@ -239,7 +240,21 @@ namespace CNC_Assist
                 _nowPos++;
 
                 //TODO: так-же добавить прерывание, в случае смены инструмента/паузы
+                
+                // вариант 1 - выполняется до последней строчки
                 needContinue = (_nowPos < _endPos);
+
+                // вариант 2 - выполняется до смены инструмента, и активируется остановка
+                if (dataRowNow.Tools.NeedChange)
+                {
+                    needContinue = false;
+                    MessageBox.Show("Возникла необходимость смены инструмента № " + dataRowNow.Tools.NumberTools +
+                                    ", с диамтром: " + dataRowNow.Tools.DiametrTools);
+
+                }
+
+
+
             }
 
 
