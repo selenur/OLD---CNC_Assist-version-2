@@ -561,6 +561,49 @@ namespace CNC_Assist
 
 
 
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// Дублирование движения оси A с другой осью
+        /// </summary>
+        private bool _UseDuplicationAxes;
+        /// <summary>
+        /// Автоподключение к контроллеру
+        /// </summary>
+        [DisplayName(@"Дублирование оси")]
+        [Description("Настройка активирует режим, при котором происходит дублирование одной оси к к другой")]
+        [Category("2.4 Дополнительно")]
+        [TypeConverter(typeof(BooleanTypeConverter))]
+        public bool UseDuplicationAxes
+        {
+            get { return _UseDuplicationAxes; }
+            set { _UseDuplicationAxes = value; }
+
+        }
+
+
+        /// <summary>
+        /// Параметры дублирования оси А
+        /// </summary>
+        private ListAxes _DiblicateAxesA = ListAxes.X;
+        /// <summary>
+        /// Параметры дублирования оси А
+        /// </summary>
+        [DisplayName(@"Ось A дублируется с осью")]
+        [Category("2.4 Дополнительно")]
+        //[ReadOnly(true)]
+        [TypeConverter(typeof(EnumTypeConverter))]
+        public ListAxes DiblicateAxesA
+        {
+            get { return _DiblicateAxesA; }
+            set { _DiblicateAxesA = value; }
+        }
     }
 
     /// <summary>
@@ -1098,8 +1141,27 @@ namespace CNC_Assist
         /// <summary>
         /// Английский
         /// </summary>
-        [Description("Английский")]
-        English = 1
+        [Description("English")]
+        English = 1,
+        /// <summary>
+        /// Немецкий
+        /// </summary>
+        [Description("Deutsch")]
+        Deutsch = 2
+
+    };
+    /// <summary>
+    /// Список осей
+    /// </summary>
+    [Serializable]
+    public enum ListAxes
+    {
+        [Description("X")]
+        X = 0,
+        [Description("Y")]
+        Y = 1,
+        [Description("Z")]
+        Z = 2
     };
 
 

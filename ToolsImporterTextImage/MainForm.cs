@@ -14,14 +14,15 @@ namespace CNCImporterGkode
     public partial class MainForm : Form
     {
 
+        private readonly SelectFont _selFont = new SelectFont();
+        private readonly SelectImage _selImage = new SelectImage();
+
         private List<List<PointF>> _lines;
+
         private float _minX = 99999;
-        private float _maxX = 0;
+        private float _maxX;
         private float _minY = 99999;
-        private float _maxY = 0;
-
-        private string externFileFont = "";
-
+        private float _maxY;
 
         public MainForm()
         {
@@ -30,151 +31,63 @@ namespace CNCImporterGkode
 
         private void Form_Load(object sender, EventArgs e)
         {
-            InstalledFontCollection installedFontCollection = new InstalledFontCollection();
+            _selFont.IsChange += EventFromUc;
+            _selImage.IsChange += EventFromUc;
 
-            foreach (FontFamily fnt in installedFontCollection.Families)
-            {
-                comboBoxFont.Items.Add(fnt.Name);
-            }
-            comboBoxFont.Text = comboBoxFont.Items[0].ToString();
+            panel1.Controls.Add(_selFont);
+
+            RefreshStep1();
+        }
+
+        private void EventFromUc(object sender, EventArgs e)
+        {
             RefreshStep1();
         }
 
         // Установка доступности тех или иных элементов на страницах
         void RefreshEnableTab()
         {
-            bool enableStep2 = true;
+            bool enableStep2;
 
             if (radioButtonTypeSourcePicture.Checked)
             {
                 enableStep2 = true;
-
-
-
             }
             else
             {
-                if (radioButtonFontVector.Checked)
-                {
-                    enableStep2 = false;
-
-                }
-                else
-                {
-                    enableStep2 = true;
-
-                }                   
+                enableStep2 = !_selFont.UseVectorFont;                   
             }
-
-
-
-
 
             groupBoxFilter1.Enabled = enableStep2;
             groupBoxFilter2.Enabled = enableStep2;
             groupBoxFilter3.Enabled = enableStep2;
             groupBoxFilter4.Enabled = enableStep2;
             groupBoxFilter5.Enabled = enableStep2;
-            checkBoxStep2Refresh.Enabled = enableStep2;
-
-        }
-
-
-
-
-        #region Шаг 1
-
-        void RefreshStep1()
-        {
-            if (!checkBoxStep1Refresh.Checked) return;
-
-            if (radioButtonTypeSourcePicture.Checked)
-            {
-                ShowImageWindowFromStep(1);
-            }
-            else
-            {
-                if (radioButtonFontBitmap.Checked)
-                {
-                    ShowImageWindowFromStep(1);
-                }
-                else
-                {
-                    _lines = GetVectorFromText(textString.Text, comboBoxFont.Text, (float) textSize.Value);
-                    PreviewLines(_lines);
-                }                
-            }
-
-            RefreshEnableTab();
-        }
-
-        private void btShowOrigImage(object sender, EventArgs e)
-        {
-            ShowImageWindowFromStep(1);
         }
 
         private void radioButtonTypeSourceText_CheckedChanged(object sender, EventArgs e)
         {
-            groupBox_Text.Visible = radioButtonTypeSourceText.Checked;
-            groupBox_Picture.Visible = !radioButtonTypeSourceText.Checked;
+            panel1.Controls.Clear();
+            panel1.Controls.Add(_selFont);
+            RefreshEnableTab();
         }
 
         private void radioButtonTypeSourcePicture_CheckedChanged(object sender, EventArgs e)
         {
-            groupBox_Text.Visible = radioButtonTypeSourceText.Checked;
-            groupBox_Picture.Visible = !radioButtonTypeSourceText.Checked;
+            panel1.Controls.Clear();
+            panel1.Controls.Add(_selImage);
+            RefreshEnableTab();
         }
 
-        private void comboBoxFont_SelectedIndexChanged(object sender, EventArgs e)
+        void RefreshStep1()
         {
-            RefreshStep1();
+           ShowImageWindowFromStep(1);
+
+           RefreshEnableTab();
         }
-
-        private void textSize_ValueChanged(object sender, EventArgs e)
-        {
-            RefreshStep1();
-        }
-
-        private void textString_TextChanged(object sender, EventArgs e)
-        {
-            RefreshStep1();
-        }
-
-        private void radioButtonFontVector_CheckedChanged(object sender, EventArgs e)
-        {
-            RefreshStep1();
-        }
-
-        private void radioButtonFontBitmap_CheckedChanged(object sender, EventArgs e)
-        {
-            RefreshStep1();
-        }
-
-        private void btSelectFile(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.CheckFileExists = true;
-            openFileDialog1.Multiselect = false;
-            openFileDialog1.Title = @"Выбор рисунка";
-            //openFileDialog1.InitialDirectory = "c:\\";
-            openFileDialog1.Filter = "All files (*.*)|*.*";
-            openFileDialog1.FilterIndex = 2;
-            openFileDialog1.RestoreDirectory = true;
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                textBoxFileName.Text = openFileDialog1.FileName;
-                RefreshStep1();
-            }
-        }
-
-        #endregion
-
-        #region Шаг 2
 
         private void RefreshStep2(int _i)
         {
-            if (!checkBoxStep2Refresh.Checked) return;
-
             ShowImageWindowFromStep(_i);
         }
 
@@ -233,13 +146,8 @@ namespace CNCImporterGkode
             RefreshStep2(6);
         }
 
-        #endregion
-
-        #region Шаг 3
-
         private void RefreshTree()
         {
-            
             //заполним дерево
             treeView1.Nodes.Clear();
             textBoxGkod.Text = "";
@@ -266,29 +174,21 @@ namespace CNCImporterGkode
                 }
             }
             Calculate();
-
-
         }
 
         //вычисление отрезков
         private void buttonCalculateVectors_Click(object sender, EventArgs e)
         {
-            // в зависимости от данного параметра
-            if (radioButtonTypeSourceText.Checked && radioButtonFontVector.Checked)
-            {
-                _lines = GetVectorFromText(textString.Text, comboBoxFont.Text, (float)textSize.Value);
-            }
-            else
-            {
-                // Если оказались тут, значит нужно анализировать рисунок, и из него извлекать вектора
-                _lines = GetVectorFromImage(GetImageFromStep(6));
-            }
+            Bitmap tmp = GetImageFromStep(6);
+            _lines = GetVectorFromImage(tmp);
+
 
             RefreshTree();
+            //pictureBoxPreview.Image = GetTraectory();
         }
 
 
-        #endregion
+
 
         #region Функции обработки изображения
 
@@ -519,7 +419,6 @@ namespace CNCImporterGkode
 
             return Lines;
         }
-        
 
 
         /// <summary>
@@ -528,32 +427,29 @@ namespace CNCImporterGkode
         /// <param name="text">Текст кторый нужно преобразовать в вектора</param>
         /// <param name="fontName">Имя шрифта</param>
         /// <param name="fontSize">Размер шрифта</param>
+        /// <param name="extFileFont">Имя внешненего файла (если используется не системный шрифт)</param>
         /// <returns>Набор отрезков</returns>
-        private List<List<PointF>> GetVectorFromText(string text, string fontName, float fontSize)
+        private List<List<PointF>> GetVectorFromText(string text, string fontName, float fontSize, string extFileFont = "")
         {
             PointF[] pts = null; //список точек
             byte[] ptsType = null; //информация о начале/окончании отрезка
 
             using (GraphicsPath path = new GraphicsPath())
             {
-
-
-
-                if (checkBoxFromFile.Checked)
+                if (extFileFont != "")
                 {
-                    //TODO: вторая попытка использования внешнего файла
+                    PrivateFontCollection customFontFromFile;
                     customFontFromFile = new PrivateFontCollection();
-                    customFontFromFile.AddFontFile(externFileFont);
+                    customFontFromFile.AddFontFile(extFileFont);
                     if (customFontFromFile.Families.Length > 0)
                     {
-                        Font font = new Font(customFontFromFile.Families[0], (int)textSize.Value);
-                        path.AddString(text, font.FontFamily, (int)FontStyle.Regular, fontSize, new PointF(0f, 0f), StringFormat.GenericDefault);                        
+                        Font font = new Font(customFontFromFile.Families[0], (int)fontSize);
+                        path.AddString(text, font.FontFamily, (int)FontStyle.Regular, fontSize, new PointF(0f, 0f), StringFormat.GenericDefault);
                     }
                     else
                     {
                         MessageBox.Show(@"Ошибка загрузки шрифта из файла!!!");
                     }
-
                 }
                 else
                 {
@@ -617,30 +513,91 @@ namespace CNCImporterGkode
 
         }
 
-
-        private void PreviewLines(List<List<PointF>> linesList)
+        // Создание рисунка из текста
+        private Bitmap CreateBitmapFromText(string text, string fontName, float fontSize, string extFileFont = "")
         {
-            //получим границы векторов
-            float maxX = 0;
-            float maxY = 0;
-            float minX = 9999;
-            float minY = 9999;
+            //string imageText = textString.Text;
 
-            foreach (List<PointF> line in linesList)
+            if (text.Trim().Length == 0) text = " ";
+
+            Bitmap bitmap = new Bitmap(1, 1, PixelFormat.Format24bppRgb);
+
+            int width = 0;
+            int height = 0;
+
+            // Создаем объект Font для "рисования" им текста.
+            Font font = new Font(fontName, (int)fontSize, FontStyle.Bold, GraphicsUnit.Pixel);
+
+            if (extFileFont != "")
             {
-                foreach (PointF point in line)
+                PrivateFontCollection customFontFromFile;
+                customFontFromFile = new PrivateFontCollection();
+                customFontFromFile.AddFontFile(extFileFont);
+
+                if (customFontFromFile.Families.Length > 0)
                 {
-                    if (point.X > maxX) maxX = point.X;
-                    if (point.Y > maxY) maxY = point.Y;
-                    if (point.X < minX) minX = point.X;
-                    if (point.Y < minY) minY = point.Y;                    
+                    font = new Font(customFontFromFile.Families[0], (int)fontSize);
+                }
+                else
+                {
+                    MessageBox.Show(@"Ошибка загрузки шрифта из файла!!!");
                 }
             }
 
-            labelTextSize.Text = @"Размер текста: " + (maxX - minX) + " x " + (maxY - minY) +" единиц.";
+            // Создаем объект Graphics для вычисления высоты и ширины текста.
+            Graphics graphics = Graphics.FromImage(bitmap);
+
+            // Определение размеров изображения.
+            width = (int)graphics.MeasureString(text, font).Width;
+            height = (int)graphics.MeasureString(text, font).Height;
+
+            // Пересоздаем объект Bitmap с откорректированными размерами под текст и шрифт.
+            bitmap = new Bitmap(bitmap, new Size(width, height));
+
+            // Пересоздаем объект Graphics
+            graphics = Graphics.FromImage(bitmap);
+
+            // Задаем цвет фона.
+            graphics.Clear(Color.White);
+            // Задаем параметры анти-алиасинга
+            graphics.SmoothingMode = SmoothingMode.None;
+            graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixel;
+            // Пишем (рисуем) текст
+            graphics.DrawString(text, font, new SolidBrush(Color.Black), 0, 0);
+
+            graphics.Flush();
+
+            return (bitmap);
+        }
 
 
-            ShowTraectory();
+
+
+        private Bitmap PreviewLines(List<List<PointF>> linesList)
+        {
+
+
+            return GetTraectory();
+
+            //получим границы векторов
+            //float maxX = 0;
+            //float maxY = 0;
+            //float minX = 9999;
+            //float minY = 9999;
+
+            //foreach (List<PointF> line in linesList)
+            //{
+            //    foreach (PointF point in line)
+            //    {
+            //        if (point.X > maxX) maxX = point.X;
+            //        if (point.Y > maxY) maxY = point.Y;
+            //        if (point.X < minX) minX = point.X;
+            //        if (point.Y < minY) minY = point.Y;                    
+            //    }
+            //}
+
+            //labelTextSize.Text = @"Размер текста: " + (maxX - minX) + " x " + (maxY - minY) +" единиц.";
+
 
 
             ////сформируем чистый рисунок, в котором всё и нарисуем
@@ -712,61 +669,6 @@ namespace CNCImporterGkode
 
 
 
-        // Создание рисунка из текста
-        private Bitmap CreateBitmapFromText()
-        {
-            string imageText = textString.Text;
-
-            if (imageText.Trim().Length == 0) imageText = " ";
-
-            Bitmap bitmap = new Bitmap(1, 1, PixelFormat.Format24bppRgb);
-
-            int width = 0;
-            int height = 0;
-
-            // Создаем объект Font для "рисования" им текста.
-            Font font = new Font(comboBoxFont.Text, (int)textSize.Value, FontStyle.Bold, GraphicsUnit.Pixel);
-
-            if (checkBoxFromFile.Checked)
-            {
-                //TODO: первая попытка использования внешнего файла
-                customFontFromFile = new PrivateFontCollection();
-                customFontFromFile.AddFontFile(externFileFont);
-
-                if (customFontFromFile.Families.Length > 0)
-                {
-                    font = new Font(customFontFromFile.Families[0], (int)textSize.Value);
-                }
-                else
-                {
-                    MessageBox.Show(@"Ошибка загрузки шрифта из файла!!!");
-                }
-            }
-
-            // Создаем объект Graphics для вычисления высоты и ширины текста.
-            Graphics graphics = Graphics.FromImage(bitmap);
-
-            // Определение размеров изображения.
-            width = (int)graphics.MeasureString(imageText, font).Width;
-            height = (int)graphics.MeasureString(imageText, font).Height;
-
-            // Пересоздаем объект Bitmap с откорректированными размерами под текст и шрифт.
-            bitmap = new Bitmap(bitmap, new Size(width, height));
-
-            // Пересоздаем объект Graphics
-            graphics = Graphics.FromImage(bitmap);
-
-            // Задаем цвет фона.
-            graphics.Clear(Color.White);
-            // Задаем параметры анти-алиасинга
-            graphics.SmoothingMode = SmoothingMode.None;
-            graphics.TextRenderingHint = TextRenderingHint.SingleBitPerPixel;
-            // Пишем (рисуем) текст
-            graphics.DrawString(imageText, font, new SolidBrush(Color.Black), 0,0);
-
-            graphics.Flush();
-            return (bitmap);
-        }
 
         private Bitmap ConvertImageToBlackWhileColor(Bitmap bmp)
         {
@@ -1014,33 +916,7 @@ namespace CNCImporterGkode
         {
             Bitmap tmp = GetImageFromStep(showstep);
             pictureBoxPreview.Image = tmp;
-
-            labelTextSize.Text = @"Размер рисунка: " + tmp.Width.ToString() + " x " + tmp.Height.ToString() + " пикселей";
-
-            //if (checkBoxStep1Refresh.Checked)
-            //{
-            //    pictureBoxPreview.Image = tmp;
-
-            //    if (radioButton_Zoom.Checked)
-            //    {
-            //        pictureBoxPreview.Width = panel1.ClientSize.Width - 2;
-            //        pictureBoxPreview.Height = panel1.ClientSize.Height - 26;
-            //        panel1.AutoScrollMinSize = new Size(0, 0);
-            //        panel1.AutoScroll = false;
-            //    }
-            //    else
-            //    {
-            //        pictureBoxPreview.Width = pictureBoxPreview.Image.Width;
-            //        pictureBoxPreview.Height = pictureBoxPreview.Image.Height;
-
-            //        panel1.AutoScrollMinSize = new Size(pictureBoxPreview.Width, pictureBoxPreview.Height);
-            //        panel1.AutoScroll = true;
-            //    }
-            //}
         }
-
-
-
 
 
         private Bitmap RotatePic(Bitmap bmpBU, float w, bool keepWholeImg)
@@ -1134,19 +1010,38 @@ namespace CNCImporterGkode
             Bitmap bitmap = null;
 
             // ШАГ 1
+
             if (radioButtonTypeSourceText.Checked)
             {
-                bitmap = CreateBitmapFromText();
+                if (_selFont.UseVectorFont)
+                {
+                    if (_selFont.UseSystemFont)
+                    {
+                        //используем системный шрифт
+                        _lines = GetVectorFromText(_selFont.textString.Text, _selFont.comboBoxFont.Text, (float)_selFont.textSize.Value);
+                    }
+                    else
+                    {
+                        //используем внешний файл шрифта
+                        _lines = GetVectorFromText(_selFont.textString.Text, _selFont.comboBoxFont.Text, (float)_selFont.textSize.Value, _selFont.nameFontFile.Text);
+                    }
+                    bitmap = PreviewLines(_lines);
+                }
+                else
+                {
+                    bitmap = CreateBitmapFromText(_selFont.textString.Text, _selFont.comboBoxFont.Text, (float)_selFont.textSize.Value, _selFont.nameFontFile.Text);
+                }
             }
             else
             {
-                bitmap = new Bitmap(textBoxFileName.Text);
-                Bitmap newbitmap = new Bitmap(bitmap,bitmap.Width + 2, bitmap.Height + 2);
+                if (_selImage.textBoxFileName.Text == "") return null;
+                bitmap = new Bitmap(_selImage.textBoxFileName.Text);
+                Bitmap newbitmap = new Bitmap(bitmap, bitmap.Width + 2, bitmap.Height + 2);
                 Graphics g = Graphics.FromImage(newbitmap);
-                g.TranslateTransform(1,1);
+                g.TranslateTransform(1, 1);
                 bitmap = newbitmap;
             }
-
+            
             if (NumStep == 1) return bitmap;
 
             // ШАГ 2
@@ -1426,7 +1321,7 @@ namespace CNCImporterGkode
         }
 
 
-        private void ShowTraectory(int _posLine = -1, int _posPoint = -1)
+        private Bitmap GetTraectory(int _posLine = -1, int _posPoint = -1)
         {
             _minX = 99999;
             _maxX = 0;
@@ -1517,22 +1412,22 @@ namespace CNCImporterGkode
                     indxPoint++;
 
 
-                    //if (_posPoint != -1)
-                    //{
-                    //    if (indxPoint == _posPoint && indxLine == _posLine)
-                    //    {
-                    //        try
-                    //        {
-                    //            //отбразим точку
-                    //            graphics.DrawEllipse(new Pen(Color.Brown), oldX - 1, oldY - 1, 3, 3);
-                    //        }
-                    //        catch (Exception)
-                    //        {
-                    //            //что-бы не париться при выходе за размеры изображения 
-                    //            // throw;
-                    //        }
-                    //    }
-                    //}
+                    if (_posPoint != -1)
+                    {
+                        if (indxPoint == _posPoint && indxLine == _posLine)
+                        {
+                            try
+                            {
+                                //отбразим точку
+                                graphics.DrawEllipse(new Pen(Color.Brown), oldX - 1, oldY - 1, 3, 3);
+                            }
+                            catch (Exception)
+                            {
+                                //что-бы не париться при выходе за размеры изображения 
+                                // throw;
+                            }
+                        }
+                    }
 
                 }
                 indxLine++;
@@ -1541,12 +1436,9 @@ namespace CNCImporterGkode
             //*******************************************
 
             graphics.Flush();
-            pictureBoxPreview.Image = bitmap;
-        }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            ShowTraectory();
+            return bitmap;
+            
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
@@ -1558,21 +1450,17 @@ namespace CNCImporterGkode
 
             if (treeView1.SelectedNode != null)
             {
-                level = treeView1.SelectedNode.Level; 
-                pos = treeView1.SelectedNode.Index; 
+                level = treeView1.SelectedNode.Level;
+                pos = treeView1.SelectedNode.Index;
                 if (level > 0) posParent = treeView1.SelectedNode.Parent.Index;
- 
-                if (level == 0) ShowTraectory(pos);
-                if (level == 1) ShowTraectory(posParent, pos);
+
+                if (level == 0) pictureBoxPreview.Image = GetTraectory(pos);
+                if (level == 1) pictureBoxPreview.Image = GetTraectory(posParent, pos);
             }
             else
             {
-                ShowTraectory();
+                pictureBoxPreview.Image = GetTraectory();
             }
-
-
-
-
         }
 
 
@@ -1705,11 +1593,6 @@ namespace CNCImporterGkode
             serialPort1.Close();
         }
 
-        private void PreviewEnabled_CheckedChanged(object sender, EventArgs e)
-        {
-            RefreshStep1();
-        }
-
         private void radioButton_Zoom_CheckedChanged(object sender, EventArgs e)
         {
             pictureBoxPreview.SizeMode = ImageBoxSizeMode.Fit;
@@ -1720,10 +1603,7 @@ namespace CNCImporterGkode
             pictureBoxPreview.SizeMode = ImageBoxSizeMode.Normal;
         }
 
-        private void checkBoxStep1Refresh_CheckedChanged(object sender, EventArgs e)
-        {
-            RefreshStep1();
-        }
+
 
         private void button18_Click(object sender, EventArgs e)
         {
@@ -1740,8 +1620,8 @@ namespace CNCImporterGkode
             }
 
             RefreshTree();
-            
 
+            pictureBoxPreview.Image = GetTraectory();
 
   
 
@@ -1765,7 +1645,9 @@ namespace CNCImporterGkode
             if (level == 1) _lines[posParent].RemoveRange(pos, 1);
 
             RefreshTree();
-            ShowTraectory();
+
+
+            pictureBoxPreview.Image = GetTraectory();
         }
 
         private void buttonOptimize_Click(object sender, EventArgs e)
@@ -1839,24 +1721,9 @@ namespace CNCImporterGkode
         }
 
 
-        private PrivateFontCollection customFontFromFile;
+        
 
-        private void buttonЫSetFontFile_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
-            openFileDialog1.CheckFileExists = true;
-            openFileDialog1.Multiselect = false;
-            openFileDialog1.Title = @"Выбор файла шрифта";
-            //openFileDialog1.InitialDirectory = "c:\\";
-            openFileDialog1.Filter = "All files (*.*)|*.*";
-            openFileDialog1.FilterIndex = 2;
-            openFileDialog1.RestoreDirectory = true;
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                externFileFont = openFileDialog1.FileName;
-                RefreshStep1();
-            }
-        }
+
 
 
         private void RefreshInfo()
@@ -1878,6 +1745,11 @@ namespace CNCImporterGkode
         private void pictureBoxPreview_ImageChanged(object sender, EventArgs e)
         {
             RefreshInfo();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 

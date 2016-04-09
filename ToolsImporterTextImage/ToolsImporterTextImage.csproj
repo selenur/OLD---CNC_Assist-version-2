@@ -60,6 +60,18 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectFont.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SelectFont.Designer.cs">
+      <DependentUpon>SelectFont.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelectImage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SelectImage.Designer.cs">
+      <DependentUpon>SelectImage.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="About.resx">
       <DependentUpon>About.cs</DependentUpon>
     </EmbeddedResource>
@@ -76,6 +88,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SelectFont.resx">
+      <DependentUpon>SelectFont.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectImage.resx">
+      <DependentUpon>SelectImage.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -90,6 +108,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\font.png" />
+    <None Include="Resources\file_extension_jpg.png" />
     <Content Include="TextFile1.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

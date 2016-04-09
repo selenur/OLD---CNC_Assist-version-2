@@ -1339,6 +1339,35 @@ namespace CNC_Assist
             buf[20] = (byte)(newPosA >> 16);
             buf[21] = (byte)(newPosA >> 24);
 
+
+            if (GlobalSetting.ControllerSetting.UseDuplicationAxes)
+            {
+                //активировано дублирование оси
+
+                switch (GlobalSetting.ControllerSetting.DiblicateAxesA)
+                {
+                    case ListAxes.X:
+                        buf[18] = (byte)(newPosX);
+                        buf[19] = (byte)(newPosX >> 8);
+                        buf[20] = (byte)(newPosX >> 16);
+                        buf[21] = (byte)(newPosX >> 24);
+                        break;
+                    case ListAxes.Y:
+                        buf[18] = (byte)(newPosY);
+                        buf[19] = (byte)(newPosY >> 8);
+                        buf[20] = (byte)(newPosY >> 16);
+                        buf[21] = (byte)(newPosY >> 24);
+                        break;
+                    case ListAxes.Z:
+                        buf[18] = (byte)(newPosZ);
+                        buf[19] = (byte)(newPosZ >> 8);
+                        buf[20] = (byte)(newPosZ >> 16);
+                        buf[21] = (byte)(newPosZ >> 24);
+                        break;
+                }
+
+            }
+
             return buf;
         }
 
@@ -1571,6 +1600,39 @@ namespace CNC_Assist
 
 
 
+                    if (GlobalSetting.ControllerSetting.UseDuplicationAxes)
+                    {
+                        //активировано дублирование оси
+
+                        switch (GlobalSetting.ControllerSetting.DiblicateAxesA)
+                        {
+                            case ListAxes.X:
+                                buf[38] = buf[26];
+                                buf[39] = buf[27];
+                                buf[40] = buf[28];
+                                buf[41] = buf[29];
+                                break;
+                            case ListAxes.Y:
+                                buf[38] = buf[30];
+                                buf[39] = buf[31];
+                                buf[40] = buf[32];
+                                buf[41] = buf[33];
+                                break;
+                            case ListAxes.Z:
+                                buf[38] = buf[34];
+                                buf[39] = buf[35];
+                                buf[40] = buf[36];
+                                buf[41] = buf[37];
+                                break;
+                        }
+
+                    }
+
+
+
+
+
+
                 }
             }
 
@@ -1639,6 +1701,36 @@ namespace CNC_Assist
             buf[19] = (byte)(countPulseA >> 8);
             buf[20] = (byte)(countPulseA >> 16);
             buf[21] = (byte)(countPulseA >> 24);
+
+
+
+            if (GlobalSetting.ControllerSetting.UseDuplicationAxes)
+            {
+                //активировано дублирование оси
+
+                switch (GlobalSetting.ControllerSetting.DiblicateAxesA)
+                {
+                    case ListAxes.X:
+                        buf[18] = (byte)(countPulseX);
+                        buf[19] = (byte)(countPulseX >> 8);
+                        buf[20] = (byte)(countPulseX >> 16);
+                        buf[21] = (byte)(countPulseX >> 24);
+                        break;
+                    case ListAxes.Y:
+                        buf[18] = (byte)(countPulseY);
+                        buf[19] = (byte)(countPulseY >> 8);
+                        buf[20] = (byte)(countPulseY >> 16);
+                        buf[21] = (byte)(countPulseY >> 24);
+                        break;
+                    case ListAxes.Z:
+                        buf[18] = (byte)(countPulseZ);
+                        buf[19] = (byte)(countPulseZ >> 8);
+                        buf[20] = (byte)(countPulseZ >> 16);
+                        buf[21] = (byte)(countPulseZ >> 24);
+                        break;
+                }
+
+            }
 
             return buf;
         }
@@ -1786,6 +1878,34 @@ namespace CNC_Assist
             buf[20] = (byte)(newPosA >> 16);
             buf[21] = (byte)(newPosA >> 24);
 
+
+            if (GlobalSetting.ControllerSetting.UseDuplicationAxes)
+            {
+                //активировано дублирование оси
+
+                switch (GlobalSetting.ControllerSetting.DiblicateAxesA)
+                {
+                    case ListAxes.X:
+                        buf[18] = (byte)(newPosX);
+                        buf[19] = (byte)(newPosX >> 8);
+                        buf[20] = (byte)(newPosX >> 16);
+                        buf[21] = (byte)(newPosX >> 24);
+                        break;
+                    case ListAxes.Y:
+                        buf[18] = (byte)(newPosY);
+                        buf[19] = (byte)(newPosY >> 8);
+                        buf[20] = (byte)(newPosY >> 16);
+                        buf[21] = (byte)(newPosY >> 24);
+                        break;
+                    case ListAxes.Z:
+                        buf[18] = (byte)(newPosZ);
+                        buf[19] = (byte)(newPosZ >> 8);
+                        buf[20] = (byte)(newPosZ >> 16);
+                        buf[21] = (byte)(newPosZ >> 24);
+                        break;
+                }
+
+            }
 
 
             double koef = 4500;

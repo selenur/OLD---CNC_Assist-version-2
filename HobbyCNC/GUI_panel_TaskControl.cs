@@ -225,6 +225,9 @@ namespace CNC_Assist
 
                     }
 
+                    //отладка
+                    ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
+
 
                     ControllerPlanetCNC.AddBinaryDataToTask(BinaryData.pack_CA(ControllerPlanetCNC.Info.CalcPosPulse("X", (decimal)pointX),
                                                                     ControllerPlanetCNC.Info.CalcPosPulse("Y", (decimal)pointY),

@@ -29,16 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.textString = new System.Windows.Forms.TextBox();
-            this.textSize = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.comboBoxFont = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.buttonSelectFile = new System.Windows.Forms.Button();
-            this.btShowOriginalImage = new System.Windows.Forms.Button();
-            this.textBoxFileName = new System.Windows.Forms.TextBox();
             this.textBoxGkod = new System.Windows.Forms.TextBox();
             this.numericUpDownKoefPalitra = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
@@ -53,16 +43,10 @@
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPageStep1 = new System.Windows.Forms.TabPage();
-            this.groupBox_Text = new System.Windows.Forms.GroupBox();
-            this.checkBoxFromFile = new System.Windows.Forms.CheckBox();
-            this.buttonЫSetFontFile = new System.Windows.Forms.Button();
-            this.labelTextSize = new System.Windows.Forms.Label();
-            this.radioButtonFontBitmap = new System.Windows.Forms.RadioButton();
-            this.radioButtonFontVector = new System.Windows.Forms.RadioButton();
-            this.groupBox_Picture = new System.Windows.Forms.GroupBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.label27 = new System.Windows.Forms.Label();
             this.radioButtonTypeSourcePicture = new System.Windows.Forms.RadioButton();
             this.radioButtonTypeSourceText = new System.Windows.Forms.RadioButton();
-            this.checkBoxStep1Refresh = new System.Windows.Forms.CheckBox();
             this.tabPageStep2 = new System.Windows.Forms.TabPage();
             this.groupBoxFilter3 = new System.Windows.Forms.GroupBox();
             this.button17 = new System.Windows.Forms.Button();
@@ -75,7 +59,6 @@
             this.groupBoxFilter1 = new System.Windows.Forms.GroupBox();
             this.button6 = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
-            this.checkBoxStep2Refresh = new System.Windows.Forms.CheckBox();
             this.groupBoxFilter4 = new System.Windows.Forms.GroupBox();
             this.button1 = new System.Windows.Forms.Button();
             this.checkBoxUseFilter1 = new System.Windows.Forms.CheckBox();
@@ -87,7 +70,6 @@
             this.buttonDelLine = new System.Windows.Forms.Button();
             this.button18 = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.button3 = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.label10 = new System.Windows.Forms.Label();
             this.numericUpDownMunimumLenght = new System.Windows.Forms.NumericUpDown();
@@ -150,14 +132,11 @@
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.labelZoomSize = new System.Windows.Forms.Label();
             this.pictureBoxPreview = new Cyotek.Windows.Forms.ImageBox();
-            ((System.ComponentModel.ISupportInitialize)(this.textSize)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownKoefPalitra)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.tabControl2.SuspendLayout();
             this.tabPageStep1.SuspendLayout();
-            this.groupBox_Text.SuspendLayout();
-            this.groupBox_Picture.SuspendLayout();
             this.tabPageStep2.SuspendLayout();
             this.groupBoxFilter3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownRotate)).BeginInit();
@@ -188,115 +167,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownLazerX)).BeginInit();
             this.groupBox7.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // textString
-            // 
-            this.textString.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textString.Location = new System.Drawing.Point(2, 122);
-            this.textString.Multiline = true;
-            this.textString.Name = "textString";
-            this.textString.Size = new System.Drawing.Size(618, 121);
-            this.textString.TabIndex = 2;
-            this.textString.Text = "Test text!";
-            this.textString.TextChanged += new System.EventHandler(this.textString_TextChanged);
-            // 
-            // textSize
-            // 
-            this.textSize.Location = new System.Drawing.Point(71, 86);
-            this.textSize.Maximum = new decimal(new int[] {
-            4000,
-            0,
-            0,
-            0});
-            this.textSize.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.textSize.Name = "textSize";
-            this.textSize.Size = new System.Drawing.Size(69, 20);
-            this.textSize.TabIndex = 3;
-            this.textSize.Value = new decimal(new int[] {
-            40,
-            0,
-            0,
-            0});
-            this.textSize.ValueChanged += new System.EventHandler(this.textSize_ValueChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 106);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(40, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Текст:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 88);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(49, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Размер:";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(9, 16);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(44, 13);
-            this.label4.TabIndex = 8;
-            this.label4.Text = "Шрифт:";
-            // 
-            // comboBoxFont
-            // 
-            this.comboBoxFont.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxFont.FormattingEnabled = true;
-            this.comboBoxFont.Location = new System.Drawing.Point(58, 13);
-            this.comboBoxFont.Name = "comboBoxFont";
-            this.comboBoxFont.Size = new System.Drawing.Size(164, 21);
-            this.comboBoxFont.TabIndex = 7;
-            this.comboBoxFont.SelectedIndexChanged += new System.EventHandler(this.comboBoxFont_SelectedIndexChanged);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(35, 16);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(78, 13);
-            this.label6.TabIndex = 3;
-            this.label6.Text = "Выбор файла:";
-            // 
-            // buttonSelectFile
-            // 
-            this.buttonSelectFile.Location = new System.Drawing.Point(337, 31);
-            this.buttonSelectFile.Name = "buttonSelectFile";
-            this.buttonSelectFile.Size = new System.Drawing.Size(39, 21);
-            this.buttonSelectFile.TabIndex = 2;
-            this.buttonSelectFile.Text = "...";
-            this.buttonSelectFile.UseVisualStyleBackColor = true;
-            this.buttonSelectFile.Click += new System.EventHandler(this.btSelectFile);
-            // 
-            // btShowOriginalImage
-            // 
-            this.btShowOriginalImage.Location = new System.Drawing.Point(29, 58);
-            this.btShowOriginalImage.Name = "btShowOriginalImage";
-            this.btShowOriginalImage.Size = new System.Drawing.Size(252, 37);
-            this.btShowOriginalImage.TabIndex = 1;
-            this.btShowOriginalImage.Text = "Показать рисунок";
-            this.btShowOriginalImage.UseVisualStyleBackColor = true;
-            this.btShowOriginalImage.Click += new System.EventHandler(this.btShowOrigImage);
-            // 
-            // textBoxFileName
-            // 
-            this.textBoxFileName.Location = new System.Drawing.Point(29, 32);
-            this.textBoxFileName.Name = "textBoxFileName";
-            this.textBoxFileName.Size = new System.Drawing.Size(302, 20);
-            this.textBoxFileName.TabIndex = 0;
             // 
             // textBoxGkod
             // 
@@ -374,7 +244,6 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.exitToolStripMenuItem});
-            this.fileToolStripMenuItem.Enabled = false;
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.fileToolStripMenuItem.Text = "Файл";
@@ -384,6 +253,7 @@
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.exitToolStripMenuItem.Text = "Выход";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -430,11 +300,10 @@
             // 
             // tabPageStep1
             // 
-            this.tabPageStep1.Controls.Add(this.groupBox_Text);
-            this.tabPageStep1.Controls.Add(this.groupBox_Picture);
+            this.tabPageStep1.Controls.Add(this.panel1);
+            this.tabPageStep1.Controls.Add(this.label27);
             this.tabPageStep1.Controls.Add(this.radioButtonTypeSourcePicture);
             this.tabPageStep1.Controls.Add(this.radioButtonTypeSourceText);
-            this.tabPageStep1.Controls.Add(this.checkBoxStep1Refresh);
             this.tabPageStep1.Location = new System.Drawing.Point(4, 22);
             this.tabPageStep1.Name = "tabPageStep1";
             this.tabPageStep1.Padding = new System.Windows.Forms.Padding(3);
@@ -443,132 +312,49 @@
             this.tabPageStep1.Text = "ШАГ 1 (выбор источника данных)";
             this.tabPageStep1.UseVisualStyleBackColor = true;
             // 
-            // groupBox_Text
+            // panel1
             // 
-            this.groupBox_Text.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox_Text.Controls.Add(this.checkBoxFromFile);
-            this.groupBox_Text.Controls.Add(this.buttonЫSetFontFile);
-            this.groupBox_Text.Controls.Add(this.labelTextSize);
-            this.groupBox_Text.Controls.Add(this.radioButtonFontBitmap);
-            this.groupBox_Text.Controls.Add(this.radioButtonFontVector);
-            this.groupBox_Text.Controls.Add(this.textString);
-            this.groupBox_Text.Controls.Add(this.label2);
-            this.groupBox_Text.Controls.Add(this.label1);
-            this.groupBox_Text.Controls.Add(this.textSize);
-            this.groupBox_Text.Controls.Add(this.comboBoxFont);
-            this.groupBox_Text.Controls.Add(this.label4);
-            this.groupBox_Text.Location = new System.Drawing.Point(6, 24);
-            this.groupBox_Text.Name = "groupBox_Text";
-            this.groupBox_Text.Size = new System.Drawing.Size(626, 249);
-            this.groupBox_Text.TabIndex = 11;
-            this.groupBox_Text.TabStop = false;
+            this.panel1.Location = new System.Drawing.Point(6, 29);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(625, 243);
+            this.panel1.TabIndex = 14;
             // 
-            // checkBoxFromFile
+            // label27
             // 
-            this.checkBoxFromFile.AutoSize = true;
-            this.checkBoxFromFile.Location = new System.Drawing.Point(239, 15);
-            this.checkBoxFromFile.Name = "checkBoxFromFile";
-            this.checkBoxFromFile.Size = new System.Drawing.Size(149, 17);
-            this.checkBoxFromFile.TabIndex = 60;
-            this.checkBoxFromFile.Text = "Использовать из файла";
-            this.checkBoxFromFile.UseVisualStyleBackColor = true;
-            // 
-            // buttonЫSetFontFile
-            // 
-            this.buttonЫSetFontFile.Location = new System.Drawing.Point(394, 12);
-            this.buttonЫSetFontFile.Name = "buttonЫSetFontFile";
-            this.buttonЫSetFontFile.Size = new System.Drawing.Size(225, 22);
-            this.buttonЫSetFontFile.TabIndex = 59;
-            this.buttonЫSetFontFile.Text = "Выбрать шрифт из файла...";
-            this.buttonЫSetFontFile.UseVisualStyleBackColor = true;
-            this.buttonЫSetFontFile.Click += new System.EventHandler(this.buttonЫSetFontFile_Click);
-            // 
-            // labelTextSize
-            // 
-            this.labelTextSize.AutoSize = true;
-            this.labelTextSize.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelTextSize.ForeColor = System.Drawing.Color.Navy;
-            this.labelTextSize.Location = new System.Drawing.Point(194, 65);
-            this.labelTextSize.Name = "labelTextSize";
-            this.labelTextSize.Size = new System.Drawing.Size(148, 13);
-            this.labelTextSize.TabIndex = 13;
-            this.labelTextSize.Text = "Размер рисунка: .........";
-            // 
-            // radioButtonFontBitmap
-            // 
-            this.radioButtonFontBitmap.AutoSize = true;
-            this.radioButtonFontBitmap.Location = new System.Drawing.Point(15, 63);
-            this.radioButtonFontBitmap.Name = "radioButtonFontBitmap";
-            this.radioButtonFontBitmap.Size = new System.Drawing.Size(173, 17);
-            this.radioButtonFontBitmap.TabIndex = 58;
-            this.radioButtonFontBitmap.Text = "Получать шрифт как рисунок";
-            this.radioButtonFontBitmap.UseVisualStyleBackColor = true;
-            this.radioButtonFontBitmap.CheckedChanged += new System.EventHandler(this.radioButtonFontBitmap_CheckedChanged);
-            // 
-            // radioButtonFontVector
-            // 
-            this.radioButtonFontVector.AutoSize = true;
-            this.radioButtonFontVector.Checked = true;
-            this.radioButtonFontVector.Location = new System.Drawing.Point(15, 40);
-            this.radioButtonFontVector.Name = "radioButtonFontVector";
-            this.radioButtonFontVector.Size = new System.Drawing.Size(373, 17);
-            this.radioButtonFontVector.TabIndex = 57;
-            this.radioButtonFontVector.TabStop = true;
-            this.radioButtonFontVector.Text = "Получить векторный шрифт (будет без заливки, и шаг 2 недоступен)";
-            this.radioButtonFontVector.UseVisualStyleBackColor = true;
-            this.radioButtonFontVector.CheckedChanged += new System.EventHandler(this.radioButtonFontVector_CheckedChanged);
-            // 
-            // groupBox_Picture
-            // 
-            this.groupBox_Picture.Controls.Add(this.buttonSelectFile);
-            this.groupBox_Picture.Controls.Add(this.label6);
-            this.groupBox_Picture.Controls.Add(this.btShowOriginalImage);
-            this.groupBox_Picture.Controls.Add(this.textBoxFileName);
-            this.groupBox_Picture.Location = new System.Drawing.Point(58, 29);
-            this.groupBox_Picture.Name = "groupBox_Picture";
-            this.groupBox_Picture.Size = new System.Drawing.Size(446, 101);
-            this.groupBox_Picture.TabIndex = 12;
-            this.groupBox_Picture.TabStop = false;
-            this.groupBox_Picture.Visible = false;
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(16, 9);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(58, 13);
+            this.label27.TabIndex = 13;
+            this.label27.Text = "Источник:";
             // 
             // radioButtonTypeSourcePicture
             // 
-            this.radioButtonTypeSourcePicture.AutoSize = true;
-            this.radioButtonTypeSourcePicture.Location = new System.Drawing.Point(79, 6);
+            this.radioButtonTypeSourcePicture.Image = global::CNCImporterGkode.Properties.Resources.file_extension_jpg;
+            this.radioButtonTypeSourcePicture.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.radioButtonTypeSourcePicture.Location = new System.Drawing.Point(174, 3);
             this.radioButtonTypeSourcePicture.Name = "radioButtonTypeSourcePicture";
-            this.radioButtonTypeSourcePicture.Size = new System.Drawing.Size(67, 17);
+            this.radioButtonTypeSourcePicture.Size = new System.Drawing.Size(90, 25);
             this.radioButtonTypeSourcePicture.TabIndex = 9;
             this.radioButtonTypeSourcePicture.Text = "Рисунок";
+            this.radioButtonTypeSourcePicture.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.radioButtonTypeSourcePicture.UseVisualStyleBackColor = true;
             this.radioButtonTypeSourcePicture.CheckedChanged += new System.EventHandler(this.radioButtonTypeSourcePicture_CheckedChanged);
             // 
             // radioButtonTypeSourceText
             // 
-            this.radioButtonTypeSourceText.AutoSize = true;
             this.radioButtonTypeSourceText.Checked = true;
-            this.radioButtonTypeSourceText.Location = new System.Drawing.Point(18, 6);
+            this.radioButtonTypeSourceText.Image = global::CNCImporterGkode.Properties.Resources.font;
+            this.radioButtonTypeSourceText.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.radioButtonTypeSourceText.Location = new System.Drawing.Point(80, 3);
             this.radioButtonTypeSourceText.Name = "radioButtonTypeSourceText";
-            this.radioButtonTypeSourceText.Size = new System.Drawing.Size(55, 17);
+            this.radioButtonTypeSourceText.Size = new System.Drawing.Size(79, 25);
             this.radioButtonTypeSourceText.TabIndex = 8;
             this.radioButtonTypeSourceText.TabStop = true;
             this.radioButtonTypeSourceText.Text = "Текст";
+            this.radioButtonTypeSourceText.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.radioButtonTypeSourceText.UseVisualStyleBackColor = true;
             this.radioButtonTypeSourceText.CheckedChanged += new System.EventHandler(this.radioButtonTypeSourceText_CheckedChanged);
-            // 
-            // checkBoxStep1Refresh
-            // 
-            this.checkBoxStep1Refresh.Checked = true;
-            this.checkBoxStep1Refresh.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxStep1Refresh.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.checkBoxStep1Refresh.Location = new System.Drawing.Point(199, 7);
-            this.checkBoxStep1Refresh.Name = "checkBoxStep1Refresh";
-            this.checkBoxStep1Refresh.Size = new System.Drawing.Size(305, 20);
-            this.checkBoxStep1Refresh.TabIndex = 20;
-            this.checkBoxStep1Refresh.Text = "При любых изменениях обновить в предпросмотре";
-            this.checkBoxStep1Refresh.UseVisualStyleBackColor = true;
-            this.checkBoxStep1Refresh.CheckedChanged += new System.EventHandler(this.checkBoxStep1Refresh_CheckedChanged);
             // 
             // tabPageStep2
             // 
@@ -576,7 +362,6 @@
             this.tabPageStep2.Controls.Add(this.groupBoxFilter2);
             this.tabPageStep2.Controls.Add(this.groupBoxFilter1);
             this.tabPageStep2.Controls.Add(this.label12);
-            this.tabPageStep2.Controls.Add(this.checkBoxStep2Refresh);
             this.tabPageStep2.Controls.Add(this.groupBoxFilter4);
             this.tabPageStep2.Controls.Add(this.groupBoxFilter5);
             this.tabPageStep2.Location = new System.Drawing.Point(4, 22);
@@ -706,18 +491,6 @@
             this.label12.TabIndex = 20;
             this.label12.Text = "<<-- пока не оптимизировал....";
             // 
-            // checkBoxStep2Refresh
-            // 
-            this.checkBoxStep2Refresh.Checked = true;
-            this.checkBoxStep2Refresh.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxStep2Refresh.ForeColor = System.Drawing.Color.MidnightBlue;
-            this.checkBoxStep2Refresh.Location = new System.Drawing.Point(426, 18);
-            this.checkBoxStep2Refresh.Name = "checkBoxStep2Refresh";
-            this.checkBoxStep2Refresh.Size = new System.Drawing.Size(205, 50);
-            this.checkBoxStep2Refresh.TabIndex = 19;
-            this.checkBoxStep2Refresh.Text = "При любых изменениях обновить в предпросмотре";
-            this.checkBoxStep2Refresh.UseVisualStyleBackColor = true;
-            // 
             // groupBoxFilter4
             // 
             this.groupBoxFilter4.Controls.Add(this.button1);
@@ -790,7 +563,6 @@
             this.tabPageStep3.Controls.Add(this.buttonDelLine);
             this.tabPageStep3.Controls.Add(this.button18);
             this.tabPageStep3.Controls.Add(this.groupBox6);
-            this.tabPageStep3.Controls.Add(this.button3);
             this.tabPageStep3.Controls.Add(this.groupBox5);
             this.tabPageStep3.Controls.Add(this.groupBox2);
             this.tabPageStep3.Controls.Add(this.button5);
@@ -843,16 +615,6 @@
             this.groupBox6.TabIndex = 22;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Итоговые отрезки";
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(9, 232);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(255, 35);
-            this.button3.TabIndex = 19;
-            this.button3.Text = "Показать отрезки";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // groupBox5
             // 
@@ -1622,9 +1384,9 @@
             this.labelZoomSize.AutoSize = true;
             this.labelZoomSize.Location = new System.Drawing.Point(308, 21);
             this.labelZoomSize.Name = "labelZoomSize";
-            this.labelZoomSize.Size = new System.Drawing.Size(85, 13);
+            this.labelZoomSize.Size = new System.Drawing.Size(132, 13);
             this.labelZoomSize.TabIndex = 19;
-            this.labelZoomSize.Text = "Масштаб: 100%";
+            this.labelZoomSize.Text = "Текущий масштаб: 100%";
             // 
             // pictureBoxPreview
             // 
@@ -1652,7 +1414,6 @@
             this.Name = "MainForm";
             this.Text = "Генератор G-кода";
             this.Load += new System.EventHandler(this.Form_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.textSize)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownKoefPalitra)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -1661,10 +1422,6 @@
             this.tabControl2.ResumeLayout(false);
             this.tabPageStep1.ResumeLayout(false);
             this.tabPageStep1.PerformLayout();
-            this.groupBox_Text.ResumeLayout(false);
-            this.groupBox_Text.PerformLayout();
-            this.groupBox_Picture.ResumeLayout(false);
-            this.groupBox_Picture.PerformLayout();
             this.tabPageStep2.ResumeLayout(false);
             this.groupBoxFilter3.ResumeLayout(false);
             this.groupBoxFilter3.PerformLayout();
@@ -1712,12 +1469,6 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textString;
-        private System.Windows.Forms.NumericUpDown textSize;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btShowOriginalImage;
-        private System.Windows.Forms.TextBox textBoxFileName;
         private System.Windows.Forms.NumericUpDown numericUpDownKoefPalitra;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TreeView treeView1;
@@ -1733,12 +1484,8 @@
         private System.Windows.Forms.TabPage tabPageStep1;
         private System.Windows.Forms.TabPage tabPageStep2;
         private System.Windows.Forms.TabPage tabPageStep3;
-        private System.Windows.Forms.ComboBox comboBoxFont;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button7;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Button buttonSelectFile;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.GroupBox groupBoxFilter5;
         private System.Windows.Forms.CheckBox checkBoxUseFilter2;
@@ -1749,8 +1496,6 @@
         private System.Windows.Forms.RadioButton radioButtonTypeSourcePicture;
         private System.Windows.Forms.RadioButton radioButtonTypeSourceText;
         private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.GroupBox groupBox_Picture;
-        private System.Windows.Forms.GroupBox groupBox_Text;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label labelInfoY;
@@ -1763,8 +1508,6 @@
         private System.Windows.Forms.CheckBox checkBoxUseFilter1;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.NumericUpDown numericUpDownMunimumLenght;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.CheckBox checkBoxStep2Refresh;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.GroupBox groupBox5;
@@ -1780,7 +1523,6 @@
         private System.Windows.Forms.NumericUpDown numericUpDownZ1;
         private System.Windows.Forms.Label label14;
         private System.IO.Ports.SerialPort serialPort1;
-        private System.Windows.Forms.Label labelTextSize;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.Button button16;
         private System.Windows.Forms.Button button15;
@@ -1803,7 +1545,6 @@
         private System.Windows.Forms.RadioButton radioButton_FullSize;
         private System.Windows.Forms.RadioButton radioButton_Zoom;
         private System.Windows.Forms.GroupBox groupBox7;
-        private System.Windows.Forms.CheckBox checkBoxStep1Refresh;
         private System.Windows.Forms.GroupBox groupBoxFilter1;
         private System.Windows.Forms.GroupBox groupBoxFilter3;
         private System.Windows.Forms.Button button17;
@@ -1813,8 +1554,6 @@
         private System.Windows.Forms.Button button12;
         private System.Windows.Forms.CheckBox checkBoxFlipY;
         private System.Windows.Forms.CheckBox checkBoxFlipX;
-        private System.Windows.Forms.RadioButton radioButtonFontBitmap;
-        private System.Windows.Forms.RadioButton radioButtonFontVector;
         private System.Windows.Forms.Button button18;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.TextBox textBoxGkodLaser;
@@ -1826,13 +1565,13 @@
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.NumericUpDown numericUpDownMoveLazerX;
         private System.Windows.Forms.Label label25;
-        private System.Windows.Forms.Button buttonЫSetFontFile;
-        private System.Windows.Forms.CheckBox checkBoxFromFile;
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.NumericUpDown numericUpDownSpeedLaser;
         private System.Windows.Forms.CheckBox checkBoxForLaser;
         private Cyotek.Windows.Forms.ImageBox pictureBoxPreview;
         private System.Windows.Forms.Label labelZoomSize;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Panel panel1;
     }
 }
 
