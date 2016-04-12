@@ -140,8 +140,8 @@ namespace CNC_Assist
             double GrateYmax = GlobalSetting.ControllerSetting.WorkSizeYp;
             
             //текущие координаты
-            double x = (double)ControllerPlanetCNC.Info.AxesX_PositionMM;
-            double y = (double)ControllerPlanetCNC.Info.AxesY_PositionMM;
+            double x = (double)ControllerPlanetCNC.Info.AxesXPositionMm;
+            double y = (double)ControllerPlanetCNC.Info.AxesYPositionMm;
 
 
             // При каждом получении новых данных от контроллера, проверим необходимость расширения рабочей области
@@ -175,7 +175,8 @@ namespace CNC_Assist
         #region Отслеживание нажатий на NumLock-e и функц. клавиш
 
         //KeyHook gkh = new KeyHook();
-        [DllImport("USER32.dll")] static extern short GetKeyState(VirtualKeyStates nVirtKey);
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass"), DllImport("USER32.dll")]
+        static extern short GetKeyState(VirtualKeyStates nVirtKey);
 
         enum VirtualKeyStates
         {
@@ -1365,9 +1366,9 @@ namespace CNC_Assist
             {
 
                 //нарисуем курсор
-                double startX = (double)ControllerPlanetCNC.Info.AxesX_PositionMM;
-                double startY = (double)ControllerPlanetCNC.Info.AxesY_PositionMM;
-                double startZ = (double)ControllerPlanetCNC.Info.AxesZ_PositionMM;
+                double startX = (double)ControllerPlanetCNC.Info.AxesXPositionMm;
+                double startY = (double)ControllerPlanetCNC.Info.AxesYPositionMm;
+                double startZ = (double)ControllerPlanetCNC.Info.AxesZPositionMm;
 
                 Gl.glColor3f(1.000f, 1.000f, 0.000f);
                 Gl.glLineWidth(3);

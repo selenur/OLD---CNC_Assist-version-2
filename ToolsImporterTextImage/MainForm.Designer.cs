@@ -43,6 +43,7 @@
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPageStep1 = new System.Windows.Forms.TabPage();
+            this.radioButtonTypeSourcePLT = new System.Windows.Forms.RadioButton();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label27 = new System.Windows.Forms.Label();
             this.radioButtonTypeSourcePicture = new System.Windows.Forms.RadioButton();
@@ -300,6 +301,7 @@
             // 
             // tabPageStep1
             // 
+            this.tabPageStep1.Controls.Add(this.radioButtonTypeSourcePLT);
             this.tabPageStep1.Controls.Add(this.panel1);
             this.tabPageStep1.Controls.Add(this.label27);
             this.tabPageStep1.Controls.Add(this.radioButtonTypeSourcePicture);
@@ -311,6 +313,20 @@
             this.tabPageStep1.TabIndex = 0;
             this.tabPageStep1.Text = "ШАГ 1 (выбор источника данных)";
             this.tabPageStep1.UseVisualStyleBackColor = true;
+            // 
+            // radioButtonTypeSourcePLT
+            // 
+            this.radioButtonTypeSourcePLT.Image = global::CNCImporterGkode.Properties.Resources.smartart_change_color_gallery;
+            this.radioButtonTypeSourcePLT.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.radioButtonTypeSourcePLT.Location = new System.Drawing.Point(284, 3);
+            this.radioButtonTypeSourcePLT.Name = "radioButtonTypeSourcePLT";
+            this.radioButtonTypeSourcePLT.Size = new System.Drawing.Size(122, 25);
+            this.radioButtonTypeSourcePLT.TabIndex = 15;
+            this.radioButtonTypeSourcePLT.TabStop = true;
+            this.radioButtonTypeSourcePLT.Text = "PLT Corel Draw";
+            this.radioButtonTypeSourcePLT.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.radioButtonTypeSourcePLT.UseVisualStyleBackColor = true;
+            this.radioButtonTypeSourcePLT.CheckedChanged += new System.EventHandler(this.radioButtonTypeSourcePLT_CheckedChanged);
             // 
             // panel1
             // 
@@ -1572,6 +1588,7 @@
         private System.Windows.Forms.Label labelZoomSize;
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.RadioButton radioButtonTypeSourcePLT;
     }
 }
 

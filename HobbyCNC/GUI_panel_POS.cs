@@ -45,10 +45,10 @@ namespace CNC_Assist
         {
             if (ControllerPlanetCNC.IsConnectedToController)
             {
-                numPosX.Value = ControllerPlanetCNC.Info.AxesX_PositionMM;
-                numPosY.Value = ControllerPlanetCNC.Info.AxesY_PositionMM;
-                numPosZ.Value = ControllerPlanetCNC.Info.AxesZ_PositionMM;
-                numPosA.Value = ControllerPlanetCNC.Info.AxesA_PositionMM;
+                numPosX.Value = ControllerPlanetCNC.Info.AxesXPositionMm;
+                numPosY.Value = ControllerPlanetCNC.Info.AxesYPositionMm;
+                numPosZ.Value = ControllerPlanetCNC.Info.AxesZPositionMm;
+                numPosA.Value = ControllerPlanetCNC.Info.AxesAPositionMm;
 
                 if (ControllerPlanetCNC.IsAvailability)
                 {

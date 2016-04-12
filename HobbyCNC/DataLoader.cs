@@ -392,10 +392,10 @@ namespace CNC_Assist
                 {
                     //TODO: пока применим простое смещение с переносом в точку ноль
                     ControllerPlanetCNC.CorrectionPos.UseCorrection = true;
-                    ControllerPlanetCNC.CorrectionPos.DeltaX = ControllerPlanetCNC.Info.AxesX_PositionMM;
-                    ControllerPlanetCNC.CorrectionPos.DeltaY = ControllerPlanetCNC.Info.AxesY_PositionMM;
-                    ControllerPlanetCNC.CorrectionPos.DeltaZ = ControllerPlanetCNC.Info.AxesZ_PositionMM;
-                    ControllerPlanetCNC.CorrectionPos.DeltaA = ControllerPlanetCNC.Info.AxesA_PositionMM;
+                    ControllerPlanetCNC.CorrectionPos.DeltaX = ControllerPlanetCNC.Info.AxesXPositionMm;
+                    ControllerPlanetCNC.CorrectionPos.DeltaY = ControllerPlanetCNC.Info.AxesYPositionMm;
+                    ControllerPlanetCNC.CorrectionPos.DeltaZ = ControllerPlanetCNC.Info.AxesZPositionMm;
+                    ControllerPlanetCNC.CorrectionPos.DeltaA = ControllerPlanetCNC.Info.AxesAPositionMm;
                 }
 
                 if (code == "G92.1")
@@ -566,7 +566,7 @@ namespace CNC_Assist
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static List<string> ParseStringToSubString(string value)
+        public static List<string> ParseStringToSubString(string value)
         {
 
             List<string> lcmd = new List<string>();

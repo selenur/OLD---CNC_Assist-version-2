@@ -128,6 +128,7 @@ namespace CNC_Assist
 
 
         //дорисовка данных на изображение перед выводом
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2002:DoNotLockOnObjectsWithWeakIdentity")]
         private void videoSourcePlayer1_Paint(object sender, PaintEventArgs e)
         {
 

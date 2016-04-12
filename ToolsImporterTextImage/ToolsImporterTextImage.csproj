@@ -72,6 +72,12 @@
     <Compile Include="SelectImage.Designer.cs">
       <DependentUpon>SelectImage.cs</DependentUpon>
     </Compile>
+    <Compile Include="SelectPLT.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="SelectPLT.Designer.cs">
+      <DependentUpon>SelectPLT.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="About.resx">
       <DependentUpon>About.cs</DependentUpon>
     </EmbeddedResource>
@@ -94,6 +100,9 @@
     <EmbeddedResource Include="SelectImage.resx">
       <DependentUpon>SelectImage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="SelectPLT.resx">
+      <DependentUpon>SelectPLT.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -110,6 +119,7 @@
   <ItemGroup>
     <None Include="Resources\font.png" />
     <None Include="Resources\file_extension_jpg.png" />
+    <None Include="Resources\smartart_change_color_gallery.png" />
     <Content Include="TextFile1.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

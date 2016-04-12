@@ -16,6 +16,7 @@ namespace CNCImporterGkode
 
         private readonly SelectFont _selFont = new SelectFont();
         private readonly SelectImage _selImage = new SelectImage();
+        private readonly SelectPLT _selPLT = new SelectPLT();
 
         private List<List<PointF>> _lines;
 
@@ -33,6 +34,7 @@ namespace CNCImporterGkode
         {
             _selFont.IsChange += EventFromUc;
             _selImage.IsChange += EventFromUc;
+            _selPLT.IsChange += EventFromUc;
 
             panel1.Controls.Add(_selFont);
 
@@ -52,6 +54,10 @@ namespace CNCImporterGkode
             if (radioButtonTypeSourcePicture.Checked)
             {
                 enableStep2 = true;
+            }
+            else if (radioButtonTypeSourcePLT.Checked)
+            {
+                enableStep2 = false;
             }
             else
             {
@@ -179,8 +185,42 @@ namespace CNCImporterGkode
         //вычисление отрезков
         private void buttonCalculateVectors_Click(object sender, EventArgs e)
         {
-            Bitmap tmp = GetImageFromStep(6);
-            _lines = GetVectorFromImage(tmp);
+
+            if (radioButtonTypeSourceText.Checked)
+            {
+                if (_selFont.UseVectorFont)
+                {
+                    if (_selFont.UseSystemFont)
+                    {
+                        //используем системный шрифт
+                        _lines = GetVectorFromText(_selFont.textString.Text, _selFont.comboBoxFont.Text, (float)_selFont.textSize.Value);
+                    }
+                    else
+                    {
+                        //используем внешний файл шрифта
+                        _lines = GetVectorFromText(_selFont.textString.Text, _selFont.comboBoxFont.Text, (float)_selFont.textSize.Value, _selFont.nameFontFile.Text);
+                    }
+                    
+                }
+                else
+                {
+                    Bitmap tmp = GetImageFromStep(6);
+                    _lines = GetVectorFromImage(tmp);
+                }
+
+                
+            }
+            else if (radioButtonTypeSourcePLT.Checked)
+            {
+                _lines = GetVectorFromPLT(_selPLT.textBoxFileName.Text);
+            }
+            else
+            {
+                Bitmap tmp = GetImageFromStep(6);
+                _lines = GetVectorFromImage(tmp);
+            }
+
+
 
 
             RefreshTree();
@@ -994,6 +1034,139 @@ namespace CNCImporterGkode
             return bmp;
         }
 
+
+        private List<List<PointF>> GetVectorFromPLT(string FileNAME)
+        {
+            // для сбора информации о точках у отрезка
+            List<PointF> ListPoints = new List<PointF>();
+            // для сбора информации об отрезках
+            List<List<PointF>> Lines = new List<List<PointF>>();
+
+            //для смещения по оси в положительную сторону
+            float minX = 0;
+            float minY = 0;
+
+
+            int numRow = 1;
+
+            StreamReader fs = new StreamReader(FileNAME);
+            string s = fs.ReadLine();
+
+            while (s != null)
+            {
+                s = s.Trim();
+
+                int pos1 = -1, pos2 = -1, pos3 = -1;
+
+                //начальная точка
+                if (s.Substring(0, 2) == "PU" && s.Length > 3)
+                {
+                    //это не самый первый сегмент, поэтому перед заполнением нового, предыдущий сохраним
+                    if (ListPoints.Count > 0)
+                    {
+                        Lines.Add(ListPoints);
+                        ListPoints = new List<PointF>();
+                    }
+
+                    pos1 = s.IndexOf('U');
+                    pos2 = s.IndexOf(' ');
+                    pos3 = s.IndexOf(';');
+                }
+
+                //продолжение
+                if (s.Substring(0, 2) == "PD" && s.Length > 3)
+                {
+                    pos1 = s.IndexOf('D');
+                    pos2 = s.IndexOf(' ');
+                    pos3 = s.IndexOf(';');
+                }
+
+                // завершение
+                if (s.Substring(0, 3) == "SP0")
+                {
+                    Lines.Add(ListPoints);
+                    ListPoints = new List<PointF>();
+                    s = fs.ReadLine();
+                    numRow++;
+                    continue;
+                }
+
+                if (pos1 == -1 || pos2 == -1 || pos3 == -1)//какая-то ненужная пока строка
+                {
+                    s = fs.ReadLine();
+                    numRow++;
+                    continue;
+                }
+
+                float posX, posY;
+
+                if (!float.TryParse(s.Substring(pos1 + 1, pos2 - pos1 - 1), out posX))
+                {
+                    MessageBox.Show(@"Ошибка преобразования координаты X в строке № " + numRow.ToString());
+                    break;
+                }
+
+                if (!float.TryParse(s.Substring(pos2 + 1, pos3 - pos2 - 1), out posY))
+                {
+                    MessageBox.Show(@"Ошибка преобразования координаты Y в строке № " + numRow.ToString());
+                    break;
+                }
+
+                // Пересчет в милиметры
+                posX = posX / 40;
+                posY = posY / 40;
+
+
+                if (posX < minX) minX = posX;
+
+                if (posY < minY) minY = posY;
+
+                //if (posX > xmax) xmax = posX;
+
+                //if (posX < xmin) xmin = posX;
+
+                //if (posY > ymax) ymax = posY;
+
+                //if (posY < ymin) ymin = posY;
+
+
+                ListPoints.Add(new PointF(posX, posY));
+                   
+
+
+            s = fs.ReadLine();
+            numRow++;
+            }
+          
+            fs = null;
+
+
+           List<List<PointF>> ListLines;
+
+           List<PointF> ListPoint;
+
+           ListLines = new List<List<PointF>>();
+
+           foreach (List<PointF> pline in Lines)
+           {
+               ListPoint = new List<PointF>();
+
+               foreach (PointF ppoint in pline)
+               {
+
+                   float fX = (ppoint.X + (-minX))*10;
+                   float fY = (ppoint.Y + (-minY))*10;
+
+                   ListPoint.Add(new PointF(fX, fY));
+               }
+               ListLines.Add(ListPoint);
+           }
+
+           return ListLines;
+        }
+
+
+
         /// <summary>
         /// Возвращает изображение полученное на определенном шаге обработки
         /// 1 - Изображение введенного текста, или выбраного файла изображения
@@ -1031,6 +1204,12 @@ namespace CNCImporterGkode
                 {
                     bitmap = CreateBitmapFromText(_selFont.textString.Text, _selFont.comboBoxFont.Text, (float)_selFont.textSize.Value, _selFont.nameFontFile.Text);
                 }
+            }
+            else if (radioButtonTypeSourcePLT.Checked)
+            {
+                _lines = GetVectorFromPLT(_selPLT.textBoxFileName.Text);
+                bitmap = PreviewLines(_lines);
+                
             }
             else
             {
@@ -1079,11 +1258,6 @@ namespace CNCImporterGkode
 
 
 
-
-
-
-
-        
         private void Calculate()
         {
             labelInfoX.Text = @"значения X: от " + _minX.ToString() + @" до " + _maxX.ToString();
@@ -1750,6 +1924,13 @@ namespace CNCImporterGkode
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void radioButtonTypeSourcePLT_CheckedChanged(object sender, EventArgs e)
+        {
+            panel1.Controls.Clear();
+            panel1.Controls.Add(_selPLT);
+            RefreshEnableTab();
         }
     }
 

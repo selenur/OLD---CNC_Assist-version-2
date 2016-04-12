@@ -83,9 +83,9 @@ namespace CNC_Assist
             //}
 
             //фиксируем точку
-            numStartPosX.Value = ControllerPlanetCNC.Info.AxesX_PositionMM;
-            numStartPosY.Value = ControllerPlanetCNC.Info.AxesY_PositionMM;
-            numZforStart.Value = ControllerPlanetCNC.Info.AxesZ_PositionMM;
+            numStartPosX.Value = ControllerPlanetCNC.Info.AxesXPositionMm;
+            numStartPosY.Value = ControllerPlanetCNC.Info.AxesYPositionMm;
+            numZforStart.Value = ControllerPlanetCNC.Info.AxesZPositionMm;
 
             //// 2) поднимаемся обратно
             //Controller.SendBinaryData(BinaryData.pack_C0(0x01)); //вкл
@@ -425,7 +425,7 @@ namespace CNC_Assist
                 }
 
                 //фиксируем точку
-                mp.PosZ = (float)ControllerPlanetCNC.Info.AxesZ_PositionMM;
+                mp.PosZ = (float)ControllerPlanetCNC.Info.AxesZPositionMm;
 
                 // установим флаг что можно обновлять таблицу на форме
                 _refreshDataFromMatrix = true;

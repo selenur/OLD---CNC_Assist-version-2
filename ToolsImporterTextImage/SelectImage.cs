@@ -22,7 +22,7 @@ namespace CNCImporterGkode
                 openFileDialog1.Multiselect = false;
                 openFileDialog1.Title = @"Выбор рисунка";
                 //openFileDialog1.InitialDirectory = "c:\\";
-                openFileDialog1.Filter = "All files (*.*)|*.*";
+                openFileDialog1.Filter = @"Файлы рисунков(*.jpg; *.jpeg; *.gif; *.bmp)|*.jpg; *.jpeg; *.gif; *.bmp";
                 openFileDialog1.FilterIndex = 2;
                 openFileDialog1.RestoreDirectory = true;
                 if (openFileDialog1.ShowDialog() == DialogResult.OK)
@@ -44,6 +44,11 @@ namespace CNCImporterGkode
         private void btShowOriginalImage_Click(object sender, EventArgs e)
         {
             CreateEvent();
+        }
+
+        private void SelectImage_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -14,6 +15,7 @@ namespace CNC_Assist
     /// <summary>
     /// Класс работы с контроллером
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public static class ControllerPlanetCNC
     {
         #region Переменные
@@ -41,40 +43,40 @@ namespace CNC_Assist
         /// <summary>
         /// Статус работы потока
         /// </summary>
-        private static volatile enumStatusThread _StatusThread;
+        private static volatile EnumStatusThread _statusThread;
 
         /// <summary>
         /// Поток который работает с контроллером
         /// </summary>
-        private static volatile Thread thController;
+        private static volatile Thread _thController;
 
         /// <summary>
         /// необходимость работы потока
         /// </summary>
-        private static volatile bool ThreadneedLoop;
+        private static volatile bool _threadneedLoop;
 
 
         // Доступ к контроллеру - vid 2121 pid 2130 в десятичной системе будет как 8481 и 8496 соответственно
-        private static volatile UsbDeviceFinder myUsbFinder;
-        private static volatile UsbDevice tmpUsbDevice;
-        private static volatile UsbEndpointReader usbReader;
-        private static volatile UsbEndpointWriter usbWriter;
-        private static volatile IUsbDevice wholeUsbDevice;
+        private static volatile UsbDeviceFinder _myUsbFinder;
+        private static volatile UsbDevice _tmpUsbDevice;
+        private static volatile UsbEndpointReader _usbReader;
+        private static volatile UsbEndpointWriter _usbWriter;
+        private static volatile IUsbDevice _wholeUsbDevice;
 
         /// <summary>
         /// Для отслеживания изменений в полученных данных от контроллера,
         /// что-бы не парсить данные которые не изменились
         /// </summary>
-        private static volatile byte[] oldInfoFromController;
+        private static volatile byte[] _oldInfoFromController;
 
         /// <summary>
         /// Массив данных для посылки в контроллер, при выполнении программы из G-кодов
         /// </summary>
-        private static List<byte[]> DataForSend;
+        private static readonly List<byte[]> DataForSend;
         /// <summary>
         /// Локер для Массива данных
         /// </summary>
-        private static object LockDataForSend;
+        private static readonly object LockDataForSend;
 
         #endregion
 
@@ -84,21 +86,21 @@ namespace CNC_Assist
         static ControllerPlanetCNC()
         {
             _isConnectedController = false;
-            _StatusThread = enumStatusThread.Off;
+            _statusThread = EnumStatusThread.Off;
 
-            myUsbFinder = new UsbDeviceFinder(8481, 8496);
-            tmpUsbDevice = null;
-            usbReader = null;
-            usbWriter = null;
-            wholeUsbDevice = null;
+            _myUsbFinder = new UsbDeviceFinder(8481, 8496);
+            _tmpUsbDevice = null;
+            _usbReader = null;
+            _usbWriter = null;
+            _wholeUsbDevice = null;
 
             Locker = new object();
 
-            thController = null;
+            _thController = null;
 
-            ThreadneedLoop = false;
+            _threadneedLoop = false;
 
-            oldInfoFromController = new byte[64];
+            _oldInfoFromController = new byte[64];
 
             DataForSend = new List<byte[]>();
             LockDataForSend = new object();
@@ -135,9 +137,9 @@ namespace CNC_Assist
         }
 
 
-        public static enumStatusThread StatusTThread
+        public static EnumStatusThread StatusTThread
         {
-            get { return _StatusThread; }
+            get { return _statusThread; }
         }
 
         /// <summary>
@@ -150,7 +152,7 @@ namespace CNC_Assist
             {
                 if (!IsConnectedToController) return false;
 
-                if (_StatusThread == enumStatusThread.Work) return false;
+                if (_statusThread == EnumStatusThread.Work) return false;
 
                 if (Info.NuberCompleatedInstruction > 0) return false;
 
@@ -163,24 +165,28 @@ namespace CNC_Assist
         #region События от контроллера
 
         // для посылки главному потоку сообщений, о статусе работы, отладочных сообщений
-        public delegate void DeviceEventNewMessage(object sender, DeviceEventArgsMessage e); 
+        public delegate void DeviceEventNewMessage(object sender, DeviceEventArgsMessage e);
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventNewMessage Message;
 
         /// <summary>
         /// Событие при успешном подключении к контроллеру
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventConnect WasConnected;   
         public delegate void DeviceEventConnect(object sender);                              // уведомление об установки связи
 
         /// <summary>
         /// Событие при отключении от контроллера, или разрыве связи с контроллером
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventDisconnect WasDisconnected; 
         public delegate void DeviceEventDisconnect(object sender, DeviceEventArgsMessage e); // уведомление об обрыве/прекращении связи
 
         /// <summary>
         /// Получены новые данные от контроллера
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventNewData NewDataFromController;
         public delegate void DeviceEventNewData(object sender);                              // уведомление что получены новые данные контроллером
 
@@ -200,14 +206,14 @@ namespace CNC_Assist
             }
 
             //если поток ещё не завершился, то остановим его:
-            if (thController != null)
+            if (_thController != null)
             {
-                if (thController.IsAlive)
+                if (_thController.IsAlive)
                 {
                     //пошлем завершение
-                    thController.Abort();
+                    _thController.Abort();
                     //и дождемся пока завершиться
-                    thController.Join();
+                    _thController.Join();
                 }
             }
 
@@ -216,26 +222,26 @@ namespace CNC_Assist
             _isConnectedController = false;
 
             // проверим наличие физического подключения контроллера
-            if (tmpUsbDevice == null)
+            if (_tmpUsbDevice == null)
             {
                 // Попытаемся установить связь
-                tmpUsbDevice = UsbDevice.OpenUsbDevice(myUsbFinder);
+                _tmpUsbDevice = UsbDevice.OpenUsbDevice(_myUsbFinder);
 
-                wholeUsbDevice = tmpUsbDevice as IUsbDevice;
-                if (!ReferenceEquals(wholeUsbDevice, null))
+                _wholeUsbDevice = _tmpUsbDevice as IUsbDevice;
+                if (!ReferenceEquals(_wholeUsbDevice, null))
                 {
                     // This is a "whole" USB device. Before it can be used, 
                     // the desired configuration and interface must be selected.
 
                     // Select config #1
-                    wholeUsbDevice.SetConfiguration(1);
+                    _wholeUsbDevice.SetConfiguration(1);
 
                     // Claim interface #0.
-                    wholeUsbDevice.ClaimInterface(0);
+                    _wholeUsbDevice.ClaimInterface(0);
 
                     // open read endpoint 1.
-                    usbReader = tmpUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
-                    usbWriter = tmpUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
+                    _usbReader = _tmpUsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
+                    _usbWriter = _tmpUsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
 
                     _isConnectedController = true;
 
@@ -250,16 +256,16 @@ namespace CNC_Assist
                     if (WasDisconnected != null) WasDisconnected(null, new DeviceEventArgsMessage("Ошибка"));
 
                     _isConnectedController = false;
-                    tmpUsbDevice = null;
+                    _tmpUsbDevice = null;
                     return;
                 }
             }  //if (tmpUsbDevice == null) //попытка установки связи
 
-            ThreadneedLoop = true;
+            _threadneedLoop = true;
 
             //запустим поток, который будет работать с контроллером
-            thController = new Thread(ThreadController);
-            thController.Start();
+            _thController = new Thread(ThreadController);
+            _thController.Start();
         }
 
         /// <summary>
@@ -270,15 +276,15 @@ namespace CNC_Assist
             AddMessage("Команда ОТКЛЮЧЕНИЕ: программы от контроллера!");
 
             //если поток ещё не завершился, то остановим его:
-            if (thController != null)
+            if (_thController != null)
             {
-                if (thController.IsAlive)
+                if (_thController.IsAlive)
                 {
-                    ThreadneedLoop = false;
+                    _threadneedLoop = false;
                     //пошлем завершение
                     //thController.Abort();
                     //и дождемся пока завершиться
-                    bool theend = thController.Join(2000);
+                    bool theend = _thController.Join(2000);
 
                     if (!theend)
                         MessageBox.Show(
@@ -286,13 +292,13 @@ namespace CNC_Assist
                 }
             }
 
-            thController = null;
+            _thController = null;
             //tmpUsbDevice = null;
             _isConnectedController = false;
 
-            if (tmpUsbDevice != null)
+            if (_tmpUsbDevice != null)
             {
-                if (tmpUsbDevice.IsOpen)
+                if (_tmpUsbDevice.IsOpen)
                 {
                     // If this is a "whole" usb device (libusb-win32, linux libusb-1.0)
                     // it exposes an IUsbDevice interface. If not (WinUSB) the
@@ -300,15 +306,15 @@ namespace CNC_Assist
                     // an interface of a device; it does not require or support
                     // configuration and interface selection.
                     //IUsbDevice wholeUsbDevice = tmpUsbDevice as IUsbDevice;
-                    if (!ReferenceEquals(wholeUsbDevice, null))
+                    if (!ReferenceEquals(_wholeUsbDevice, null))
                     {
                         // Release interface
-                        wholeUsbDevice.ReleaseInterface(1);
+                        _wholeUsbDevice.ReleaseInterface(1);
                     }
 
-                    tmpUsbDevice.Close();
+                    _tmpUsbDevice.Close();
                 }
-                tmpUsbDevice = null;
+                _tmpUsbDevice = null;
 
                 // Free usb resources
                 UsbDevice.Exit();
@@ -345,15 +351,15 @@ namespace CNC_Assist
 
             try
             {
-                _StatusThread = enumStatusThread.Wait;
+                _statusThread = EnumStatusThread.Wait;
 
                 // цикл будет работать постоянно до исключения
-                while (ThreadneedLoop)
+                while (_threadneedLoop)
                 {
                     // получение данных от контроллера, в случае ошибки, завершаем работу
                     if (!GET_FROM_CONTROLLER_INFO())
                     {
-                        ThreadneedLoop = false;
+                        _threadneedLoop = false;
                     }
 
                     if (!SEND_TO_CONTROLLER())
@@ -365,10 +371,10 @@ namespace CNC_Assist
                     Thread.Sleep(1);
                 }//while (true)
 
-                _StatusThread = enumStatusThread.Off;
+                _statusThread = EnumStatusThread.Off;
 
             }//try
-            catch (Exception ex)
+            catch (Exception)
             {
                 //Thread.ResetAbort(); //если нужно то можем отменить отмену потока
                 // остановка потока....
@@ -389,7 +395,7 @@ namespace CNC_Assist
 
             try
             {
-                ec = usbReader.Read(readBuffer, 2000, out bytesRead);
+                ec = _usbReader.Read(readBuffer, 2000, out bytesRead);
             }
             catch (Exception)
             {
@@ -408,7 +414,7 @@ namespace CNC_Assist
                 return false;
             }
 
-            if (bytesRead > 0 && readBuffer[0] == 0x01 && !CompareArray(oldInfoFromController, readBuffer))
+            if (bytesRead > 0 && readBuffer[0] == 0x01 && !CompareArray(_oldInfoFromController, readBuffer))
             {
                 Info.RawData = readBuffer;
 
@@ -425,7 +431,7 @@ namespace CNC_Assist
                 //    File.AppendAllText(fileDebug, ss, Encoding.UTF8);
                 //}
 
-                oldInfoFromController = readBuffer;
+                _oldInfoFromController = readBuffer;
 
                 if (NewDataFromController != null)
                 {
@@ -440,31 +446,34 @@ namespace CNC_Assist
 
         }
 
+        /// <summary>
+        /// Вызывается из потока "ThreadController()", работающего с контроллером
+        /// </summary>
+        /// <returns>Результат посылки команды в контроллер</returns>
         private static bool SEND_TO_CONTROLLER()
         {
 
-            if (_StatusThread != enumStatusThread.Work) return true; //всё нормально, но дальше продолжать не нужно
+            if (_statusThread != EnumStatusThread.Work) return true; //всё нормально, но дальше продолжать не нужно
 
-            if (DataForSend.Count == 0) _StatusThread = enumStatusThread.Wait; //данные для передачи закончились
+            if (DataForSend.Count == 0) _statusThread = EnumStatusThread.Wait; //данные для передачи закончились
 
             if ((Info.FreebuffSize < GlobalSetting.ControllerSetting.MinBuffSize)) return true; //всё нормально, но дальше продолжать пока не нужно
 
             // получим монопольный доступ
             lock (LockDataForSend)
             {
-                int bytesWritten = 64;
-
                 try
                 {
                     byte[] data = DataForSend[DataForSend.Count - 1];
 
-                    usbWriter.Write(data, 200, out bytesWritten);
+                    int bytesWritten;
+                    _usbWriter.Write(data, 200, out bytesWritten);
 
                     DataForSend.Remove(data);
                 }
                 catch (Exception e)
                 {
-                    AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e.ToString());
+                    AddMessage(@" <-- ОШИБКА посылки данных в контроллер: " + e);
                     return false;
                 }
             }
@@ -480,17 +489,25 @@ namespace CNC_Assist
             AddBinaryDataToTask(BinaryData.pack_9E(0x05));
             AddBinaryDataToTask(BinaryData.pack_BF(GlobalSetting.ControllerSetting.AxleX.MaxSpeed, GlobalSetting.ControllerSetting.AxleY.MaxSpeed, GlobalSetting.ControllerSetting.AxleZ.MaxSpeed, GlobalSetting.ControllerSetting.AxleA.MaxSpeed));
             AddBinaryDataToTask(BinaryData.pack_C0());
-            AddBinaryDataToTask(BinaryData.pack_D3());
-            AddBinaryDataToTask(BinaryData.pack_AB());
-            AddBinaryDataToTask(BinaryData.pack_9F(GlobalSetting.ControllerSetting.allowMotorUse, GlobalSetting.ControllerSetting.useSensorTools, GlobalSetting.ControllerSetting.AxleX.CountPulse, GlobalSetting.ControllerSetting.AxleY.CountPulse, GlobalSetting.ControllerSetting.AxleZ.CountPulse, GlobalSetting.ControllerSetting.AxleA.CountPulse));
+            //AddBinaryDataToTask(BinaryData.pack_D3());
+            //AddBinaryDataToTask(BinaryData.pack_AB());
+            //AddBinaryDataToTask(BinaryData.pack_9F(GlobalSetting.ControllerSetting.allowMotorUse, GlobalSetting.ControllerSetting.useSensorTools, GlobalSetting.ControllerSetting.AxleX.CountPulse, GlobalSetting.ControllerSetting.AxleY.CountPulse, GlobalSetting.ControllerSetting.AxleZ.CountPulse, GlobalSetting.ControllerSetting.AxleA.CountPulse));
             //AddBinaryDataToTask(BinaryData.pack_A0(GlobalSetting.ControllerSetting.AxleX.Acceleration, GlobalSetting.ControllerSetting.AxleY.Acceleration, GlobalSetting.ControllerSetting.AxleZ.Acceleration, GlobalSetting.ControllerSetting.AxleA.Acceleration, GlobalSetting.ControllerSetting.AxleX.reversAxle, GlobalSetting.ControllerSetting.AxleY.reversAxle, GlobalSetting.ControllerSetting.AxleZ.reversAxle, GlobalSetting.ControllerSetting.AxleA.reversAxle, GlobalSetting.ControllerSetting.AxleX.reversSignal, GlobalSetting.ControllerSetting.AxleY.reversSignal, GlobalSetting.ControllerSetting.AxleZ.reversSignal, GlobalSetting.ControllerSetting.AxleA.reversSignal));
-            AddBinaryDataToTask(BinaryData.pack_A1(GlobalSetting.ControllerSetting.UseLimitSwichXmin, GlobalSetting.ControllerSetting.UseLimitSwichXmax, GlobalSetting.ControllerSetting.UseLimitSwichYmin, GlobalSetting.ControllerSetting.UseLimitSwichYmax, GlobalSetting.ControllerSetting.UseLimitSwichZmin, GlobalSetting.ControllerSetting.UseLimitSwichZmax, false, false));
-            AddBinaryDataToTask(BinaryData.pack_BF(GlobalSetting.ControllerSetting.AxleX.MaxSpeed, GlobalSetting.ControllerSetting.AxleY.MaxSpeed, GlobalSetting.ControllerSetting.AxleZ.MaxSpeed, GlobalSetting.ControllerSetting.AxleA.MaxSpeed));
-            AddBinaryDataToTask(BinaryData.pack_B5());
-            AddBinaryDataToTask(BinaryData.pack_B6());
-            AddBinaryDataToTask(BinaryData.pack_C2());
-            AddBinaryDataToTask(BinaryData.pack_9D());
-            AddBinaryDataToTask(BinaryData.pack_9E(0x01));            
+           // AddBinaryDataToTask(BinaryData.pack_A1(GlobalSetting.ControllerSetting.UseLimitSwichXmin, GlobalSetting.ControllerSetting.UseLimitSwichXmax, GlobalSetting.ControllerSetting.UseLimitSwichYmin, GlobalSetting.ControllerSetting.UseLimitSwichYmax, GlobalSetting.ControllerSetting.UseLimitSwichZmin, GlobalSetting.ControllerSetting.UseLimitSwichZmax, false, false));
+            //AddBinaryDataToTask(BinaryData.pack_BF(GlobalSetting.ControllerSetting.AxleX.MaxSpeed, GlobalSetting.ControllerSetting.AxleY.MaxSpeed, GlobalSetting.ControllerSetting.AxleZ.MaxSpeed, GlobalSetting.ControllerSetting.AxleA.MaxSpeed));
+
+            AddBinaryDataToTask(BinaryData.pack_B7());
+            //AddBinaryDataToTask(BinaryData.pack_B5());
+            //AddBinaryDataToTask(BinaryData.pack_B6());
+            //AddBinaryDataToTask(BinaryData.pack_C2());
+            //AddBinaryDataToTask(BinaryData.pack_9D());
+            //AddBinaryDataToTask(BinaryData.pack_9E(0x01));  
+          
+            // Перед посылом задания подправим текущие координаты
+            _lastTaskPosX = Info.AxesXPositionMm;
+            _lastTaskPosY = Info.AxesYPositionMm;
+            _lastTaskPosZ = Info.AxesZPositionMm;
+            _lastTaskPosA = Info.AxesAPositionMm;
         }
 
         public static void TASK_SendStopData()
@@ -499,16 +516,16 @@ namespace CNC_Assist
             AddBinaryDataToTask(BinaryData.pack_9D());
             AddBinaryDataToTask(BinaryData.pack_9E(0x02));
             AddBinaryDataToTask(BinaryData.pack_FF());
-            AddBinaryDataToTask(BinaryData.pack_FF());
-            AddBinaryDataToTask(BinaryData.pack_FF());
-            AddBinaryDataToTask(BinaryData.pack_FF());
-            AddBinaryDataToTask(BinaryData.pack_FF());           
+            //AddBinaryDataToTask(BinaryData.pack_FF());
+            //AddBinaryDataToTask(BinaryData.pack_FF());
+            //AddBinaryDataToTask(BinaryData.pack_FF());
+            //AddBinaryDataToTask(BinaryData.pack_FF());           
 
         }
 
         public static void TASK_START()
         {
-            _StatusThread = enumStatusThread.Work;
+            _statusThread = EnumStatusThread.Work;
         }
 
         public static void TASK_STOP()
@@ -520,23 +537,186 @@ namespace CNC_Assist
         public static void TASK_PAUSE()
         {
 
-            if (_StatusThread == enumStatusThread.Work) //нужно остановить
+            if (_statusThread == EnumStatusThread.Work) //нужно остановить
             {
-                _StatusThread = enumStatusThread.Pause;
+                _statusThread = EnumStatusThread.Pause;
             }
-            else if (_StatusThread == enumStatusThread.Pause) //нужно запустить
+            else if (_statusThread == EnumStatusThread.Pause) //нужно запустить
             {
-                _StatusThread = enumStatusThread.Work;
+                _statusThread = EnumStatusThread.Work;
             }
 
         }
 
         public static void TASK_CLEAR()
         {
-            DataForSend.Clear();
+            lock (LockDataForSend)
+            {
+                DataForSend.Clear();
+            }
         }
 
 
+        // Промежуточные данные для выполнения задания
+        private static decimal _lastTaskPosX;
+        private static decimal _lastTaskPosY;
+        private static decimal _lastTaskPosZ;
+        private static decimal _lastTaskPosA;
+        private static int _lastSpeedG0 = 100;
+        private static int _lastSpeedG1 = 100;
+        private static int _lastTypeGkm = 0; //0-> G0 1->G1
+        private static readonly bool AbsolutlePosParsing = true;
+
+        /// <summary>
+        /// добавление команды в задание для выполнения
+        /// </summary>
+        /// <param name="gcommand">строка с кодом</param>
+        /// <param name="numbr">номер инструкции</param>
+        public static void TASK_AddCommand(string gcommand,int numbr = 0)
+        {
+            //получим символ разделения дробной и целой части.
+            string symbSeparatorDec = CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator;
+
+            char csourse = '.';
+            char cdestination = ',';
+
+            if (symbSeparatorDec == ".")
+            {
+                csourse = ',';
+                cdestination = '.';
+            }
+
+            // 1) распарсим строку на отдельные строки с параметрами
+            List<string> lcmd = DataLoader.ParseStringToSubString(gcommand.ToUpper());
+
+            if (lcmd.Count == 0) return;
+
+            // 2) Найдем вначале команды начинающиеся на "M"
+            foreach (string sLine in lcmd)
+            {
+                if (sLine.Substring(0,1) != "M") continue;
+
+                if (sLine == "M3" || sLine == "M03")
+                {
+                    AddBinaryDataToTask(BinaryData.pack_B5(true));
+                }
+
+                if (sLine == "M5" || sLine == "M05")
+                {
+                    // ReSharper disable once RedundantArgumentDefaultValue
+                    AddBinaryDataToTask(BinaryData.pack_B5(false));
+                }
+                
+            }
+
+            // 3) Извлечем скороcть выполнения
+            int spd = -1;  // значение из F (если -1 то значения в строке нет)
+            int typeg = -1;// значение из g (если -1 то значения в строке нет)
+            //int gsubspd = -1; //значение из g во втором актете, если он есть
+            foreach (string sline in lcmd)
+            {
+                if (sline.Substring(0, 1) != "G" && sline.Substring(0, 1) != "F") continue;
+                
+                if (sline == "G0" || sline == "G00") typeg = 0;
+
+                if (sline == "G1" || sline == "G01") typeg = 1;
+
+                if (sline.Substring(0, 1) == "F")
+                {
+                    string svalue = sline.Substring(1).Replace(csourse, cdestination);
+                    int.TryParse(svalue, out spd);
+                }
+
+                //todo: дабавить g0.39 и т.д.
+            }
+
+            // Данное значение будет послано в контроллер
+            int speedToController = 100;
+
+            // Ряд условий, связанных с тем что команда G0 G1 могут быть отдельно указаны от Fxxx
+            if (typeg == 0) _lastTypeGkm = 0;
+
+            if (typeg == 1) _lastTypeGkm = 1;
+
+            if (spd != -1)
+            {
+                if (_lastTypeGkm == 0) _lastSpeedG0 = spd;
+
+                if (_lastTypeGkm == 1) _lastSpeedG1 = spd;
+            }
+
+            if (_lastTypeGkm == 0) speedToController = _lastSpeedG0;
+
+            if (_lastTypeGkm == 1) speedToController = _lastSpeedG1;
+            
+            // 4) а теперь уже команды движения в точку
+            bool needSendPos = false;
+            foreach (string sLine in lcmd)
+            {
+                if (sLine.Substring(0, 1) != "X" && sLine.Substring(0, 1) != "Y" && sLine.Substring(0, 1) != "Z" && sLine.Substring(0, 1) != "A") continue;
+
+                needSendPos = true;
+
+                //todo: тут получим координаты
+
+
+                if (sLine.Substring(0, 1) == "X") //координата
+                {
+                    string svalue = sLine.Substring(1).Replace(csourse, cdestination);
+                    decimal pos;
+                    decimal.TryParse(svalue, out pos);
+
+                    if (AbsolutlePosParsing) _lastTaskPosX = pos;
+                    else _lastTaskPosX += pos;
+                }
+
+
+                if (sLine.Substring(0, 1) == "Y") //координата
+                {
+                    string svalue = sLine.Substring(1).Replace(csourse, cdestination);
+                    decimal pos;
+                    decimal.TryParse(svalue, out pos);
+
+                    if (AbsolutlePosParsing) _lastTaskPosY = pos;
+                    else _lastTaskPosY += pos;
+                }
+
+
+                if (sLine.Substring(0, 1) == "Z") //координата
+                {
+                    string svalue = sLine.Substring(1).Replace(csourse, cdestination); 
+                    decimal pos;
+                    decimal.TryParse(svalue, out pos);
+
+                    if (AbsolutlePosParsing) _lastTaskPosZ = pos;
+                    else _lastTaskPosZ += pos;
+                }
+
+
+                if (sLine.Substring(0, 1) == "A") //координата
+                {
+                    string svalue = sLine.Substring(1);
+                    decimal pos;
+                    decimal.TryParse(svalue, out pos);
+
+                    if (AbsolutlePosParsing) _lastTaskPosA = pos;
+                    else _lastTaskPosA += pos;
+                }
+
+
+            }
+
+            // 5) 
+            if (needSendPos)
+            {
+                AddBinaryDataToTask(BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX),
+                                                            Info.CalcPosPulse("Y", _lastTaskPosY),
+                                                            Info.CalcPosPulse("Z", _lastTaskPosZ),
+                                                            Info.CalcPosPulse("A", _lastTaskPosA),
+                                                            speedToController,
+                                                            numbr));                
+            }
+        }
 
         //// ведения логов
         //private static string GetTextFromBinary(byte[] _bytes)
@@ -644,16 +824,16 @@ namespace CNC_Assist
 
         #region Послания данных в контроллер
 
-        public static void DirectPostToController(byte[] _data)
+        public static void DirectPostToController(byte[] data)
         {
-            if (tmpUsbDevice != null)
+            if (_tmpUsbDevice != null)
             {
-                if (tmpUsbDevice.IsOpen)
+                if (_tmpUsbDevice.IsOpen)
                 {
                     try
                     {
                         int bytesWritten;
-                        usbWriter.Write(_data, 200, out bytesWritten);
+                        _usbWriter.Write(data, 200, out bytesWritten);
                     }
                     catch (Exception e)
                     {
@@ -663,7 +843,6 @@ namespace CNC_Assist
             }
 
         }
-   
 
         /// <summary>
         /// Посылка в контроллер двоичных данных
@@ -686,9 +865,6 @@ namespace CNC_Assist
                 }
             }
         }
-
-
-
 
         /// <summary>
         /// Установка в контроллер, нового положения по осям
@@ -788,7 +964,7 @@ namespace CNC_Assist
         /// <summary>
         /// Временная переменная для процедуры ExecuteCommand, что-бы помнить последние настройки
         /// </summary>
-        private static PropMaсhine ExecuteCommandLastMachine = new PropMaсhine();
+        private static readonly PropMaсhine ExecuteCommandLastMachine = new PropMaсhine();
 
         /// <summary>
         /// Выполнение G-кода
@@ -796,20 +972,24 @@ namespace CNC_Assist
         /// <param name="command">строка с G-кодом</param>
         public static void ExecuteCommand(string command)
         {
-            if (_StatusThread != enumStatusThread.Wait) return;
+            if (_statusThread != EnumStatusThread.Wait) return;
 
             // сюда запишем текущие координаты
-            Position POS = new Position();
+            Position pos = new Position
+            {
+                A = Info.AxesAPositionMm,
+                X = Info.AxesXPositionMm,
+                Y = Info.AxesYPositionMm,
+                Z = Info.AxesZPositionMm
+            };
 
-            POS.A = Info.AxesA_PositionMM;
-            POS.X = Info.AxesX_PositionMM;
-            POS.Y = Info.AxesY_PositionMM;
-            POS.Z = Info.AxesZ_PositionMM;
 
-            DataRow dataRowLast = new DataRow(0, "");
+            DataRow dataRowLast = new DataRow(0, "")
+            {
+                POS = pos,
+                Machine = ExecuteCommandLastMachine
+            };
 
-            dataRowLast.POS = POS;
-            dataRowLast.Machine = ExecuteCommandLastMachine;
 
             DataRow dataRowNow = new DataRow(0, command);
 
@@ -841,7 +1021,7 @@ namespace CNC_Assist
     /// <summary>
     /// Варианты статусов выполнения задания
     /// </summary>
-    public enum enumStatusThread
+    public enum EnumStatusThread
     {
         Off = 0,
         Wait = 1,
@@ -922,7 +1102,7 @@ namespace CNC_Assist
         /// <summary>
         /// Получение положения в милиметрах
         /// </summary>
-        public decimal AxesX_PositionMM
+        public decimal AxesXPositionMm
         {
             get
             {
@@ -932,7 +1112,7 @@ namespace CNC_Assist
         /// <summary>
         /// Получение положения в милиметрах
         /// </summary>
-        public decimal AxesY_PositionMM
+        public decimal AxesYPositionMm
         {
             get
             {
@@ -942,7 +1122,7 @@ namespace CNC_Assist
         /// <summary>
         /// Получение положения в милиметрах
         /// </summary>
-        public decimal AxesZ_PositionMM
+        public decimal AxesZPositionMm
         {
             get
             {
@@ -952,7 +1132,7 @@ namespace CNC_Assist
         /// <summary>
         /// Получение положения в милиметрах
         /// </summary>
-        public decimal AxesA_PositionMM
+        public decimal AxesAPositionMm
         {
             get
             {
@@ -1044,7 +1224,7 @@ namespace CNC_Assist
         /// <param name="ts">Тип сигнала</param>
         /// <param name="speedShim">Значение определяющее форму сигнала</param>
         /// <returns></returns>
-        public static byte[] pack_B5(bool shpindelOn = false, int numShimChanel = 0, TypeSignal ts = TypeSignal.None, int speedShim = 0)
+        public static byte[] pack_B5(bool shpindelOn = false, int numShimChanel = 2, TypeSignal ts = TypeSignal.Hz, int speedShim = 3000)
         {
 
             int tmpSpeed = speedShim;
@@ -1056,7 +1236,8 @@ namespace CNC_Assist
             byte[] buf = new byte[64];
 
             buf[0] = 0xB5;
-            buf[4] = 0x80;
+
+            if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK1) buf[4] = 0x80;
 
 
             if (shpindelOn)
@@ -1166,6 +1347,35 @@ namespace CNC_Assist
 
             return buf;
         }
+
+
+
+        public static byte[] pack_B7()
+        {
+            // появилась в mk2
+
+            // B7 00 00 00 00 00 60 AE 0A 00 00 35 0C 00 00 00
+            // 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+            // 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+            // 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+
+
+            byte[] buf = new byte[64];
+
+            buf[0] = 0xB7;
+
+            buf[6] = 0x60;
+            buf[7] = 0xAE;
+            buf[8] = 0x0A;
+            buf[11] = 0x35;
+            buf[12] = 0x0C;
+           
+            return buf;
+        }
+
+
+
 
         /// <summary>
         /// Установка параметров работы с драйверами моторов
@@ -1648,8 +1858,18 @@ namespace CNC_Assist
             byte[] buf = new byte[64];
 
             buf[0] = 0x9E;
-            buf[4] = byte4;
-            buf[5] = byte5;
+
+            if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK2)
+            {
+                buf[5] = 0x05;
+            }
+            else
+            {
+                //for mk1
+                buf[4] = 0x05;
+                buf[5] = 0x00;
+            }
+
 
             return buf;
         }
@@ -1757,7 +1977,7 @@ namespace CNC_Assist
 
             buf[0] = 0xBF;
 
-            buf[4] = 0x80;
+
 
             double koef = 4500;
 
@@ -1976,40 +2196,7 @@ namespace CNC_Assist
 
     }
 
-    #region НАБОР ДАННЫХ
 
-
-
-
-
-
-
-    //public class matrixYline
-    //{
-    //    public decimal Y = 0;       // координата в мм
-    //   // public List<matrixPoint> X = new List<matrixPoint>(); //набор координат по оси X, и свойства используется ли эта точка
-    //}
-
-    //public class matrixPoint
-    //{
-    //    public decimal X = 0;       // координата в мм
-    //    public decimal Z = 0;       // координата в мм
-    //    public bool Used = false;       // используется ли эта точка
-
-    //    public matrixPoint(decimal _X, decimal _Z, bool _Used)
-    //    {
-    //        X = _X;
-    //        Z = _Z;
-    //        Used = _Used;
-    //    }
-    //}
-
-
-
-
-
-
-    #endregion
 
     ////public class decPoint
     ////{
