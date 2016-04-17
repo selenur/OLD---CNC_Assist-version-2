@@ -47,15 +47,19 @@ namespace CNC_Assist
         {
             textBoxNumberLine.Text = @"Выполнена: " + ControllerPlanetCNC.Info.NuberCompleatedInstruction;
 
-
             // проверим не обновились ли данные
             if (_dateGetLastNewDataCode != DataLoader.dateGetNewDataCode && DataLoader.status == DataLoader.eDataSetStatus.none)
             {
+                int idx=0;
                 listGkodeCommand.Items.Clear();
-                foreach (DataRow val in DataLoader.DataRows)
+
+                listGkodeCommand.BeginUpdate();
+                foreach (string val in GkodeWorker.Gkode)
                 {
-                    listGkodeCommand.Items.Add(@"№" + val.numberRow + " " + val.DataString);
+                    //listGkodeCommand.Items.Add(@"№" + (idx++) + " " + val);
+                    listGkodeCommand.Items.Add(val);
                 }
+                listGkodeCommand.EndUpdate();
                 _dateGetLastNewDataCode = DataLoader.dateGetNewDataCode;
             }
 
@@ -133,9 +137,9 @@ namespace CNC_Assist
 
             while (needContinue)
             {
-                DataRow dataRowNow = DataLoader.DataRows[_nowPos];
+                //DataRow dataRowNow = DataLoader.DataRows[_nowPos];
 
-                ControllerPlanetCNC.TASK_AddCommand(dataRowNow.DataString,dataRowNow.numberRow);
+                ControllerPlanetCNC.TASK_AddCommand(listGkodeCommand.Items[_nowPos].ToString(), _nowPos);
 
                 _nowPos++;
 

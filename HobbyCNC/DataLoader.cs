@@ -1,8 +1,6 @@
 ﻿/*
- * Данный класс предназначачен для парсинга данных, в G-kod
- * И их хранения
+ * Данный класс предназначачен для получения данных, в G-kod
  */
-
 
 using System;
 using System.Collections.Generic;
@@ -23,10 +21,7 @@ namespace CNC_Assist
         /// </summary>
         private static volatile bool _shouldStop = false;
 
-        /// <summary>
-        /// Набор данных
-        /// </summary>
-        public static volatile List<DataRow> DataRows = new List<DataRow>();
+        public static volatile List<PointCNC> PointsFor3D = new List<PointCNC>(); 
 
         /// <summary>
         /// статус работы потока в данном классе
@@ -73,17 +68,12 @@ namespace CNC_Assist
 
         public static ResultCommand ReadFromFile(string fileName)
         {
-            if (DataRows.Count != 0)
+            if (GkodeWorker.Gkode.Count != 0)
             {
                 DialogResult res = MessageBox.Show("Очистить существующий G-код?", "Вопрос", MessageBoxButtons.YesNo);
 
-                if (res == DialogResult.Yes) DataRows.Clear(); 
+                if (res == DialogResult.Yes) GkodeWorker.Gkode.Clear(); 
             }
-
-
-            //DataRows.Clear(); 
-
-            //Data_string.Clear();
 
             if (status == eDataSetStatus.loadingFromFile)
             {
@@ -102,24 +92,17 @@ namespace CNC_Assist
 
             if (needAskClearData)
             {
-                if (DataRows.Count != 0)
+                if (GkodeWorker.Gkode.Count != 0)
                 {
                     DialogResult res = MessageBox.Show("Очистить существующий G-код?", "Вопрос", MessageBoxButtons.YesNo);
 
-                    if (res == DialogResult.Yes) DataRows.Clear();
+                    if (res == DialogResult.Yes) GkodeWorker.Gkode.Clear();
                 }
             }
             else
             {
-                DataRows.Clear();
+                GkodeWorker.Gkode.Clear();
             }
-
-
-
-
-            //DataRows.Clear();
-
-            //Data_string.Clear();
 
             if (status == eDataSetStatus.loadingFromFile)
             {
@@ -166,36 +149,40 @@ namespace CNC_Assist
                 string line;
                 while ((line = srReader.ReadLine()) != null && !_shouldStop)
                 {
+                    GkodeWorker.Gkode.Add(line);
 
                     // в переменной line имеем строку которую парсим
-                    DataRows.Add(new DataRow(currentLine, line));
+                    /*DataRows.Add(new DataRow(currentLine, line));*/
                     //Data_string.Add(new stringData(indx++,line));
 
                     percentCompleated = (int)(((decimal)100 / countLines) * currentLine);
                     currentLine++;
                 }
             }
+            
 
-            status = eDataSetStatus.parsingData;
-            descryption = @"Парсинг данных";
-            percentCompleated = 0;
-            currentLine = 0;
+            //status = eDataSetStatus.parsingData;
+            //descryption = @"Парсинг данных";
+            //percentCompleated = 0;
+            //currentLine = 0;
 
-            DataRow tmpDataRowRecord = new DataRow(0, "");
+            //PointCNC tmpPoint = new PointCNC();
 
-            while ((currentLine < DataRows.Count) && !_shouldStop)
-            {
-                percentCompleated = (int)(((decimal)100 / countLines) * currentLine);
+            //while ((currentLine < PointsFor3D.Count) && !_shouldStop)
+            //{
+            //    percentCompleated = (int)(((decimal)100 / countLines) * currentLine);
 
-                DataRow curDataRow = DataRows[currentLine];
-                FillStructure(tmpDataRowRecord, ref curDataRow);
+            //    PointCNC curPoint = PointsFor3D[currentLine];
+            //    FillStructure(tmpPoint, ref curPoint;
 
-                //скопируем, ля возможности дальше знать предыдущие параметры
-                tmpDataRowRecord = curDataRow;
+            //    //скопируем, ля возможности дальше знать предыдущие параметры
+            //    tmpPoint = curPoint;
 
-                currentLine++;
-            }
+            //    currentLine++;
+            //}
+            
 
+            GkodeWorker.Parsing();
             status = eDataSetStatus.none;
             dateGetNewDataCode = DateTime.Now;
         }
@@ -220,13 +207,15 @@ namespace CNC_Assist
 
             foreach (string line in Gkode)
             {
+                GkodeWorker.Gkode.Add(line);
+                /*
                 DataRows.Add(new DataRow(currentLine, line));
-
+                */
                 percentCompleated = (int)(((decimal)100 / countLines) * currentLine);
                 currentLine++;
             }
 
-
+            /*
 
             status = eDataSetStatus.parsingData;
 
@@ -254,7 +243,8 @@ namespace CNC_Assist
 
                 currentLine++;
             }
-
+*/
+            GkodeWorker.Parsing();
             status = eDataSetStatus.none;
             dateGetNewDataCode = DateTime.Now;
         }
@@ -267,12 +257,16 @@ namespace CNC_Assist
         /// </summary>
         /// <param name="lastDataRow"></param>
         /// <param name="nextDataRow"></param>
-        public static void FillStructure(DataRow lastDataRow, ref DataRow nextDataRow)
+        public static void FillStructure(PointCNC lastDataRow, ref PointCNC nextDataRow, string _cmd)
         {
             // Установим большинство параметров, из предыдущей строки,
             // и при дальнейшем парсинге, изменим только те поля которые встретятся в анализируемой строке
-            nextDataRow.duplicate(lastDataRow);
-
+            nextDataRow.X = lastDataRow.X;
+            nextDataRow.Y = lastDataRow.Y;
+            nextDataRow.Z = lastDataRow.Z;
+            nextDataRow.A = lastDataRow.A;
+            nextDataRow.InstrumentOn = lastDataRow.InstrumentOn;
+            nextDataRow.workSpeed = lastDataRow.workSpeed;
 
             //получим символ разделения дробной и целой части.
             string symbSeparatorDec = CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator;
@@ -286,10 +280,10 @@ namespace CNC_Assist
                 cdestination = '.';
             }
 
-            nextDataRow.DataString = nextDataRow.DataString.ToUpper();
+            //nextDataRow.DataString = nextDataRow.DataString.ToUpper();
 
             // 1) распарсим строку на отдельные строки с параметрами
-            List<string> lcmd = ParseStringToSubString(nextDataRow.DataString);
+            List<string> lcmd = ParseStringToSubString(_cmd);
 
             if (lcmd.Count == 0) return;
 
@@ -299,154 +293,112 @@ namespace CNC_Assist
             {
                 if (code == "M3")
                 {
-                    nextDataRow.Machine.SpindelON = true;
+                    nextDataRow.InstrumentOn = true;
                 }
 
                 if (code == "M5")
                 {
-                    nextDataRow.Machine.SpindelON = false;
+                    nextDataRow.InstrumentOn = false;
                 }
 
-                if (code == "M7")
-                {
-                    nextDataRow.Machine.Chanel2ON = true;
-                }
-
-                if (code == "M8")
-                {
-                    nextDataRow.Machine.Chanel3ON = true;
-                }
-
-                if (code == "M9")
-                {
-                    nextDataRow.Machine.Chanel2ON = false;
-                    nextDataRow.Machine.Chanel3ON = false;
-                }
 
 
                 if (code == "G0") //холостое движение
                 {
-                    nextDataRow.Machine.NumGkode = 0;
+                    nextDataRow.workSpeed = false;
                 }
 
                 if (code.Length >=2 && code.Substring(0, 2) == "G1") //рабочее движение
                 {
-                    nextDataRow.Machine.NumGkode = 1;
+                    nextDataRow.workSpeed = true;
 
-                    if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK2)
-                    {
-                        if (code.Contains("."))
-                        {
-                            //извлечем значение после точки
-                            string stmp = code.Substring(code.IndexOf(".")+1);
+                    //if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK2)
+                    //{
+                    //    if (code.Contains("."))
+                    //    {
+                    //        //извлечем значение после точки
+                    //        string stmp = code.Substring(code.IndexOf(".")+1);
 
-                            int inttmp = 57;
+                    //        int inttmp = 57;
 
-                            int.TryParse(stmp, out inttmp);
+                    //        int.TryParse(stmp, out inttmp);
 
-                            if (inttmp < 0) inttmp = 0;
+                    //        if (inttmp < 0) inttmp = 0;
 
-                            if (inttmp > 57) inttmp = 57;
+                    //        if (inttmp > 57) inttmp = 57;
 
-                            nextDataRow.Machine.TimeOutPause = (byte)inttmp;
-                        }
-                    }
+                    //        nextDataRow.Machine.TimeOutPause = (byte)inttmp;
+                    //    }
+                    //}
                 }
 
 
-                if (code == "G2") //TODO: не реализовано
-                {
-                    nextDataRow.Machine.NumGkode = 2;
-                }
-
-                if (code == "G3") //TODO: не реализовано
-                {
-                    nextDataRow.Machine.NumGkode = 3;
-                }
 
 
-                if (code == "G4") //пауза
-                {
-                    try
-                    {
-                        //следующий параметр должен быть длительностью типа P500
-                        string strNext = lcmd[index + 1].ToUpper();
-                        if (strNext.Substring(0,1) == "P")
-                        {
-                            int times;
-                            int.TryParse(strNext.Substring(1), out times);
-                            nextDataRow.Extra.NeedPause = true;
-                            nextDataRow.Extra.timeoutMsec = times;
-                        }
-                    }
-                    catch (Exception)
-                    {
-
-                        nextDataRow.Extra.NeedPause = false;
-                    }
-                }
-
-                #region G92 - несколько кодов отвечающие за смещение координат
-
-                if (code == "G92")
-                {
-                    //TODO: пока применим простое смещение с переносом в точку ноль
-                    ControllerPlanetCNC.CorrectionPos.UseCorrection = true;
-                    ControllerPlanetCNC.CorrectionPos.DeltaX = ControllerPlanetCNC.Info.AxesXPositionMm;
-                    ControllerPlanetCNC.CorrectionPos.DeltaY = ControllerPlanetCNC.Info.AxesYPositionMm;
-                    ControllerPlanetCNC.CorrectionPos.DeltaZ = ControllerPlanetCNC.Info.AxesZPositionMm;
-                    ControllerPlanetCNC.CorrectionPos.DeltaA = ControllerPlanetCNC.Info.AxesAPositionMm;
-                }
-
-                if (code == "G92.1")
-                {
-                    ControllerPlanetCNC.CorrectionPos.UseCorrection = false;
-                    ControllerPlanetCNC.CorrectionPos.DeltaX = 0;
-                    ControllerPlanetCNC.CorrectionPos.DeltaY = 0;
-                    ControllerPlanetCNC.CorrectionPos.DeltaZ = 0;
-                    ControllerPlanetCNC.CorrectionPos.DeltaA = 0;
-                }
 
 
-                if (code == "G92.2")
-                {
-                    ControllerPlanetCNC.CorrectionPos.UseCorrection = false;
-                }
+
+                //#region G92 - несколько кодов отвечающие за смещение координат
+
+                //if (code == "G92")
+                //{
+                //    //TODO: пока применим простое смещение с переносом в точку ноль
+                //    ControllerPlanetCNC.CorrectionPos.UseCorrection = true;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaX = ControllerPlanetCNC.Info.AxesXPositionMm;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaY = ControllerPlanetCNC.Info.AxesYPositionMm;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaZ = ControllerPlanetCNC.Info.AxesZPositionMm;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaA = ControllerPlanetCNC.Info.AxesAPositionMm;
+                //}
+
+                //if (code == "G92.1")
+                //{
+                //    ControllerPlanetCNC.CorrectionPos.UseCorrection = false;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaX = 0;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaY = 0;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaZ = 0;
+                //    ControllerPlanetCNC.CorrectionPos.DeltaA = 0;
+                //}
 
 
-                if (code == "G92.3")
-                {
-                    ControllerPlanetCNC.CorrectionPos.UseCorrection = true;
-                }
-
-                #endregion
+                //if (code == "G92.2")
+                //{
+                //    ControllerPlanetCNC.CorrectionPos.UseCorrection = false;
+                //}
 
 
-                if (code.Substring(0, 1) == "F") //скорость движения, извлечем
-                {
-                    string svalue = code.Substring(1).Replace(csourse, cdestination);
-                    int spd;
-                    int.TryParse(svalue, out spd);
+                //if (code == "G92.3")
+                //{
+                //    ControllerPlanetCNC.CorrectionPos.UseCorrection = true;
+                //}
 
-                    nextDataRow.Machine.SpeedMaсhine = spd;
-                }
+                //#endregion
 
-                if (code.Substring(0, 1) == "N") //номер кадра
-                {
-                    string svalue = code.Substring(1).Replace(csourse, cdestination); ;
-                    int numKadr = 0;
-                    int.TryParse(svalue, out numKadr);
 
-                    nextDataRow.numberKadr = numKadr;
-                }
+                //if (code.Substring(0, 1) == "F") //скорость движения, извлечем
+                //{
+                //    string svalue = code.Substring(1).Replace(csourse, cdestination);
+                //    int spd;
+                //    int.TryParse(svalue, out spd);
 
-                if (code.Substring(0, 1) == "S") //скорость движения, извлечем
-                {
-                    string svalue = code.Substring(1).Replace(csourse, cdestination); ;
-                    int spd = 0;
-                    int.TryParse(svalue, out spd);
-                    nextDataRow.Machine.SpeedSpindel = spd;
-                }
+                //    nextDataRow.Machine.SpeedMaсhine = spd;
+                //}
+
+                //if (code.Substring(0, 1) == "N") //номер кадра
+                //{
+                //    string svalue = code.Substring(1).Replace(csourse, cdestination); ;
+                //    int numKadr = 0;
+                //    int.TryParse(svalue, out numKadr);
+
+                //    nextDataRow.numberKadr = numKadr;
+                //}
+
+                //if (code.Substring(0, 1) == "S") //скорость движения, извлечем
+                //{
+                //    string svalue = code.Substring(1).Replace(csourse, cdestination); ;
+                //    int spd = 0;
+                //    int.TryParse(svalue, out spd);
+                //    nextDataRow.Machine.SpeedSpindel = spd;
+                //}
 
 
                 if (code.Substring(0, 1) == "X") //координата
@@ -455,8 +407,8 @@ namespace CNC_Assist
                     decimal pos = 0;
                     decimal.TryParse(svalue, out pos);
 
-                    if (AbsolutlePosParsing) nextDataRow.POS.X = pos;
-                    else nextDataRow.POS.X += pos;
+                    if (AbsolutlePosParsing) nextDataRow.X = pos;
+                    else nextDataRow.X += pos;
                 }
 
 
@@ -466,8 +418,8 @@ namespace CNC_Assist
                     decimal pos = 0;
                     decimal.TryParse(svalue, out pos);
 
-                    if (AbsolutlePosParsing) nextDataRow.POS.Y = pos;
-                    else nextDataRow.POS.Y += pos;
+                    if (AbsolutlePosParsing) nextDataRow.Y = pos;
+                    else nextDataRow.Y += pos;
                 }
 
 
@@ -477,8 +429,8 @@ namespace CNC_Assist
                     decimal pos = 0;
                     decimal.TryParse(svalue, out pos);
 
-                    if (AbsolutlePosParsing) nextDataRow.POS.Z = pos;
-                    else nextDataRow.POS.Z += pos;
+                    if (AbsolutlePosParsing) nextDataRow.Z = pos;
+                    else nextDataRow.Z += pos;
                 }
 
 
@@ -488,57 +440,57 @@ namespace CNC_Assist
                     decimal pos = 0;
                     decimal.TryParse(svalue, out pos);
 
-                    if (AbsolutlePosParsing) nextDataRow.POS.A = pos;
-                    else nextDataRow.POS.A += pos;
+                    if (AbsolutlePosParsing) nextDataRow.A = pos;
+                    else nextDataRow.A += pos;
                 }
 
-                if (code == "G90")
-                {
-                    AbsolutlePosParsing = true; //применяем абсолютные координаты
-                }
+                //if (code == "G90")
+                //{
+                //    AbsolutlePosParsing = true; //применяем абсолютные координаты
+                //}
 
-                if (code == "G91")
-                {
-                    AbsolutlePosParsing = false;//применяем относительные координаты
-                }
-
-
-                // информация о инструменте 
-                if (code == "M6")
-                {
-
-                    try
-                    {
-                    //    //следующий параметр должен быть длительностью типа P500
-                        string strNumInstr = lcmd[index + 1].ToUpper();
-                        string strDiametrn = lcmd[index + 2].ToUpper();
-
-                        int NumInstr;
-                        int.TryParse(strNumInstr.Substring(1), out NumInstr);
-
-                        float Diametrn;
-                        float.TryParse(strDiametrn.Substring(1), out Diametrn);
+                //if (code == "G91")
+                //{
+                //    AbsolutlePosParsing = false;//применяем относительные координаты
+                //}
 
 
-                        nextDataRow.Tools.NumberTools = NumInstr;
-                        nextDataRow.Tools.DiametrTools = Diametrn;
-                        nextDataRow.Tools.NeedChange = true;
+                //// информация о инструменте 
+                //if (code == "M6")
+                //{
 
-                        //    if (strNext.Substring(0, 1) == "P")
-                        //    {
-                        //        int times;
-                        //        int.TryParse(strNext.Substring(1), out times);
-                        //        nextDataRow.Extra.NeedPause = true;
-                        //        nextDataRow.Extra.timeoutMsec = times;
-                        //    }
-                    }
-                    catch (Exception)
-                    {
+                //    try
+                //    {
+                //    //    //следующий параметр должен быть длительностью типа P500
+                //        string strNumInstr = lcmd[index + 1].ToUpper();
+                //        string strDiametrn = lcmd[index + 2].ToUpper();
 
-                    //    nextDataRow.Extra.NeedPause = false;
-                    }
+                //        int NumInstr;
+                //        int.TryParse(strNumInstr.Substring(1), out NumInstr);
 
-                }
+                //        float Diametrn;
+                //        float.TryParse(strDiametrn.Substring(1), out Diametrn);
+
+
+                //        nextDataRow.Tools.NumberTools = NumInstr;
+                //        nextDataRow.Tools.DiametrTools = Diametrn;
+                //        nextDataRow.Tools.NeedChange = true;
+
+                //        //    if (strNext.Substring(0, 1) == "P")
+                //        //    {
+                //        //        int times;
+                //        //        int.TryParse(strNext.Substring(1), out times);
+                //        //        nextDataRow.Extra.NeedPause = true;
+                //        //        nextDataRow.Extra.timeoutMsec = times;
+                //        //    }
+                //    }
+                //    catch (Exception)
+                //    {
+
+                //    //    nextDataRow.Extra.NeedPause = false;
+                //    }
+
+                //}
 
 
                 index++;
@@ -619,54 +571,8 @@ namespace CNC_Assist
 
     #region Классы для хранения всей структуры загруженных данных
 
-    /// <summary>
-    /// Хранение координат
-    /// </summary>
-    class Position
-    {
-        /// <summary>
-        /// координата в мм
-        /// </summary>
-        public decimal X;
-        /// <summary>
-        /// координата в мм
-        /// </summary>
-        public decimal Y;
-        /// <summary>
-        /// координата в мм
-        /// </summary>
-        public decimal Z;         
-        /// <summary>
-        /// координата в мм
-        /// </summary>
-        public decimal A;
 
-        /// <summary>
-        /// Конструктор расположения
-        /// </summary>
-        /// <param name="_X">координата X</param>
-        /// <param name="_Y">координата Y</param>
-        /// <param name="_Z">координата Z</param>
-        /// <param name="_A">координата A</param>
-        public Position(decimal _X,decimal _Y,decimal _Z,decimal _A)
-        {
-            X = _X;
-            Y = _Y;
-            Z = _Z;
-            A = _A;
-        }
 
-        /// <summary>
-        /// Конструктор расположения
-        /// </summary>
-        public Position()
-        {
-            X = (decimal)0.00001;
-            Y = (decimal)0.00001;
-            Z = (decimal)0.00001;
-            A = (decimal)0.00001;
-        }
-    }
 
     /// <summary>
     /// Хранение параметров станка
@@ -820,97 +726,97 @@ namespace CNC_Assist
     }
 
 
-    /// <summary>
-    /// данный класс содержит всю необходимую информацию для выполнения на станке, полученную из 1-й строки файла
-    /// </summary>
-    class DataRow
-    {
-        /// <summary>
-        /// Номер строки из файла
-        /// </summary>
-        public int numberRow;
-        /// <summary>
-        /// Номер кадра
-        /// </summary>
-        public int numberKadr;
-        /// <summary>
-        /// Вся строка из файла
-        /// </summary>
-        public string DataString;
-        /// <summary>
-        /// Координаты расположения
-        /// </summary>
-        public Position POS;
+    ///// <summary>
+    ///// данный класс содержит всю необходимую информацию для выполнения на станке, полученную из 1-й строки файла
+    ///// </summary>
+    //class DataRow
+    //{
+    //    /// <summary>
+    //    /// Номер строки из файла
+    //    /// </summary>
+    //    public int numberRow;
+    //    /// <summary>
+    //    /// Номер кадра
+    //    /// </summary>
+    //    public int numberKadr;
+    //    /// <summary>
+    //    /// Вся строка из файла
+    //    /// </summary>
+    //    public string DataString;
+    //    /// <summary>
+    //    /// Координаты расположения
+    //    /// </summary>
+    //    public PointCNC POS;
 
-        /// <summary>
-        /// Параметры работы станка
-        /// </summary>
-        public PropMaсhine Machine;
-        /// <summary>
-        /// Параметры применяемого инструмента
-        /// </summary>
-        public ToolOptions Tools;
-        /// <summary>
-        /// Дополнительные параметры
-        /// </summary>
-        public ExtraOtions Extra;
+    //    /// <summary>
+    //    /// Параметры работы станка
+    //    /// </summary>
+    //    public PropMaсhine Machine;
+    //    /// <summary>
+    //    /// Параметры применяемого инструмента
+    //    /// </summary>
+    //    public ToolOptions Tools;
+    //    /// <summary>
+    //    /// Дополнительные параметры
+    //    /// </summary>
+    //    public ExtraOtions Extra;
 
-        ///// <summary>
-        ///// Список телеграмм для посылки в контроллер
-        ///// </summary>
-        //public List<Byte[]> BinaryData; 
+    //    ///// <summary>
+    //    ///// Список телеграмм для посылки в контроллер
+    //    ///// </summary>
+    //    //public List<Byte[]> BinaryData; 
 
-        /// <summary>
-        /// Конструктор строки данных
-        /// </summary>
-        /// <param name="_numberRow">Номер строки из файла</param>
-        /// <param name="_DataString">Вся строка из файла</param>
-        /// <param name="_POS">Координаты расположения</param>
-        /// <param name="_Machine">Параметры работы станка</param>
-        /// <param name="_Tools">Параметры применяемого инструмента</param>
-        /// <param name="_Extra">Дополнительные параметры</param>
-        public DataRow(int _numberRow, int _numberKadr, string _DataString, Position _POS, PropMaсhine _Machine, ToolOptions _Tools, ExtraOtions _Extra)
-        {
-            numberRow = _numberRow;
-            numberKadr = _numberKadr;
-            DataString = _DataString;
-            POS = _POS;
-            Machine = _Machine;
-            Tools = _Tools;
-            Extra = _Extra;
-            //BinaryData = new List<byte[]>();
-        }
+    //    /// <summary>
+    //    /// Конструктор строки данных
+    //    /// </summary>
+    //    /// <param name="_numberRow">Номер строки из файла</param>
+    //    /// <param name="_DataString">Вся строка из файла</param>
+    //    /// <param name="_POS">Координаты расположения</param>
+    //    /// <param name="_Machine">Параметры работы станка</param>
+    //    /// <param name="_Tools">Параметры применяемого инструмента</param>
+    //    /// <param name="_Extra">Дополнительные параметры</param>
+    //    public DataRow(int _numberRow, int _numberKadr, string _DataString, PointCNC _POS, PropMaсhine _Machine, ToolOptions _Tools, ExtraOtions _Extra)
+    //    {
+    //        numberRow = _numberRow;
+    //        numberKadr = _numberKadr;
+    //        DataString = _DataString;
+    //        POS = _POS;
+    //        Machine = _Machine;
+    //        Tools = _Tools;
+    //        Extra = _Extra;
+    //        //BinaryData = new List<byte[]>();
+    //    }
 
-        /// <summary>
-        /// Конструктор строки данных
-        /// </summary>
-        /// <param name="_numberRow">Номер строки из файла</param>
-        /// <param name="_DataString">Вся строка из файла</param>
-        public DataRow(int _numberRow, string _DataString)
-        {
-            numberRow = _numberRow;
-            numberKadr = 0;
-            DataString = _DataString;
-            POS = new Position();
-            Machine = new PropMaсhine();
-            Tools = new ToolOptions();
-            Extra = new ExtraOtions();
-            //BinaryData = new List<byte[]>();
-        }
+    //    /// <summary>
+    //    /// Конструктор строки данных
+    //    /// </summary>
+    //    /// <param name="_numberRow">Номер строки из файла</param>
+    //    /// <param name="_DataString">Вся строка из файла</param>
+    //    public DataRow(int _numberRow, string _DataString)
+    //    {
+    //        numberRow = _numberRow;
+    //        numberKadr = 0;
+    //        DataString = _DataString;
+    //        POS = new PointCNC();
+    //        Machine = new PropMaсhine();
+    //        Tools = new ToolOptions();
+    //        Extra = new ExtraOtions();
+    //        //BinaryData = new List<byte[]>();
+    //    }
 
-        /// <summary>
-        /// Копирование почти всех параметров из указанного источника
-        /// </summary>
-        /// <param name="_sourceRow"></param>
-        public void duplicate(DataRow tmp)
-        {
-            POS = new Position(tmp.POS.X, tmp.POS.Y, tmp.POS.Z, tmp.POS.A);
-            Machine = new PropMaсhine(tmp.Machine.NumGkode, tmp.Machine.SpeedMaсhine,tmp.Machine.SpindelON,tmp.Machine.SpeedSpindel,tmp.Machine.Chanel2ON,tmp.Machine.Chanel3ON,tmp.Machine.TimeOutPause);
-            Tools = new ToolOptions(false, tmp.Tools.NumberTools, tmp.Tools.DiametrTools);
-            Extra = new ExtraOtions(false, 0, tmp.Extra.useThisCommand); //не нужно копировать паузу....
-        }
+    //    /// <summary>
+    //    /// Копирование почти всех параметров из указанного источника
+    //    /// </summary>
+    //    /// <param name="_sourceRow"></param>
+    //    public void duplicate(DataRow tmp)
+    //    {
+    //        POS = new PointCNC(tmp.POS.X, tmp.POS.Y, tmp.POS.Z, tmp.POS.A);
+    //        Machine = new PropMaсhine(tmp.Machine.NumGkode, tmp.Machine.SpeedMaсhine,tmp.Machine.SpindelON,tmp.Machine.SpeedSpindel,tmp.Machine.Chanel2ON,tmp.Machine.Chanel3ON,tmp.Machine.TimeOutPause);
+    //        Tools = new ToolOptions(false, tmp.Tools.NumberTools, tmp.Tools.DiametrTools);
+    //        Extra = new ExtraOtions(false, 0, tmp.Extra.useThisCommand); //не нужно копировать паузу....
+    //    }
 
-    }
+    //}
 
 
     #endregion

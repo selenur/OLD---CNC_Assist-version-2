@@ -851,6 +851,10 @@ namespace CNC_Assist
         {
             if (openFileDialog.ShowDialog() != DialogResult.OK) return;
 
+            Cursor.Current = Cursors.WaitCursor;
+
+
+            
             //Text = @"Управленец ЧПУ: " + openFileDialog.FileName; //заголовок окна
 
             listBoxLog.Items.Add(@"Загрузка данных из файла: " + openFileDialog.FileName);
@@ -860,6 +864,7 @@ namespace CNC_Assist
             //и покажем диалог загрузки
             LoadingData frmLoad = new LoadingData();
             frmLoad.ShowDialog();
+            Cursor.Current = Cursors.Default;
         }
 
         private void menuOpenFile_Click(object sender, EventArgs e)
@@ -1104,7 +1109,20 @@ namespace CNC_Assist
 
         private void RenderTimer_Tick(object sender, EventArgs e)
         {
-            toolStripStatusLabel2.Text = ControllerPlanetCNC.StatusTThread.ToString();
+            //toolStripStatusLabel2.Text = ControllerPlanetCNC.StatusTThread.ToString();
+            toolStripStatusLabelG0.Text = "   G0: " + ControllerPlanetCNC._lastSpeedG0.ToString();
+            toolStripStatusLabelG1.Text = "   G1: " + ControllerPlanetCNC._lastSpeedG1.ToString();
+
+            if (ControllerPlanetCNC._lastSpeedIsWork == 0)
+            {
+                toolStripStatusLabelG0.BackColor = Color.PaleGreen;
+                toolStripStatusLabelG1.BackColor = Color.Crimson;
+            }
+            else
+            {
+                toolStripStatusLabelG1.BackColor = Color.PaleGreen;
+                toolStripStatusLabelG0.BackColor = Color.Crimson;
+            }
             
             // обработка "тика" таймера - вызов функции отрисовки 
             _dtStart = DateTime.Now;
@@ -1414,25 +1432,27 @@ namespace CNC_Assist
 
                 Gl.glBegin(Gl.GL_LINE_STRIP);
                 //TODO: источником данных теперь будет являться другое место
-                foreach (DataRow vv in DataLoader.DataRows)
+                
+
+                foreach (PointCNC vv in GkodeWorker.Point3D)
                 {
 
 
-                    if (!GlobalSetting.RenderSetting.ShowCompleatedTraectory)
-                    {
-                        //проверим необходимость отрисовки траектории
-                        if (vv.numberRow < ControllerPlanetCNC.Info.NuberCompleatedInstruction) continue;
-                    }
+                    //if (!GlobalSetting.RenderSetting.ShowCompleatedTraectory)
+                    //{
+                    //    //проверим необходимость отрисовки траектории
+                    //    if (vv.numberRow < ControllerPlanetCNC.Info.NuberCompleatedInstruction) continue;
+                    //}
 
 
 
                     if (GlobalSetting.AppSetting.typeworks == TypeWorks.Milling)
                     {
-                        if (vv.Machine.NumGkode == 1) Gl.glColor3f(0, 255, 0); else Gl.glColor3f(255, 0, 0);
+                        if (vv.workSpeed) Gl.glColor3f(0, 255, 0); else Gl.glColor3f(255, 0, 0);
                     }
                     else if (GlobalSetting.AppSetting.typeworks == TypeWorks.BurningOnOff)
                     {
-                        if (vv.Machine.SpindelON) Gl.glColor3f(0, 0, 0); else Gl.glColor3f(255, 255, 255);
+                        if (vv.InstrumentOn) Gl.glColor3f(0, 0, 0); else Gl.glColor3f(255, 255, 255);
                     }
 
 
@@ -1444,9 +1464,9 @@ namespace CNC_Assist
 
 
                     //координаты следующей точки
-                    float pointX = (float)vv.POS.X;
-                    float pointY = (float)vv.POS.Y;
-                    float pointZ = (float)vv.POS.Z;
+                    float pointX = (float)vv.X;
+                    float pointY = (float)vv.Y;
+                    float pointZ = (float)vv.Z;
 
                     //добавление смещения G-кода
                     if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
@@ -1496,13 +1516,13 @@ namespace CNC_Assist
                 Gl.glColor3f(1, 1, 1);
                 Gl.glBegin(Gl.GL_LINE_STRIP);
                 //TODO: источником данных теперь изменил...
-                foreach (DataRow vv in DataLoader.DataRows)
+                foreach (PointCNC vv in GkodeWorker.Point3D)
                 {
 
                     //координаты следующей точки
-                    double pointX = (double)vv.POS.X;
-                    double pointY = (double)vv.POS.Y;
-                    double pointZ = (double)vv.POS.Z;
+                    double pointX = (double)vv.X;
+                    double pointY = (double)vv.Y;
+                    double pointZ = (double)vv.Z;
 
                     //добавление смещения G-кода
                     if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
@@ -1534,13 +1554,13 @@ namespace CNC_Assist
 
                 ////    if (Task.StatusTask == statusVariant.Waiting)
                 ////    {
-                    int numSelectStart = DataLoader.SelectedRowStart-1;
-                    int numSelectStop = DataLoader.SelectedRowStop-1;
+                    //int numSelectStart = DataLoader.SelectedRowStart-1;
+                    //int numSelectStop = DataLoader.SelectedRowStop-1;
 
-                    if (vv.numberRow >= numSelectStart && vv.numberRow <= numSelectStop)
-                    {
-                        Gl.glVertex3d(pointX, pointY, pointZ);
-                    }
+                    //if (vv.numberRow >= numSelectStart && vv.numberRow <= numSelectStop)
+                    //{
+                    //    Gl.glVertex3d(pointX, pointY, pointZ);
+                    //}
 
                     ////    }
                     ////    else
@@ -1559,10 +1579,10 @@ namespace CNC_Assist
                     ////    }
                 }
                 Gl.glEnd();
-
+                   
             }
 
-
+             
             //////////////отобразим выделенную одну или несколько линий
             ////////////GKOD_ready poi1 = null;
             ////////////GKOD_ready poi2 = null;

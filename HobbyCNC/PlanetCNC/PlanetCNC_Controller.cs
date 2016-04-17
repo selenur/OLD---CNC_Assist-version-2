@@ -3,7 +3,7 @@
     static class PlanetCNC_Controller
     {
         //при каждом выполнении сюда записываем последнюю команду
-        public static DataRow LastStatus = new DataRow(0,"");
+        //public static DataRow LastStatus = new DataRow(0,"");
 
 
         //// последнее отправленное в контроллер значение
@@ -52,7 +52,7 @@
             ControllerPlanetCNC.DirectPostToController(BinaryData.pack_B5(true, 2, BinaryData.TypeSignal.Hz, PlanetCNC_Controller.ValueHz));
 
             //зафиксируем
-            PlanetCNC_Controller.LastStatus.Machine.SpindelON = true;
+            //PlanetCNC_Controller.LastStatus.Machine.SpindelON = true;
 
         }
 
@@ -63,7 +63,7 @@
         {
             ControllerPlanetCNC.DirectPostToController(BinaryData.pack_B5(false, 2, BinaryData.TypeSignal.Hz, PlanetCNC_Controller.ValueHz));
             //зафиксируем
-            PlanetCNC_Controller.LastStatus.Machine.SpindelON = false;
+            //PlanetCNC_Controller.LastStatus.Machine.SpindelON = false;
         }
 
 

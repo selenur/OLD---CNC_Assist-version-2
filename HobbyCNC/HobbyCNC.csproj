@@ -100,6 +100,7 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="CommonTypes.cs" />
     <Compile Include="Constructor\ConstructorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -150,6 +151,7 @@
     </Compile>
     <Compile Include="CONTROLLER.cs" />
     <Compile Include="DataLoader.cs" />
+    <Compile Include="GkodeWorker.cs" />
     <Compile Include="GlobalSetting.cs" />
     <Compile Include="GRBL\ArduinoCNC_Controller.cs" />
     <Compile Include="LoadingData.cs">
@@ -249,7 +251,6 @@
     <Compile Include="webCamera.Designer.cs">
       <DependentUpon>webCamera.cs</DependentUpon>
     </Compile>
-    <Compile Include="TaskManager.cs" />
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>

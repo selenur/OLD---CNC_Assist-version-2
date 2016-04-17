@@ -28,14 +28,14 @@
       </Delegate>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>D4VAiFAoQBBACAAUEAMEQYBAgAGQIAAANYAAIEAIECA=</HashCode>
+      <HashCode>DYVAmFAoQBHgCIBUMAMEQIBAgACcAAAANagAIEEIgCA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CNC_Assist.DeviceInfo">
     <Position X="7" Y="1.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>EgAgAEAIAAAAIACgQChCAgAAABAAAAABQAgAAhAAAAA=</HashCode>
+      <HashCode>EgAgAgAIABACIAAgQChCAgAAAAAAAAABQEgAAhAAAAA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -49,7 +49,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAIBOAAAAAAAAAACgfAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAIBOAAAAAAAAAACgfQAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -60,7 +60,7 @@
       <FileName>CONTROLLER.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Enum Name="CNC_Assist.enumStatusThread">
+  <Enum Name="CNC_Assist.EnumStatusThread">
     <Position X="9.25" Y="5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAggAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>

@@ -62,6 +62,8 @@
             this.additionallyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainStatusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabelG0 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabelG1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage3D = new System.Windows.Forms.TabPage();
             this.btDefaulPreview = new System.Windows.Forms.Button();
@@ -111,7 +113,6 @@
             this.panelCenter = new System.Windows.Forms.Panel();
             this.panelRight = new System.Windows.Forms.FlowLayoutPanel();
             this.panelLeft = new System.Windows.Forms.FlowLayoutPanel();
-            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.MainMenu.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.MainStatusStrip.SuspendLayout();
@@ -451,7 +452,8 @@
             // 
             this.MainStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2});
+            this.toolStripStatusLabelG0,
+            this.toolStripStatusLabelG1});
             this.MainStatusStrip.Location = new System.Drawing.Point(0, 582);
             this.MainStatusStrip.Name = "MainStatusStrip";
             this.MainStatusStrip.Size = new System.Drawing.Size(864, 22);
@@ -463,6 +465,18 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(47, 17);
             this.toolStripStatusLabel1.Text = "FPS:000";
+            // 
+            // toolStripStatusLabelG0
+            // 
+            this.toolStripStatusLabelG0.Name = "toolStripStatusLabelG0";
+            this.toolStripStatusLabelG0.Size = new System.Drawing.Size(51, 17);
+            this.toolStripStatusLabelG0.Text = "   G0:100";
+            // 
+            // toolStripStatusLabelG1
+            // 
+            this.toolStripStatusLabelG1.Name = "toolStripStatusLabelG1";
+            this.toolStripStatusLabelG1.Size = new System.Drawing.Size(51, 17);
+            this.toolStripStatusLabelG1.Text = "   G1:100";
             // 
             // tabControl1
             // 
@@ -1006,12 +1020,6 @@
             this.panelLeft.Size = new System.Drawing.Size(204, 511);
             this.panelLeft.TabIndex = 10;
             // 
-            // toolStripStatusLabel2
-            // 
-            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(118, 17);
-            this.toolStripStatusLabel2.Text = "toolStripStatusLabel2";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1139,7 +1147,8 @@
         private System.Windows.Forms.ToolStripMenuItem toolsConstructorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsImporterTextImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsImporterVectorsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelG0;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelG1;
     }
 }
 

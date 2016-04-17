@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using CNC_Assist.PlanetCNC;
 using LibUsbDotNet;
 using LibUsbDotNet.Main;
 
@@ -166,27 +166,27 @@ namespace CNC_Assist
 
         // для посылки главному потоку сообщений, о статусе работы, отладочных сообщений
         public delegate void DeviceEventNewMessage(object sender, DeviceEventArgsMessage e);
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
+        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventNewMessage Message;
 
         /// <summary>
         /// Событие при успешном подключении к контроллеру
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
+        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventConnect WasConnected;   
         public delegate void DeviceEventConnect(object sender);                              // уведомление об установки связи
 
         /// <summary>
         /// Событие при отключении от контроллера, или разрыве связи с контроллером
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
+        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventDisconnect WasDisconnected; 
         public delegate void DeviceEventDisconnect(object sender, DeviceEventArgsMessage e); // уведомление об обрыве/прекращении связи
 
         /// <summary>
         /// Получены новые данные от контроллера
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
+        [SuppressMessage("Microsoft.Design", "CA1009:DeclareEventHandlersCorrectly")]
         public static event DeviceEventNewData NewDataFromController;
         public delegate void DeviceEventNewData(object sender);                              // уведомление что получены новые данные контроллером
 
@@ -557,23 +557,93 @@ namespace CNC_Assist
         }
 
 
-        // Промежуточные данные для выполнения задания
-        private static decimal _lastTaskPosX;
-        private static decimal _lastTaskPosY;
-        private static decimal _lastTaskPosZ;
-        private static decimal _lastTaskPosA;
-        private static int _lastSpeedG0 = 100;
-        private static int _lastSpeedG1 = 100;
-        private static int _lastTypeGkm = 0; //0-> G0 1->G1
-        private static readonly bool AbsolutlePosParsing = true;
+
+
+        /// <summary>
+        /// Разбивка строки на отдельные команды
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static List<string> ParseStringToListString(string value)
+        {
+            List<string> returnValue = new List<string>();
+
+            string tmpString = value.Trim().ToUpper();
+
+            if (tmpString.Length == 1) return returnValue;
+
+            //все что после скобки отбросим, дальше не будем анализировать
+            int i = tmpString.IndexOf(@"(", StringComparison.Ordinal);
+            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+
+            //все что после точки с запятой отбросим, дальше не будем анализировать
+            i = tmpString.IndexOf(@";", StringComparison.Ordinal);
+            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+
+            //все что после точки с запятой отбросим, дальше не будем анализировать
+            i = tmpString.IndexOf(@"%", StringComparison.Ordinal);
+            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+
+            //все что после двух косых отбросим, дальше не будем анализировать
+            i = tmpString.IndexOf(@"//", StringComparison.Ordinal);
+            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+
+            // ещё раз обрежем
+            tmpString = tmpString.Trim();
+
+            if (tmpString.Length < 2) return returnValue;
+
+            // распарсим строку на отдельные строки с параметрами
+            int inx = 0;
+
+            bool collectCommand = false;
+
+            foreach (char symb in tmpString)
+            {
+                if (symb > 0x40 && symb < 0x5B)  //символы от A до Z
+                {
+                    if (collectCommand)
+                    {
+                        inx++;
+                    }
+
+                    collectCommand = true;
+                    returnValue.Add("");
+                }
+
+                if (collectCommand && symb != ' ') returnValue[inx] += symb.ToString();
+            }
+
+            return returnValue;
+        }
+
+     
+
+
+
+
+        //TODO: Промежуточные данные для выполнения задания, позже сделаем по нормальному.....
+        public static decimal _lastTaskPosX;
+        public static decimal _lastTaskPosY;
+        public static decimal _lastTaskPosZ;
+        public static decimal _lastTaskPosA;
+        public static int _lastSpeedG0 = 100;
+        public static int _lastSpeedG1 = 100;
+        public static int _lastSpeedIsWork = 0; //0-> G0 1->G1
+        public static readonly bool AbsolutlePosParsing = true;
 
         /// <summary>
         /// добавление команды в задание для выполнения
         /// </summary>
         /// <param name="gcommand">строка с кодом</param>
         /// <param name="numbr">номер инструкции</param>
-        public static void TASK_AddCommand(string gcommand,int numbr = 0)
+        public static void TASK_AddCommand(string gcommand,int numbr = 0,bool StartImmediately = false)
         {
+            // Все неликвидные команды будем отбрасывать
+            List<string> LCommand = ParseStringToListString(gcommand);
+
+            if (LCommand.Count == 0) return;
+
             //получим символ разделения дробной и целой части.
             string symbSeparatorDec = CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalSeparator;
 
@@ -586,25 +656,32 @@ namespace CNC_Assist
                 cdestination = '.';
             }
 
-            // 1) распарсим строку на отдельные строки с параметрами
-            List<string> lcmd = DataLoader.ParseStringToSubString(gcommand.ToUpper());
 
-            if (lcmd.Count == 0) return;
-
-            // 2) Найдем вначале команды начинающиеся на "M"
-            foreach (string sLine in lcmd)
+            // Найдем вначале команды начинающиеся на "M"
+            foreach (string sLine in LCommand)
             {
+                //todo: разобъем строку на команду и значение
+
+
+
                 if (sLine.Substring(0,1) != "M") continue;
 
                 if (sLine == "M3" || sLine == "M03")
                 {
-                    AddBinaryDataToTask(BinaryData.pack_B5(true));
+                    byte[] dt = BinaryData.pack_B5(true);
+
+                    if (StartImmediately) DirectPostToController(dt);
+                    else AddBinaryDataToTask(dt);
+
+                    
                 }
 
                 if (sLine == "M5" || sLine == "M05")
                 {
-                    // ReSharper disable once RedundantArgumentDefaultValue
-                    AddBinaryDataToTask(BinaryData.pack_B5(false));
+                    byte[] dt = BinaryData.pack_B5(false);
+
+                    if (StartImmediately) DirectPostToController(dt);
+                    else AddBinaryDataToTask(dt);
                 }
                 
             }
@@ -613,7 +690,7 @@ namespace CNC_Assist
             int spd = -1;  // значение из F (если -1 то значения в строке нет)
             int typeg = -1;// значение из g (если -1 то значения в строке нет)
             //int gsubspd = -1; //значение из g во втором актете, если он есть
-            foreach (string sline in lcmd)
+            foreach (string sline in LCommand)
             {
                 if (sline.Substring(0, 1) != "G" && sline.Substring(0, 1) != "F") continue;
                 
@@ -634,24 +711,24 @@ namespace CNC_Assist
             int speedToController = 100;
 
             // Ряд условий, связанных с тем что команда G0 G1 могут быть отдельно указаны от Fxxx
-            if (typeg == 0) _lastTypeGkm = 0;
+            if (typeg == 0) _lastSpeedIsWork = 0;
 
-            if (typeg == 1) _lastTypeGkm = 1;
+            if (typeg == 1) _lastSpeedIsWork = 1;
 
             if (spd != -1)
             {
-                if (_lastTypeGkm == 0) _lastSpeedG0 = spd;
+                if (_lastSpeedIsWork == 0) _lastSpeedG0 = spd;
 
-                if (_lastTypeGkm == 1) _lastSpeedG1 = spd;
+                if (_lastSpeedIsWork == 1) _lastSpeedG1 = spd;
             }
 
-            if (_lastTypeGkm == 0) speedToController = _lastSpeedG0;
+            if (_lastSpeedIsWork == 0) speedToController = _lastSpeedG0;
 
-            if (_lastTypeGkm == 1) speedToController = _lastSpeedG1;
+            if (_lastSpeedIsWork == 1) speedToController = _lastSpeedG1;
             
             // 4) а теперь уже команды движения в точку
             bool needSendPos = false;
-            foreach (string sLine in lcmd)
+            foreach (string sLine in LCommand)
             {
                 if (sLine.Substring(0, 1) != "X" && sLine.Substring(0, 1) != "Y" && sLine.Substring(0, 1) != "Z" && sLine.Substring(0, 1) != "A") continue;
 
@@ -709,12 +786,15 @@ namespace CNC_Assist
             // 5) 
             if (needSendPos)
             {
-                AddBinaryDataToTask(BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX),
+                byte[] dt = BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX),
                                                             Info.CalcPosPulse("Y", _lastTaskPosY),
                                                             Info.CalcPosPulse("Z", _lastTaskPosZ),
                                                             Info.CalcPosPulse("A", _lastTaskPosA),
                                                             speedToController,
-                                                            numbr));                
+                                                            numbr);      
+
+                if (StartImmediately) DirectPostToController(dt);
+                else AddBinaryDataToTask(dt);
             }
         }
 
@@ -974,43 +1054,14 @@ namespace CNC_Assist
         {
             if (_statusThread != EnumStatusThread.Wait) return;
 
-            // сюда запишем текущие координаты
-            Position pos = new Position
-            {
-                A = Info.AxesAPositionMm,
-                X = Info.AxesXPositionMm,
-                Y = Info.AxesYPositionMm,
-                Z = Info.AxesZPositionMm
-            };
+            // установим текущее положение в качестве базистного
+            _lastTaskPosX = Info.AxesXPositionMm;
+            _lastTaskPosY = Info.AxesYPositionMm;
+            _lastTaskPosZ = Info.AxesZPositionMm;
+            _lastTaskPosA = Info.AxesAPositionMm;
 
+            TASK_AddCommand(command, 0, true);
 
-            DataRow dataRowLast = new DataRow(0, "")
-            {
-                POS = pos,
-                Machine = ExecuteCommandLastMachine
-            };
-
-
-            DataRow dataRowNow = new DataRow(0, command);
-
-            DataLoader.FillStructure(dataRowLast, ref dataRowNow);
-            
-            //if (dataRowNow.Machine.SpindelON != dataRowLast.Machine.SpindelON || dataRowNow.Machine.SpeedSpindel != dataRowLast.Machine.SpeedSpindel)
-            //{
-                DirectPostToController(BinaryData.pack_B5(dataRowNow.Machine.SpindelON, 2, BinaryData.TypeSignal.Hz, dataRowNow.Machine.SpeedSpindel));
-           // }
-
-           // if (dataRowNow.POS.X != dataRowLast.POS.X || dataRowNow.POS.Y != dataRowLast.POS.Y || dataRowNow.POS.Z != dataRowLast.POS.Z || dataRowNow.POS.Z != dataRowLast.POS.Z)
-           // {
-                DirectPostToController(BinaryData.pack_CA(Info.CalcPosPulse("X", dataRowNow.POS.X),
-                                                                Info.CalcPosPulse("Y", dataRowNow.POS.Y),
-                                                                Info.CalcPosPulse("Z", dataRowNow.POS.Z),
-                                                                Info.CalcPosPulse("A", dataRowNow.POS.A),
-                                                                dataRowNow.Machine.SpeedMaсhine,
-                                                                dataRowNow.numberRow));
-           // }
-            
-            dataRowLast = dataRowNow;
         }
 
         #endregion
@@ -1305,7 +1356,7 @@ namespace CNC_Assist
             //buf[12] = 0x04;
 
             //зафиксируем
-            PlanetCNC_Controller.LastStatus.Machine.SpindelON = shpindelOn;
+            //PlanetCNC_Controller.LastStatus.Machine.SpindelON = shpindelOn;
 
             return buf;
         }
@@ -1342,8 +1393,8 @@ namespace CNC_Assist
                 buf[7] = 0x01;
             }
             //зафиксируем
-            PlanetCNC_Controller.LastStatus.Machine.Chanel2ON = chanel2On;
-            PlanetCNC_Controller.LastStatus.Machine.Chanel3ON = chanel3On;
+            //PlanetCNC_Controller.LastStatus.Machine.Chanel2ON = chanel2On;
+            //PlanetCNC_Controller.LastStatus.Machine.Chanel3ON = chanel3On;
 
             return buf;
         }
