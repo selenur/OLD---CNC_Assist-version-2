@@ -42,7 +42,7 @@ namespace CNC_Assist
 
                 ValueLangStrings.Add(new langString(@"_ToolsConstructor_"       , @"Конструктор G-кода"             , @"Constructor G-kode"));
                 ValueLangStrings.Add(new langString(@"_ToolsImporterTextImage_" , @"Импорт из текста и рисунков"    , @"Import from text and image"));
-                ValueLangStrings.Add(new langString(@"_ToolsImporterVectors_"   , @"Импорт из веторов, сверловок"   , @"Import from vertor and drill"));
+                ValueLangStrings.Add(new langString(@"_ToolsImporterVectors_"   , @"Импорт из векторов, сверловок"   , @"Import from vertor and drill"));
 
 
                 ValueLangStrings.Add(new langString(@"_WitgetPosition_", @"Координаты", @"Position"));
