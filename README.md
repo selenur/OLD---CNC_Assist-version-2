@@ -1,4 +1,5 @@
-# CNC_Assist - Набор программ для работы с ЧПУ станком, и подготовки G-кода
+# CNC_Assist - Набор программ для работы с ЧПУ станком, и подготовки G-кода.
+EN = A set of programs for CNC machine tools, and the preparation of the G-code.
 
 В данном наборе содержатся следующие программы:
 
@@ -10,6 +11,13 @@ ToolsImporterVectors.exe   | Программа для генерации G-ко
 
 
 
-
+Вид программы управления контроллером (program for controller MK1 and MK2):
 ![CNC_Controller Screenshot](https://github.com/selenur/CNC_Assist/blob/master/main.jpg?raw=true)
+
+
+Вид программы генерации G-кода из текста (program for generate G-kode from text):
+![CNC_Controller Screenshot](https://github.com/selenur/CNC_Assist/blob/master/gen1.jpg?raw=true)
+
+Вид программы генерации G-кода из рисунка (program for generate G-kode from image):
+![CNC_Controller Screenshot](https://github.com/selenur/CNC_Assist/blob/master/gen2.jpg?raw=true)
 
