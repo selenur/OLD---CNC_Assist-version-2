@@ -11,5 +11,5 @@ ToolsImporterVectors.exe   | Программа для генерации G-ко
 
 
 
-![CNC_Controller Screenshot](https://github.com/selenur/CNC_Assist/blob/master/main.PNG?raw=true)
+![CNC_Controller Screenshot](https://github.com/selenur/CNC_Assist/blob/master/main.jpg?raw=true)
 
