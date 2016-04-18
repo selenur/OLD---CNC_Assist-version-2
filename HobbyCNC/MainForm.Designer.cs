@@ -451,9 +451,9 @@
             // MainStatusStrip
             // 
             this.MainStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1,
             this.toolStripStatusLabelG0,
-            this.toolStripStatusLabelG1});
+            this.toolStripStatusLabelG1,
+            this.toolStripStatusLabel1});
             this.MainStatusStrip.Location = new System.Drawing.Point(0, 582);
             this.MainStatusStrip.Name = "MainStatusStrip";
             this.MainStatusStrip.Size = new System.Drawing.Size(864, 22);

@@ -25,19 +25,19 @@ namespace CNC_Assist
 
             //все что после скобки отбросим, дальше не будем анализировать
             int i = tmpString.IndexOf(@"(", StringComparison.Ordinal);
-            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+            if (i != -1) return returnValue;
 
             //все что после точки с запятой отбросим, дальше не будем анализировать
             i = tmpString.IndexOf(@";", StringComparison.Ordinal);
-            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+            if (i != -1) return returnValue;
 
             //все что после точки с запятой отбросим, дальше не будем анализировать
             i = tmpString.IndexOf(@"%", StringComparison.Ordinal);
-            if (i != -1) return returnValue; 
+            if (i != -1) return returnValue;
 
             //все что после двух косых отбросим, дальше не будем анализировать
             i = tmpString.IndexOf(@"//", StringComparison.Ordinal);
-            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+            if (i != -1) return returnValue;
 
             // ещё раз обрежем
             tmpString = tmpString.Trim();
