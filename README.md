@@ -9,3 +9,7 @@ ToolsImporterTextImage.exe | Программа для генерации G-ко
 ToolsImporterVectors.exe   | Программа для генерации G-кода из DLR, PLT файлов
 
 
+
+
+![CNC_Controller Screenshot](https://github.com/selenur/CNC_Assist/blob/master/main.PNG?raw=true)
+
