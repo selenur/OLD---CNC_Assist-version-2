@@ -574,19 +574,19 @@ namespace CNC_Assist
 
             //все что после скобки отбросим, дальше не будем анализировать
             int i = tmpString.IndexOf(@"(", StringComparison.Ordinal);
-            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+            if (i != -1) return returnValue;
 
             //все что после точки с запятой отбросим, дальше не будем анализировать
             i = tmpString.IndexOf(@";", StringComparison.Ordinal);
-            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+            if (i != -1) return returnValue;
 
             //все что после точки с запятой отбросим, дальше не будем анализировать
             i = tmpString.IndexOf(@"%", StringComparison.Ordinal);
-            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+            if (i != -1) return returnValue;
 
             //все что после двух косых отбросим, дальше не будем анализировать
             i = tmpString.IndexOf(@"//", StringComparison.Ordinal);
-            if (i != -1) tmpString = tmpString.Substring(0, i - 1);
+            if (i != -1) return returnValue;
 
             // ещё раз обрежем
             tmpString = tmpString.Trim();
@@ -786,10 +786,24 @@ namespace CNC_Assist
             // 5) 
             if (needSendPos)
             {
-                byte[] dt = BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX),
-                                                            Info.CalcPosPulse("Y", _lastTaskPosY),
-                                                            Info.CalcPosPulse("Z", _lastTaskPosZ),
-                                                            Info.CalcPosPulse("A", _lastTaskPosA),
+                decimal deltaA = 0;
+                decimal deltaX = 0;
+                decimal deltaY = 0;
+                decimal deltaZ = 0;
+                //сюда необходимо добавить смещение
+                if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
+                {
+                    deltaA = ControllerPlanetCNC.CorrectionPos.DeltaA;
+                    deltaX = ControllerPlanetCNC.CorrectionPos.DeltaX;
+                    deltaY = ControllerPlanetCNC.CorrectionPos.DeltaY;
+                    deltaZ = ControllerPlanetCNC.CorrectionPos.DeltaZ;
+                }
+
+
+                byte[] dt = BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX + deltaX),
+                                                            Info.CalcPosPulse("Y", _lastTaskPosY + deltaY),
+                                                            Info.CalcPosPulse("Z", _lastTaskPosZ + deltaZ),
+                                                            Info.CalcPosPulse("A", _lastTaskPosA + deltaA),
                                                             speedToController,
                                                             numbr);      
 

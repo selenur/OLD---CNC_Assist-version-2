@@ -25,7 +25,7 @@ namespace CNC_Assist
             //numericUpDown1.Value = (decimal)Setting.koeffSizeX;
             //numericUpDown2.Value = (decimal)Setting.koeffSizeY;
 
-            groupBox1.Enabled = cbCorrection.Checked;
+            //groupBox1.Enabled = cbCorrection.Checked;
             groupBox2.Enabled = cbCorrection.Checked;
             checkBoxUseMatrix.Enabled = cbCorrection.Checked;
         }

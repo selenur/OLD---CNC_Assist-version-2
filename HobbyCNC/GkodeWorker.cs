@@ -100,22 +100,22 @@ namespace CNC_Assist
                 int index = 0;
                 foreach (string code in lcmd)
                 {
-                    if (code == "M3")
+                    if (code == "M3" || code == "M03")
                     {
                         LastPoint.InstrumentOn = true;
                     }
 
-                    if (code == "M5")
+                    if (code == "M5" || code == "M05")
                     {
                         LastPoint.InstrumentOn = false;
                     }
 
-                    if (code == "G0") //холостое движение
+                    if (code == "G0" || code == "G00") //холостое движение
                     {
                         LastPoint.workSpeed = false;
                     }
 
-                    if (code.Length >= 2 && code.Substring(0, 2) == "G1") //рабочее движение
+                    if (code == "G1" || code == "G01") //рабочее движение
                     {
                         LastPoint.workSpeed = true;
                     }
