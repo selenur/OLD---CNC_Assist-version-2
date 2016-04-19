@@ -14,8 +14,12 @@
         /// Скорость и инструмент
         /// </summary>
         public bool workSpeed, InstrumentOn;
+        /// <summary>
+        /// Номер строки из файла
+        /// </summary>
+        public int numRow;
 
-        public PointCNC(decimal _X, decimal _Y, decimal _Z, decimal _A, bool _workSpeed = false, bool _InstrumentOn = false)
+        public PointCNC(decimal _X, decimal _Y, decimal _Z, decimal _A, bool _workSpeed = false, bool _InstrumentOn = false, int _numRow = 0)
         {
             X = _X;
             Y = _Y;
@@ -23,6 +27,7 @@
             A = _A;
             workSpeed = _workSpeed;
             InstrumentOn = _InstrumentOn;
+            numRow = _numRow;
         }
     }
 

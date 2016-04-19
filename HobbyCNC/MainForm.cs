@@ -1116,12 +1116,12 @@ namespace CNC_Assist
             if (ControllerPlanetCNC._lastSpeedIsWork == 0)
             {
                 toolStripStatusLabelG0.BackColor = Color.PaleGreen;
-                toolStripStatusLabelG1.BackColor = Color.Crimson;
+                toolStripStatusLabelG1.BackColor = SystemColors.Control;
             }
             else
             {
                 toolStripStatusLabelG1.BackColor = Color.PaleGreen;
-                toolStripStatusLabelG0.BackColor = Color.Crimson;
+                toolStripStatusLabelG0.BackColor = SystemColors.Control;
             }
             
             // обработка "тика" таймера - вызов функции отрисовки 
@@ -1137,10 +1137,10 @@ namespace CNC_Assist
             if ((DateTime.Now - dtold).Seconds > 1)
             {
                 dtold = DateTime.Now;
-                toolStripStatusLabel1.Text = @"FPS: " + refr.ToString("F");
+                if (refr > 999) toolStripStatusLabelFPS.Text = @"  FPS: ∞";
+                else toolStripStatusLabelFPS.Text = @"  FPS: " + refr.ToString("###");
 
                 RefreshElementsForms();
-
             }
             
             //вычислим разницу времени
@@ -1428,23 +1428,15 @@ namespace CNC_Assist
                     Gl.glLineWidth(5.0f);
                 }
 
-
-
                 Gl.glBegin(Gl.GL_LINE_STRIP);
-                //TODO: источником данных теперь будет являться другое место
-                
 
                 foreach (PointCNC vv in GkodeWorker.Point3D)
                 {
-
-
                     //if (!GlobalSetting.RenderSetting.ShowCompleatedTraectory)
                     //{
                     //    //проверим необходимость отрисовки траектории
                     //    if (vv.numberRow < ControllerPlanetCNC.Info.NuberCompleatedInstruction) continue;
                     //}
-
-
 
                     if (GlobalSetting.AppSetting.typeworks == TypeWorks.Milling)
                     {
@@ -1455,14 +1447,6 @@ namespace CNC_Assist
                         if (vv.InstrumentOn) Gl.glColor3f(0, 0, 0); else Gl.glColor3f(255, 255, 255);
                     }
 
-
-
-                    //Gl.glLineWidth(0.1f);
-                    
-
-
-
-
                     //координаты следующей точки
                     float pointX = (float)vv.X;
                     float pointY = (float)vv.Y;
@@ -1471,10 +1455,6 @@ namespace CNC_Assist
                     //добавление смещения G-кода
                     if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
                     {
-                        //// применение пропорций
-                        //pointX *= Setting.koeffSizeX;
-                        //pointY *= Setting.koeffSizeY;
-
                         //применение смещения
                         pointX += (float)ControllerPlanetCNC.CorrectionPos.DeltaX;
                         pointY += (float)ControllerPlanetCNC.CorrectionPos.DeltaY;
@@ -1499,10 +1479,6 @@ namespace CNC_Assist
                    ////     if (vv.Machine.SpindelON) Gl.glColor3f(0, 0, 0); else Gl.glColor3f(255, 255, 255);
                    //     Gl.glLineWidth(5.0f);
                    // }
-
-
-
-                    
                 }
 
                 Gl.glEnd();                
@@ -1520,51 +1496,44 @@ namespace CNC_Assist
                 {
 
                     //координаты следующей точки
-                    double pointX = (double)vv.X;
-                    double pointY = (double)vv.Y;
-                    double pointZ = (double)vv.Z;
+                    float pointX = (float)vv.X;
+                    float pointY = (float)vv.Y;
+                    float pointZ = (float)vv.Z;
 
                     //добавление смещения G-кода
                     if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
                     {
-                        //// применение пропорций
-                        //pointX *= Setting.koeffSizeX;
-                        //pointY *= Setting.koeffSizeY;
-
                         //применение смещения
-                        pointX += (double)ControllerPlanetCNC.CorrectionPos.DeltaX;
-                        pointY += (double)ControllerPlanetCNC.CorrectionPos.DeltaY;
-                        pointZ += (double)ControllerPlanetCNC.CorrectionPos.DeltaZ;
+                        pointX += (float)ControllerPlanetCNC.CorrectionPos.DeltaX;
+                        pointY += (float)ControllerPlanetCNC.CorrectionPos.DeltaY;
 
-                        ////применение матрицы поверхности детали
-                        //if (Setting.deltaFeed)
-                        //{
-                        //    pointZ += GetDeltaZ(pointX, pointY);
-                        //}
+                        //применение матрицы поверхности детали
+                        if (ControllerPlanetCNC.CorrectionPos.UseMatrix)
+                        {
+                            pointZ += ScanSurface.GetPosZ(pointX, pointY);
+                        }
+
+                        pointZ += (float)ControllerPlanetCNC.CorrectionPos.DeltaZ;
+
                     }
-
-
-
-
-
                     
 
 
                 ////    //добавим тут фильт
 
-                ////    if (Task.StatusTask == statusVariant.Waiting)
-                ////    {
-                    //int numSelectStart = DataLoader.SelectedRowStart-1;
-                    //int numSelectStop = DataLoader.SelectedRowStop-1;
+                //    if (Task.StatusTask == statusVariant.Waiting)
+                //    {
+                    int numSelectStart = DataLoader.SelectedRowStart-1;
+                    int numSelectStop = DataLoader.SelectedRowStop-1;
 
-                    //if (vv.numberRow >= numSelectStart && vv.numberRow <= numSelectStop)
-                    //{
-                    //    Gl.glVertex3d(pointX, pointY, pointZ);
-                    //}
+                    if (vv.numRow >= numSelectStart && vv.numRow <= numSelectStop)
+                    {
+                        Gl.glVertex3d(pointX, pointY, pointZ);
+                    }
 
-                    ////    }
-                    ////    else
-                    ////    {
+                    //    }
+                    //    else
+                    //    {
                     // Тут выделяется только одна линия из траектории
                     //int numSelect = DataCode.SelectedRow;
                     //if (vv.indexStr == (numSelect - 1))
@@ -1576,7 +1545,7 @@ namespace CNC_Assist
                     //{
                     //    Gl.glVertex3d(pointX, pointY, pointZ);
                     //}
-                    ////    }
+                    //    }
                 }
                 Gl.glEnd();
                    

@@ -48,6 +48,7 @@
             this.TimerRefresh = new System.Windows.Forms.Timer(this.components);
             this.listGkodeCommand = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.groupBoxManualSpeedGkode.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
@@ -278,7 +279,7 @@
             this.listGkodeCommand.Location = new System.Drawing.Point(6, 18);
             this.listGkodeCommand.Name = "listGkodeCommand";
             this.listGkodeCommand.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listGkodeCommand.Size = new System.Drawing.Size(382, 213);
+            this.listGkodeCommand.Size = new System.Drawing.Size(382, 194);
             this.listGkodeCommand.TabIndex = 10;
             this.listGkodeCommand.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.listGkodeCommand_DrawItem);
             this.listGkodeCommand.SelectedIndexChanged += new System.EventHandler(this.listGkodeCommand_SelectedIndexChanged);
@@ -286,6 +287,7 @@
             // groupBox1
             // 
             this.groupBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.listGkodeCommand);
             this.groupBox1.Controls.Add(this.groupBoxWorking);
             this.groupBox1.Controls.Add(this.groupBoxManualSpeedGkode);
@@ -295,6 +297,15 @@
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Данные для выполнения";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(8, 221);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(35, 13);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "label3";
             // 
             // GuiPanelTaskControl
             // 
@@ -310,6 +321,7 @@
             this.groupBoxWorking.ResumeLayout(false);
             this.groupBoxWorking.PerformLayout();
             this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -335,5 +347,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label labelStatusTask;
+        private System.Windows.Forms.Label label3;
     }
 }

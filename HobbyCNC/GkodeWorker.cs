@@ -88,6 +88,7 @@ namespace CNC_Assist
 
             PointCNC LastPoint = new PointCNC(ControllerPlanetCNC.Info.AxesXPositionMm, ControllerPlanetCNC.Info.AxesYPositionMm, ControllerPlanetCNC.Info.AxesZPositionMm, ControllerPlanetCNC.Info.AxesAPositionMm);
 
+            int numRow = 0;
 
             foreach (string str in Gkode)
             {
@@ -175,7 +176,12 @@ namespace CNC_Assist
  
                     index++;
                 }//foreach (string CODE in lcmd)
+
+                LastPoint.numRow = numRow;
+
                 Point3D.Add(LastPoint);
+
+                numRow++;
             }
         }
    

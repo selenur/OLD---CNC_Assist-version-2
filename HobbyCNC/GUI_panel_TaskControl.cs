@@ -45,6 +45,7 @@ namespace CNC_Assist
 
         private void TaskTimer_Tick(object sender, EventArgs e)
         {
+            label3.Text = @"Выделенно с " + DataLoader.SelectedRowStart + @" по " + DataLoader.SelectedRowStop;
             textBoxNumberLine.Text = @"Выполнена: " + ControllerPlanetCNC.Info.NuberCompleatedInstruction;
 
             // проверим не обновились ли данные
