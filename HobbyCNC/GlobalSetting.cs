@@ -576,7 +576,7 @@ namespace CNC_Assist
         /// <summary>
         /// Автоподключение к контроллеру
         /// </summary>
-        [DisplayName(@"Дублирование оси")]
+        [DisplayName(@"Дублировать ось А с др. осью")]
         [Description("Настройка активирует режим, при котором происходит дублирование одной оси к к другой")]
         [Category("2.4 Дополнительно")]
         [TypeConverter(typeof(BooleanTypeConverter))]

@@ -36,7 +36,7 @@ namespace CNC_Assist.SettingApp
             tr.Name = @"SettingRender";
             treeView1.Nodes.Add(tr);
 
-            tr = new TreeNode("4. Натройка модулей");
+            tr = new TreeNode("4. Наcтройка модулей");
             tr.Name = @"SettingPanel";
 
             //TODO: сюда добавить суб панели
