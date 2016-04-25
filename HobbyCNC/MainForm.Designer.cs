@@ -85,6 +85,7 @@
             this.posAngleZm = new System.Windows.Forms.ToolStripButton();
             this.OpenGL_preview = new Tao.Platform.Windows.SimpleOpenGlControl();
             this.tabPageSupp = new System.Windows.Forms.TabPage();
+            this.button3 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBoxDisableControl = new System.Windows.Forms.CheckBox();
             this.btSendSetting = new System.Windows.Forms.Button();
@@ -699,6 +700,7 @@
             // 
             // tabPageSupp
             // 
+            this.tabPageSupp.Controls.Add(this.button3);
             this.tabPageSupp.Controls.Add(this.groupBox1);
             this.tabPageSupp.Controls.Add(this.label2);
             this.tabPageSupp.Controls.Add(this.numericUpDown1);
@@ -716,6 +718,16 @@
             this.tabPageSupp.TabIndex = 1;
             this.tabPageSupp.Text = "Дополнительно";
             this.tabPageSupp.UseVisualStyleBackColor = true;
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(359, 239);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(56, 44);
+            this.button3.TabIndex = 16;
+            this.button3.Text = "0xFF";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // groupBox1
             // 
@@ -1150,6 +1162,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolsImporterVectorsToolStripMenuItem;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelG0;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelG1;
+        private System.Windows.Forms.Button button3;
     }
 }
 

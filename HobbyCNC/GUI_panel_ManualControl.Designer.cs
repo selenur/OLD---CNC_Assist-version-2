@@ -38,6 +38,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.buttonSend = new System.Windows.Forms.Button();
             this.tbSendGKode = new System.Windows.Forms.TextBox();
+            this.btShowNumHelp = new System.Windows.Forms.Button();
             this.groupBoxManualMove.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownManualSpeed)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -45,6 +46,7 @@
             // 
             // groupBoxManualMove
             // 
+            this.groupBoxManualMove.Controls.Add(this.btShowNumHelp);
             this.groupBoxManualMove.Controls.Add(this.lbSpeed);
             this.groupBoxManualMove.Controls.Add(this.numericUpDownManualSpeed);
             this.groupBoxManualMove.Controls.Add(this.buttonShowKeyInfo);
@@ -147,6 +149,17 @@
             this.tbSendGKode.TabIndex = 0;
             this.tbSendGKode.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSendGKode_KeyDown);
             // 
+            // btShowNumHelp
+            // 
+            this.btShowNumHelp.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btShowNumHelp.Location = new System.Drawing.Point(153, 9);
+            this.btShowNumHelp.Name = "btShowNumHelp";
+            this.btShowNumHelp.Size = new System.Drawing.Size(33, 25);
+            this.btShowNumHelp.TabIndex = 5;
+            this.btShowNumHelp.Text = "?";
+            this.btShowNumHelp.UseVisualStyleBackColor = true;
+            this.btShowNumHelp.Click += new System.EventHandler(this.btShowNumHelp_Click);
+            // 
             // GUI_panel_ManualControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -175,5 +188,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox tbSendGKode;
         private System.Windows.Forms.Button buttonSend;
+        private System.Windows.Forms.Button btShowNumHelp;
     }
 }

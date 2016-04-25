@@ -160,6 +160,12 @@
     <Compile Include="LoadingData.Designer.cs">
       <DependentUpon>LoadingData.cs</DependentUpon>
     </Compile>
+    <Compile Include="NumpadHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NumpadHelp.Designer.cs">
+      <DependentUpon>NumpadHelp.cs</DependentUpon>
+    </Compile>
     <Compile Include="PlanetCNC\GUI_panel_BitValue.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -283,6 +289,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LoadingData.resx">
       <DependentUpon>LoadingData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NumpadHelp.resx">
+      <DependentUpon>NumpadHelp.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PlanetCNC\GUI_panel_BitValue.resx">
       <DependentUpon>GUI_panel_BitValue.cs</DependentUpon>

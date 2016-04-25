@@ -617,8 +617,31 @@ namespace CNC_Assist
             return returnValue;
         }
 
-     
 
+        /// <summary>
+        /// Возращает значение необходимой команды, если такая команда есть
+        /// </summary>
+        /// <param name="value">Список команд</param>
+        /// <param name="Komand">Необходимая команда</param>
+        /// <returns>значение искомой команды</returns>
+        private static string GetValueFromGkomand(List<string> value, string Komand)
+        {
+            string retValue = "";
+
+            foreach (string vrl in value)
+            {
+                if (vrl.Substring(0, 1).ToUpper() == Komand.ToUpper())
+                {
+                    return vrl.Substring(1);
+
+                }
+                
+            }
+
+
+
+            return retValue;
+        }
 
 
 
@@ -637,7 +660,8 @@ namespace CNC_Assist
         /// </summary>
         /// <param name="gcommand">строка с кодом</param>
         /// <param name="numbr">номер инструкции</param>
-        public static void TASK_AddCommand(string gcommand,int numbr = 0,bool StartImmediately = false)
+        /// <param name="StartImmediately">Если false то добавляется в задание команда, иначе сразу посылается на выполнение</param>
+        public static void ANALIZE_Command(string gcommand,int numbr = 0,bool StartImmediately = false)
         {
             // Все неликвидные команды будем отбрасывать
             List<string> LCommand = ParseStringToListString(gcommand);
@@ -683,7 +707,90 @@ namespace CNC_Assist
                     if (StartImmediately) DirectPostToController(dt);
                     else AddBinaryDataToTask(dt);
                 }
-                
+
+
+                // Прерывание безостановочного движения
+                if (sLine == "M201")
+                {
+                    byte[] buff = BinaryData.pack_BE("", 0,true);
+
+                    buff[22] = 0x01;//TODO: разобраться для чего, этот байт
+
+                    DirectPostToController(buff);
+                    DirectPostToController(buff);
+                    DirectPostToController(buff);
+                }
+
+                // Запуск безостановочного движения
+                if (sLine.Substring(0, 4) == "M200")
+                {
+                    string speed = GetValueFromGkomand(LCommand, "F").Replace(csourse, cdestination); ;
+                    string pX    = GetValueFromGkomand(LCommand, "X");
+                    string pY    = GetValueFromGkomand(LCommand, "Y");
+                    string pZ    = GetValueFromGkomand(LCommand, "Z");
+                    string pA    = GetValueFromGkomand(LCommand, "A");
+
+
+                    string direction = "";
+
+                    int ispeed = 100;
+                    int.TryParse(speed, out ispeed);
+
+                    switch (pX)
+                    {
+                        case "+":
+                            direction += "+";
+                            break;
+                        case "-":
+                            direction += "-";
+                            break;
+                        default:
+                            direction += "0";
+                            break;
+                    }
+
+                    switch (pY)
+                    {
+                        case "+":
+                            direction += "+";
+                            break;
+                        case "-":
+                            direction += "-";
+                            break;
+                        default:
+                            direction += "0";
+                            break;
+                    }
+
+                    switch (pZ)
+                    {
+                        case "+":
+                            direction += "+";
+                            break;
+                        case "-":
+                            direction += "-";
+                            break;
+                        default:
+                            direction += "0";
+                            break;
+                    }
+
+                    switch (pA)
+                    {
+                        case "+":
+                            direction += "+";
+                            break;
+                        case "-":
+                            direction += "-";
+                            break;
+                        default:
+                            direction += "0";
+                            break;
+                    }
+
+                    DirectPostToController(BinaryData.pack_BE(direction, ispeed));
+                    return;
+                }
             }
 
             // 3) Извлечем скороcть выполнения
@@ -1012,42 +1119,42 @@ namespace CNC_Assist
             }
         }
 
-        /// <summary>
-        /// Запуск движения без остановки
-        /// </summary>
-        /// <param name="x">Ось Х (доступные значения "+" "0" "-")</param>
-        /// <param name="y">Ось Y (доступные значения "+" "0" "-")</param>
-        /// <param name="z">Ось Z (доступные значения "+" "0" "-")</param>
-        /// <param name="speed"></param>
-        public static void StartManualMove(string x, string y, string z, int speed)
-        {
-            if (!IsAvailability) return;
+        ///////// <summary>
+        ///////// Запуск движения без остановки
+        ///////// </summary>
+        ///////// <param name="x">Ось Х (доступные значения "+" "0" "-")</param>
+        ///////// <param name="y">Ось Y (доступные значения "+" "0" "-")</param>
+        ///////// <param name="z">Ось Z (доступные значения "+" "0" "-")</param>
+        ///////// <param name="speed"></param>
+        //////public static void StartManualMove(string x, string y, string z, int speed)
+        //////{
+        //////    if (!IsAvailability) return;
 
-            SuperByte axesDirection = new SuperByte(0x00);
-            //поставим нужные биты
-            if (x == "-") axesDirection.SetBit(0, true);
-            if (x == "+") axesDirection.SetBit(1, true);
-            if (y == "-") axesDirection.SetBit(2, true);
-            if (y == "+") axesDirection.SetBit(3, true);
-            if (z == "-") axesDirection.SetBit(4, true);
-            if (z == "+") axesDirection.SetBit(5, true);
+        //////    SuperByte axesDirection = new SuperByte(0x00);
+        //////    //поставим нужные биты
+        //////    if (x == "-") axesDirection.SetBit(0, true);
+        //////    if (x == "+") axesDirection.SetBit(1, true);
+        //////    if (y == "-") axesDirection.SetBit(2, true);
+        //////    if (y == "+") axesDirection.SetBit(3, true);
+        //////    if (z == "-") axesDirection.SetBit(4, true);
+        //////    if (z == "+") axesDirection.SetBit(5, true);
 
-            DirectPostToController(BinaryData.pack_BE(axesDirection.ValueByte, speed, x, y, z));
-        }
+        //////    DirectPostToController(BinaryData.pack_BE(axesDirection.ValueByte, speed, x, y, z));
+        //////}
 
-        /// <summary>
-        /// Послание контроллеру, комманды для остановки
-        /// </summary>
-        public static void StopManualMove()
-        {
-            byte[] buff = BinaryData.pack_BE(0x00, 0);
+        ///////// <summary>
+        ///////// Послание контроллеру, комманды для остановки
+        ///////// </summary>
+        //////public static void StopManualMove()
+        //////{
+        //////    byte[] buff = BinaryData.pack_BE(0x00, 0);
             
-            buff[22] = 0x01;//TODO: разобраться для чего, этот байт
+        //////    buff[22] = 0x01;//TODO: разобраться для чего, этот байт
 
-            DirectPostToController(buff);
-            DirectPostToController(buff);
-            DirectPostToController(buff);
-        }
+        //////    DirectPostToController(buff);
+        //////    DirectPostToController(buff);
+        //////    DirectPostToController(buff);
+        //////}
 
         #endregion
 
@@ -1074,7 +1181,7 @@ namespace CNC_Assist
             _lastTaskPosZ = Info.AxesZPositionMm;
             _lastTaskPosA = Info.AxesAPositionMm;
 
-            TASK_AddCommand(command, 0, true);
+            ANALIZE_Command(command, 0, true);
 
         }
 
@@ -1722,194 +1829,185 @@ namespace CNC_Assist
         /// <param name="z"></param>
         /// <param name="a"></param>
         /// <returns></returns>
-        public static byte[] pack_BE(byte direction, int speed, string x = "_", string y = "_", string z = "_", string a = "_")
+        public static byte[] pack_BE(string direction = "", int speed = 100, bool needStop = false)
         {
-
-
-
-
-
             //TODO: переделать определения с направлениями движения
 
             byte[] buf = new byte[64];
 
             buf[0] = 0xBE;
             buf[4] = 0x80;
-            buf[6] = direction;
+
+
+            buf[18] = 0x01;
+            buf[22] = 0x01;
+
+            // В случае остановки другие данные не нужны
+            if (needStop || direction == "") return buf;
+
+
+            SuperByte axesDirection = new SuperByte(0x00);
+
+            string pX = direction.Substring(0, 1);
+            string pY = direction.Substring(1, 1);
+            string pZ = direction.Substring(2, 1);
+            string pA = direction.Substring(3, 1);
+
+            //поставим нужные биты
+            if (pX == "-") axesDirection.SetBit(0, true);
+            if (pX == "+") axesDirection.SetBit(1, true);
+            if (pY == "-") axesDirection.SetBit(2, true);
+            if (pY == "+") axesDirection.SetBit(3, true);
+            if (pZ == "-") axesDirection.SetBit(4, true);
+            if (pZ == "+") axesDirection.SetBit(5, true);
+            if (pA == "-") axesDirection.SetBit(6, true);
+            if (pA == "+") axesDirection.SetBit(7, true);
+
+            buf[6] = axesDirection.ValueByte;
+
 
             int inewSpd = 0;
 
-            if (speed != 0)
+            if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK1)
             {
-                double dnewSpd = (1800 / (double)speed) * 1000;
-                inewSpd = (int)dnewSpd;
+                if (speed != 0)
+                {
+                    //double dnewSpd = (1800 / (double)speed) * 1000;
+                    //inewSpd = (int)dnewSpd;
+                    double dnewSpd = (9000 / (double)speed*2) * 100;
+                    inewSpd = (int)dnewSpd;
+                }                
             }
 
+            if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK2)
+            {
+                if (speed != 0)
+                {
+                    double dnewSpd = (9000/((double) speed*2))*1000;
+                    inewSpd = (int) dnewSpd;
+                }
+            }
 
             //скорость
             buf[10] = (byte)(inewSpd);
             buf[11] = (byte)(inewSpd >> 8);
             buf[12] = (byte)(inewSpd >> 16);
 
-            if (GlobalSetting.AppSetting.Controller == ControllerModel.PlanetCNC_MK2)
-            {
-                //TODO: Для МК2 немного иные посылки данных
 
-                if (speed != 0)
-                {
-                    double dnewSpd = (9000 / ((double)speed*2)) * 1000;
-                    inewSpd = (int)dnewSpd;
-                }
+            buf[22] = 0x50;
+
+
+
+
+
+                    //buf[14] = 0xC8; //TODO: WTF?? 
+                    //buf[18] = 0x14; //TODO: WTF??
+                    //buf[22] = 0x14; //TODO: WTF??
+
+
+
+
+                    //if (x == "+")
+                    //{
+                    //    buf[26] = 0x40;
+                    //    buf[27] = 0x0D;
+                    //    buf[28] = 0x03;
+                    //    buf[29] = 0x00;
+                    //}
+
+                    //if (x == "-")
+                    //{
+                    //    buf[26] = 0xC0;
+                    //    buf[27] = 0xF2;
+                    //    buf[28] = 0xFC;
+                    //    buf[29] = 0xFF;
+                    //}
+
+                    //if (y == "+")
+                    //{
+                    //    buf[30] = 0x40;
+                    //    buf[31] = 0x0D;
+                    //    buf[32] = 0x03;
+                    //    buf[33] = 0x00;
+                    //}
+
+                    //if (y == "-")
+                    //{
+                    //    buf[30] = 0xC0;
+                    //    buf[31] = 0xF2;
+                    //    buf[32] = 0xFC;
+                    //    buf[33] = 0xFF;
+                    //}
+
+                    //if (z == "+")
+                    //{
+                    //    buf[34] = 0x40;
+                    //    buf[35] = 0x0D;
+                    //    buf[36] = 0x03;
+                    //    buf[37] = 0x00;
+                    //}
+
+                    //if (z == "-")
+                    //{
+                    //    buf[34] = 0xC0;
+                    //    buf[35] = 0xF2;
+                    //    buf[36] = 0xFC;
+                    //    buf[37] = 0xFF;
+                    //}
+
+                    //if (a == "+")
+                    //{
+                    //    buf[38] = 0x40;
+                    //    buf[39] = 0x0D;
+                    //    buf[40] = 0x03;
+                    //    buf[41] = 0x00;
+                    //}
+
+                    //if (a == "-")
+                    //{
+                    //    buf[38] = 0xC0;
+                    //    buf[39] = 0xF2;
+                    //    buf[40] = 0xFC;
+                    //    buf[41] = 0xFF;
+                    //}
+
+
+
+                    //if (GlobalSetting.ControllerSetting.UseDuplicationAxes)
+                    //{
+                    //    //активировано дублирование оси
+
+                    //    switch (GlobalSetting.ControllerSetting.DiblicateAxesA)
+                    //    {
+                    //        case ListAxes.X:
+                    //            buf[38] = buf[26];
+                    //            buf[39] = buf[27];
+                    //            buf[40] = buf[28];
+                    //            buf[41] = buf[29];
+                    //            break;
+                    //        case ListAxes.Y:
+                    //            buf[38] = buf[30];
+                    //            buf[39] = buf[31];
+                    //            buf[40] = buf[32];
+                    //            buf[41] = buf[33];
+                    //            break;
+                    //        case ListAxes.Z:
+                    //            buf[38] = buf[34];
+                    //            buf[39] = buf[35];
+                    //            buf[40] = buf[36];
+                    //            buf[41] = buf[37];
+                    //            break;
+                    //    }
+
+                    //}
+
+
+
+
+
 
                 
 
-                //скорость
-                buf[10] = (byte)(inewSpd);
-                buf[11] = (byte)(inewSpd >> 8);
-                buf[12] = (byte)(inewSpd >> 16);
-
-                if (speed == 0)
-                {
-                    buf[14] = 0x00;
-                    buf[18] = 0x01;
-                    buf[22] = 0x01;
-
-                    //x
-                    buf[26] = 0x00;
-                    buf[27] = 0x00;
-                    buf[28] = 0x00;
-                    buf[29] = 0x00;
-
-                    //y
-                    buf[30] = 0x00;
-                    buf[31] = 0x00;
-                    buf[32] = 0x00;
-                    buf[33] = 0x00;
-
-                    //z
-                    buf[34] = 0x00;
-                    buf[35] = 0x00;
-                    buf[36] = 0x00;
-                    buf[37] = 0x00;
-
-                    //a
-                    buf[38] = 0x00;
-                    buf[39] = 0x00;
-                    buf[40] = 0x00;
-                    buf[41] = 0x00;
-
-
-                }
-                else
-                {
-                    buf[14] = 0xC8; //TODO: WTF?? 
-                    buf[18] = 0x14; //TODO: WTF??
-                    buf[22] = 0x14; //TODO: WTF??
-
-
-
-
-                    if (x == "+")
-                    {
-                        buf[26] = 0x40;
-                        buf[27] = 0x0D;
-                        buf[28] = 0x03;
-                        buf[29] = 0x00;
-                    }
-
-                    if (x == "-")
-                    {
-                        buf[26] = 0xC0;
-                        buf[27] = 0xF2;
-                        buf[28] = 0xFC;
-                        buf[29] = 0xFF;
-                    }
-
-                    if (y == "+")
-                    {
-                        buf[30] = 0x40;
-                        buf[31] = 0x0D;
-                        buf[32] = 0x03;
-                        buf[33] = 0x00;
-                    }
-
-                    if (y == "-")
-                    {
-                        buf[30] = 0xC0;
-                        buf[31] = 0xF2;
-                        buf[32] = 0xFC;
-                        buf[33] = 0xFF;
-                    }
-
-                    if (z == "+")
-                    {
-                        buf[34] = 0x40;
-                        buf[35] = 0x0D;
-                        buf[36] = 0x03;
-                        buf[37] = 0x00;
-                    }
-
-                    if (z == "-")
-                    {
-                        buf[34] = 0xC0;
-                        buf[35] = 0xF2;
-                        buf[36] = 0xFC;
-                        buf[37] = 0xFF;
-                    }
-
-                    if (a == "+")
-                    {
-                        buf[38] = 0x40;
-                        buf[39] = 0x0D;
-                        buf[40] = 0x03;
-                        buf[41] = 0x00;
-                    }
-
-                    if (a == "-")
-                    {
-                        buf[38] = 0xC0;
-                        buf[39] = 0xF2;
-                        buf[40] = 0xFC;
-                        buf[41] = 0xFF;
-                    }
-
-
-
-                    if (GlobalSetting.ControllerSetting.UseDuplicationAxes)
-                    {
-                        //активировано дублирование оси
-
-                        switch (GlobalSetting.ControllerSetting.DiblicateAxesA)
-                        {
-                            case ListAxes.X:
-                                buf[38] = buf[26];
-                                buf[39] = buf[27];
-                                buf[40] = buf[28];
-                                buf[41] = buf[29];
-                                break;
-                            case ListAxes.Y:
-                                buf[38] = buf[30];
-                                buf[39] = buf[31];
-                                buf[40] = buf[32];
-                                buf[41] = buf[33];
-                                break;
-                            case ListAxes.Z:
-                                buf[38] = buf[34];
-                                buf[39] = buf[35];
-                                buf[40] = buf[36];
-                                buf[41] = buf[37];
-                                break;
-                        }
-
-                    }
-
-
-
-
-
-
-                }
-            }
 
             
 

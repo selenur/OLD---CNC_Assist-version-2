@@ -267,25 +267,25 @@ namespace CNC_Assist
         private void button6_MouseDown(object sender, MouseEventArgs e)
         {
             button6.BackColor = Color.DarkGreen;
-            ControllerPlanetCNC.StartManualMove("0", "0", "+", 100);       
+            //ControllerPlanetCNC.StartManualMove("0", "0", "+", 100);       
         }
 
         private void button6_MouseUp(object sender, MouseEventArgs e)
         {
             button6.BackColor = Color.FromName("Control");
-            ControllerPlanetCNC.StopManualMove();        
+            //ControllerPlanetCNC.StopManualMove();        
         }
 
         private void button5_MouseDown(object sender, MouseEventArgs e)
         {
             button5.BackColor = Color.DarkGreen;
-            ControllerPlanetCNC.StartManualMove("0", "0", "-", 100);
+            //ControllerPlanetCNC.StartManualMove("0", "0", "-", 100);
         }
 
         private void button5_MouseUp(object sender, MouseEventArgs e)
         {
             button5.BackColor = Color.FromName("Control");
-            ControllerPlanetCNC.StopManualMove();
+            //ControllerPlanetCNC.StopManualMove();
         }
 
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)

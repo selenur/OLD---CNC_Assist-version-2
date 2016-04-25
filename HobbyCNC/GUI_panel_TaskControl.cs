@@ -140,7 +140,7 @@ namespace CNC_Assist
             {
                 //DataRow dataRowNow = DataLoader.DataRows[_nowPos];
 
-                ControllerPlanetCNC.TASK_AddCommand(listGkodeCommand.Items[_nowPos].ToString(), _nowPos);
+                ControllerPlanetCNC.ANALIZE_Command(listGkodeCommand.Items[_nowPos].ToString(), _nowPos);
 
                 _nowPos++;
 

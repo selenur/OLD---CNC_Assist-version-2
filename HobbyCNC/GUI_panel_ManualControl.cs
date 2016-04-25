@@ -77,5 +77,11 @@ namespace CNC_Assist
                 Execute();
             }
         }
+
+        private void btShowNumHelp_Click(object sender, EventArgs e)
+        {
+            NumpadHelp numform = new NumpadHelp();
+            numform.Show();
+        }
     }
 }

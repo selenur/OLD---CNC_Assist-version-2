@@ -458,12 +458,9 @@ namespace CNC_Assist
             bool num8 = IsPressed(VirtualKeyStates.VkNumpad8);
             bool num9 = IsPressed(VirtualKeyStates.VkNumpad9);
 
-            // ReSharper disable once InconsistentNaming
-            string _x = "0";
-            // ReSharper disable once InconsistentNaming
-            string _y = "0";
-            // ReSharper disable once InconsistentNaming
-            string _z = "0";
+            string _x = "";
+            string _y = "";
+            string _z = "";
 
             if (num0 || num1 || num2 || num3 || num4 || num5 || num6 || num7 || num8 || num9)
             {
@@ -487,15 +484,32 @@ namespace CNC_Assist
                 // +z
                 if (num5) _z = "+";
 
-                ControllerPlanetCNC.StartManualMove(_x, _y, _z, (int)_panelManualControl.numericUpDownManualSpeed.Value);
+
+                string sendValue = "M200 F" + _panelManualControl.numericUpDownManualSpeed.Value.ToString("0000");
+
+                if (_x != "") sendValue += " X" + _x;
+                if (_y != "") sendValue += " Y" + _y;
+                if (_z != "") sendValue += " Z" + _z;
+                //if (_a != "") sendValue += " A" + _A;
+
+                ControllerPlanetCNC.ExecuteCommand(sendValue);
+
+
+
             }
             else
             {
                 //нет ни одной нажатой
                 if (!_manualMoveButtonPressed) return;
-                ControllerPlanetCNC.StopManualMove();
+                ControllerPlanetCNC.ExecuteCommand("M201"); //остановка непрерывного движения
                 _manualMoveButtonPressed = false;
             }
+
+
+
+
+
+
         }
 
         #endregion
@@ -604,10 +618,11 @@ namespace CNC_Assist
                 if (item is ToolStripButton)
                 {
 
-                    string ss = ((ToolStripButton)item).Tag.ToString();		
+                    string ss = ((ToolStripButton)item).Tag.ToString();
 
 
                     ((ToolStripButton)item).Text = Language.GetTranslate(GlobalSetting.AppSetting.Language, ss);
+                    ((ToolStripButton)item).ToolTipText = Language.GetTranslate(GlobalSetting.AppSetting.Language, ss);
                     
 
                     
@@ -2038,6 +2053,11 @@ namespace CNC_Assist
             string pathapp = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             Process.Start(pathapp + @"\ToolsImporterVectors.exe");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ControllerPlanetCNC.DirectPostToController(BinaryData.pack_FF());
         }
 
     }
