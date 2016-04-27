@@ -1838,6 +1838,9 @@ namespace CNC_Assist
             buf[0] = 0xBE;
             buf[4] = 0x80;
 
+            buf[14] = 0x00;
+            buf[15] = 0x00;
+
 
             buf[18] = 0x01;
             buf[22] = 0x01;
@@ -1883,7 +1886,7 @@ namespace CNC_Assist
             {
                 if (speed != 0)
                 {
-                    double dnewSpd = (9000/((double) speed*2))*1000;
+                    double dnewSpd = (4500/((double) speed))*1000;
                     inewSpd = (int) dnewSpd;
                 }
             }
@@ -1894,82 +1897,86 @@ namespace CNC_Assist
             buf[12] = (byte)(inewSpd >> 16);
 
 
-            buf[22] = 0x50;
+            buf[18] = 0x50;//TODO: WTF??
+            buf[22] = 0x50;//TODO: WTF??
+
+
+
+            if (GlobalSetting.AppSetting.Controller != ControllerModel.PlanetCNC_MK2) return buf;
+
+
+            buf[14] = 0x20;//TODO: WTF?? 
+            buf[15] = 0x03;//TODO: WTF??
 
 
 
 
 
-                    //buf[14] = 0xC8; //TODO: WTF?? 
-                    //buf[18] = 0x14; //TODO: WTF??
-                    //buf[22] = 0x14; //TODO: WTF??
 
 
+            if (pX == "-")
+            {
+                buf[26] = 0x00;
+                buf[27] = 0xcb;
+                buf[28] = 0xf3;
+                buf[29] = 0xff;
+            }
 
+            if (pX == "+")
+            {
+                buf[26] = 0x00;
+                buf[27] = 0x35;
+                buf[28] = 0x0c;
+                buf[29] = 0x00;
+            }
 
-                    //if (x == "+")
-                    //{
-                    //    buf[26] = 0x40;
-                    //    buf[27] = 0x0D;
-                    //    buf[28] = 0x03;
-                    //    buf[29] = 0x00;
-                    //}
+            if (pY == "-")
+            {
+                buf[30] = 0x00;
+                buf[31] = 0xcb;
+                buf[32] = 0xf3;
+                buf[33] = 0xff;
+            }
 
-                    //if (x == "-")
-                    //{
-                    //    buf[26] = 0xC0;
-                    //    buf[27] = 0xF2;
-                    //    buf[28] = 0xFC;
-                    //    buf[29] = 0xFF;
-                    //}
+            if (pY == "+")
+            {
+                buf[30] = 0x00;
+                buf[31] = 0x35;
+                buf[32] = 0x0c;
+                buf[33] = 0x00;
+            }
 
-                    //if (y == "+")
-                    //{
-                    //    buf[30] = 0x40;
-                    //    buf[31] = 0x0D;
-                    //    buf[32] = 0x03;
-                    //    buf[33] = 0x00;
-                    //}
+            if (pZ == "-")
+            {
+                buf[34] = 0x00;
+                buf[35] = 0xcb;
+                buf[36] = 0xf3;
+                buf[37] = 0xff;
+            }
 
-                    //if (y == "-")
-                    //{
-                    //    buf[30] = 0xC0;
-                    //    buf[31] = 0xF2;
-                    //    buf[32] = 0xFC;
-                    //    buf[33] = 0xFF;
-                    //}
+            if (pZ == "+")
+            {
+                buf[34] = 0x00;
+                buf[35] = 0x35;
+                buf[36] = 0x0c;
+                buf[37] = 0x00;
+            }
 
-                    //if (z == "+")
-                    //{
-                    //    buf[34] = 0x40;
-                    //    buf[35] = 0x0D;
-                    //    buf[36] = 0x03;
-                    //    buf[37] = 0x00;
-                    //}
+            if (pA == "-")
+            {
+                buf[38] = 0x00;
+                buf[39] = 0xcb;
+                buf[40] = 0xf3;
+                buf[41] = 0xff;
+            }
 
-                    //if (z == "-")
-                    //{
-                    //    buf[34] = 0xC0;
-                    //    buf[35] = 0xF2;
-                    //    buf[36] = 0xFC;
-                    //    buf[37] = 0xFF;
-                    //}
-
-                    //if (a == "+")
-                    //{
-                    //    buf[38] = 0x40;
-                    //    buf[39] = 0x0D;
-                    //    buf[40] = 0x03;
-                    //    buf[41] = 0x00;
-                    //}
-
-                    //if (a == "-")
-                    //{
-                    //    buf[38] = 0xC0;
-                    //    buf[39] = 0xF2;
-                    //    buf[40] = 0xFC;
-                    //    buf[41] = 0xFF;
-                    //}
+            if (pA == "+")
+            {
+                buf[38] = 0x00;
+                buf[39] = 0x35;
+                buf[40] = 0x0c;
+                buf[41] = 0x00;
+            }
 
 
 
