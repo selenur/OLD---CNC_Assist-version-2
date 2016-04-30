@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -619,7 +620,7 @@ namespace CNC_Assist
 
 
         /// <summary>
-        /// Возращает значение необходимой команды, если такая команда есть
+        /// Возращает значение необходимой команды, если такая команда есть, в списке строк
         /// </summary>
         /// <param name="value">Список команд</param>
         /// <param name="Komand">Необходимая команда</param>
@@ -633,13 +634,8 @@ namespace CNC_Assist
                 if (vrl.Substring(0, 1).ToUpper() == Komand.ToUpper())
                 {
                     return vrl.Substring(1);
-
                 }
-                
             }
-
-
-
             return retValue;
         }
 
@@ -681,222 +677,189 @@ namespace CNC_Assist
             }
 
 
-            // Найдем вначале команды начинающиеся на "M"
+            //необходимо выполнить следующие действия:
+            //bool NeedMove = false;
+            //bool NeedManualMove = false;
+            //bool NeedSpindelChange = false;
+
+            // Необходимость прервать цикл парсинга
+            bool breakLoop = false;
+
+            // по циклу начинаем перебирать команды
             foreach (string sLine in LCommand)
             {
-                //todo: разобъем строку на команду и значение
+                if (breakLoop) break; // если вдруг появится острая необходимость прервать цикл
 
 
+                string parseLine = sLine.Trim().ToUpper();
 
-                if (sLine.Substring(0,1) != "M") continue;
+                if (parseLine.Length < 2) continue;
 
-                if (sLine == "M3" || sLine == "M03")
+                string sCommand = parseLine.Substring(0,1); //буква команды
+                string sValue = parseLine.Substring(1).Replace(csourse, cdestination); //номер, или значение команды
+
+
+                if (sCommand == "M")
                 {
-                    byte[] dt = BinaryData.pack_B5(true);
+                    int M_value = -1;
 
-                    if (StartImmediately) DirectPostToController(dt);
-                    else AddBinaryDataToTask(dt);
+                    int.TryParse(sValue,out M_value);
 
-                    
-                }
+                    if (M_value == -1) continue;
 
-                if (sLine == "M5" || sLine == "M05")
-                {
-                    byte[] dt = BinaryData.pack_B5(false);
+                    byte[] dt = new byte[64];
 
-                    if (StartImmediately) DirectPostToController(dt);
-                    else AddBinaryDataToTask(dt);
-                }
-
-
-                // Прерывание безостановочного движения
-                if (sLine == "M201")
-                {
-                    byte[] buff = BinaryData.pack_BE("", 0,true);
-
-                    buff[22] = 0x01;//TODO: разобраться для чего, этот байт
-
-                    DirectPostToController(buff);
-                    DirectPostToController(buff);
-                    DirectPostToController(buff);
-                }
-
-                // Запуск безостановочного движения
-                if (sLine.Substring(0, 4) == "M200")
-                {
-                    string speed = GetValueFromGkomand(LCommand, "F").Replace(csourse, cdestination); ;
-                    string pX    = GetValueFromGkomand(LCommand, "X");
-                    string pY    = GetValueFromGkomand(LCommand, "Y");
-                    string pZ    = GetValueFromGkomand(LCommand, "Z");
-                    string pA    = GetValueFromGkomand(LCommand, "A");
-
-
-                    string direction = "";
-
-                    int ispeed = 100;
-                    int.TryParse(speed, out ispeed);
-
-                    switch (pX)
+                    switch (M_value)
                     {
-                        case "+":
-                            direction += "+";
+                        case 3:
+
+                            dt = BinaryData.pack_B5(true);
+                            if (StartImmediately) DirectPostToController(dt);
+                                else AddBinaryDataToTask(dt); 
                             break;
-                        case "-":
-                            direction += "-";
+
+                        case 5:
+                            dt = BinaryData.pack_B5(false);
+                            if (StartImmediately) DirectPostToController(dt);
+                                else AddBinaryDataToTask(dt);
                             break;
-                        default:
-                            direction += "0";
+
+                        case 201:
+                            dt = BinaryData.pack_BE("", 0, true);
+                            dt[22] = 0x01;//TODO: разобраться для чего, этот байт
+                            DirectPostToController(dt);
+                            DirectPostToController(dt);
+                            DirectPostToController(dt);
+                            breakLoop = true;
+                            break;
+
+                        case 200:
+                            string speed = GetValueFromGkomand(LCommand, "F").Replace(csourse, cdestination); 
+                            string pX    = GetValueFromGkomand(LCommand, "X").Replace(csourse, cdestination); ;
+                            string pY    = GetValueFromGkomand(LCommand, "Y").Replace(csourse, cdestination); ;
+                            string pZ    = GetValueFromGkomand(LCommand, "Z").Replace(csourse, cdestination); ;
+                            string pA    = GetValueFromGkomand(LCommand, "A").Replace(csourse, cdestination); ;
+
+                            string direction = "";
+
+                            int ispeed = 100;
+                            int.TryParse(speed, out ispeed);
+
+                            switch (pX)
+                            {
+                                case "+":
+                                    direction += "+";
+                                    break;
+                                case "-":
+                                    direction += "-";
+                                    break;
+                                default:
+                                    direction += "0";
+                                    break;
+                            }
+
+                            switch (pY)
+                            {
+                                case "+":
+                                    direction += "+";
+                                    break;
+                                case "-":
+                                    direction += "-";
+                                    break;
+                                default:
+                                    direction += "0";
+                                    break;
+                            }
+
+                            switch (pZ)
+                            {
+                                case "+":
+                                    direction += "+";
+                                    break;
+                                case "-":
+                                    direction += "-";
+                                    break;
+                                default:
+                                    direction += "0";
+                                    break;
+                            }
+
+                            switch (pA)
+                            {
+                                case "+":
+                                    direction += "+";
+                                    break;
+                                case "-":
+                                    direction += "-";
+                                    break;
+                                default:
+                                    direction += "0";
+                                    break;
+                            }
+
+                            DirectPostToController(BinaryData.pack_BE(direction, ispeed));
+                            breakLoop = true;
                             break;
                     }
 
-                    switch (pY)
+                    if (breakLoop) break; // если нужна остановка, после выполнения некоторых "М" комманд
+                }
+
+                if (sCommand == "G")
+                {
+                    int G_value = -1;
+
+                    int.TryParse(sValue, out G_value);
+
+                    if (G_value == -1) continue;
+
+                    switch (G_value)
                     {
-                        case "+":
-                            direction += "+";
+                        case 0:
+                            _lastSpeedIsWork = 0;
                             break;
-                        case "-":
-                            direction += "-";
-                            break;
-                        default:
-                            direction += "0";
+
+                        case 1:
+                            _lastSpeedIsWork = 1;
                             break;
                     }
-
-                    switch (pZ)
-                    {
-                        case "+":
-                            direction += "+";
-                            break;
-                        case "-":
-                            direction += "-";
-                            break;
-                        default:
-                            direction += "0";
-                            break;
-                    }
-
-                    switch (pA)
-                    {
-                        case "+":
-                            direction += "+";
-                            break;
-                        case "-":
-                            direction += "-";
-                            break;
-                        default:
-                            direction += "0";
-                            break;
-                    }
-
-                    DirectPostToController(BinaryData.pack_BE(direction, ispeed));
-                    return;
                 }
-            }
 
-            // 3) Извлечем скороcть выполнения
-            int spd = -1;  // значение из F (если -1 то значения в строке нет)
-            int typeg = -1;// значение из g (если -1 то значения в строке нет)
-            //int gsubspd = -1; //значение из g во втором актете, если он есть
-            foreach (string sline in LCommand)
-            {
-                if (sline.Substring(0, 1) != "G" && sline.Substring(0, 1) != "F") continue;
-                
-                if (sline == "G0" || sline == "G00") typeg = 0;
-
-                if (sline == "G1" || sline == "G01") typeg = 1;
-
-                if (sline.Substring(0, 1) == "F")
+                if (sCommand == "F")
                 {
-                    string svalue = sline.Substring(1).Replace(csourse, cdestination);
-                    int.TryParse(svalue, out spd);
-                }
+                    int F_value = -1;
 
-                //todo: дабавить g0.39 и т.д.
-            }
+                    int.TryParse(sValue, out F_value);
 
-            // Данное значение будет послано в контроллер
-            int speedToController = 100;
+                    if (F_value == -1) continue;
 
-            // Ряд условий, связанных с тем что команда G0 G1 могут быть отдельно указаны от Fxxx
-            if (typeg == 0) _lastSpeedIsWork = 0;
+                    if (_lastSpeedIsWork == 0) _lastSpeedG0 = F_value;
 
-            if (typeg == 1) _lastSpeedIsWork = 1;
-
-            if (spd != -1)
-            {
-                if (_lastSpeedIsWork == 0) _lastSpeedG0 = spd;
-
-                if (_lastSpeedIsWork == 1) _lastSpeedG1 = spd;
-            }
-
-            if (_lastSpeedIsWork == 0) speedToController = _lastSpeedG0;
-
-            if (_lastSpeedIsWork == 1) speedToController = _lastSpeedG1;
-            
-            // 4) а теперь уже команды движения в точку
-            bool needSendPos = false;
-            foreach (string sLine in LCommand)
-            {
-                if (sLine.Substring(0, 1) != "X" && sLine.Substring(0, 1) != "Y" && sLine.Substring(0, 1) != "Z" && sLine.Substring(0, 1) != "A") continue;
-
-                needSendPos = true;
-
-                //todo: тут получим координаты
-
-
-                if (sLine.Substring(0, 1) == "X") //координата
-                {
-                    string svalue = sLine.Substring(1).Replace(csourse, cdestination);
-                    decimal pos;
-                    decimal.TryParse(svalue, out pos);
-
-                    if (AbsolutlePosParsing) _lastTaskPosX = pos;
-                    else _lastTaskPosX += pos;
+                    if (_lastSpeedIsWork == 1) _lastSpeedG1 = F_value;
                 }
 
 
-                if (sLine.Substring(0, 1) == "Y") //координата
-                {
-                    string svalue = sLine.Substring(1).Replace(csourse, cdestination);
-                    decimal pos;
-                    decimal.TryParse(svalue, out pos);
-
-                    if (AbsolutlePosParsing) _lastTaskPosY = pos;
-                    else _lastTaskPosY += pos;
-                }
+                // а так-же попробуем получить координаты XYZA
+                string ssX = GetValueFromGkomand(LCommand, "X").Replace(csourse, cdestination); ;
+                string ssY = GetValueFromGkomand(LCommand, "Y").Replace(csourse, cdestination); ;
+                string ssZ = GetValueFromGkomand(LCommand, "Z").Replace(csourse, cdestination); ;
+                string ssA = GetValueFromGkomand(LCommand, "A").Replace(csourse, cdestination); ;
 
 
-                if (sLine.Substring(0, 1) == "Z") //координата
-                {
-                    string svalue = sLine.Substring(1).Replace(csourse, cdestination); 
-                    decimal pos;
-                    decimal.TryParse(svalue, out pos);
-
-                    if (AbsolutlePosParsing) _lastTaskPosZ = pos;
-                    else _lastTaskPosZ += pos;
-                }
+                if (ssX == "" && ssY == "" && ssZ == "" && ssA == "") continue;
 
 
-                if (sLine.Substring(0, 1) == "A") //координата
-                {
-                    string svalue = sLine.Substring(1);
-                    decimal pos;
-                    decimal.TryParse(svalue, out pos);
-
-                    if (AbsolutlePosParsing) _lastTaskPosA = pos;
-                    else _lastTaskPosA += pos;
-                }
+                if (ssX != "") decimal.TryParse(ssX, out _lastTaskPosX);
+                if (ssY != "") decimal.TryParse(ssY, out _lastTaskPosY);
+                if (ssZ != "") decimal.TryParse(ssZ, out _lastTaskPosZ);
+                if (ssA != "") decimal.TryParse(ssA, out _lastTaskPosA);
 
 
-            }
-
-            // 5) 
-            if (needSendPos)
-            {
                 decimal deltaA = 0;
                 decimal deltaX = 0;
                 decimal deltaY = 0;
                 decimal deltaZ = 0;
+
                 //сюда необходимо добавить смещение
                 if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
                 {
@@ -906,17 +869,275 @@ namespace CNC_Assist
                     deltaZ = ControllerPlanetCNC.CorrectionPos.DeltaZ;
                 }
 
+                int speedToController = 100;
 
-                byte[] dt = BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX + deltaX),
+                if (_lastSpeedIsWork == 0) speedToController = _lastSpeedG0;
+
+                if (_lastSpeedIsWork == 1) speedToController = _lastSpeedG1;
+
+                byte[] dtm = new byte[64];
+
+                dtm = BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX + deltaX),
                                                             Info.CalcPosPulse("Y", _lastTaskPosY + deltaY),
                                                             Info.CalcPosPulse("Z", _lastTaskPosZ + deltaZ),
                                                             Info.CalcPosPulse("A", _lastTaskPosA + deltaA),
                                                             speedToController,
-                                                            numbr);      
+                                                            numbr);
 
-                if (StartImmediately) DirectPostToController(dt);
-                else AddBinaryDataToTask(dt);
+                if (StartImmediately) DirectPostToController(dtm);
+                else AddBinaryDataToTask(dtm);
+
+
             }
+
+                    //decimal XYZA_value = 0;
+
+                    //decimal.TryParse(sValue, out XYZA_value);
+
+                    //if (XYZA_value == -1) continue;
+
+
+
+            //// Найдем вначале команды начинающиеся на "M"
+            //foreach (string sLine in LCommand)
+            //{
+
+
+
+
+            ////TODO: т.к. тут несколько папраметров, с оглядкой на остальные, то нужно......
+
+
+
+            //    //if (sLine.Substring(0,1) != "M") continue;
+
+            //    //if (sLine == "M3" || sLine == "M03")
+            //    //{
+            //    //    byte[] dt = BinaryData.pack_B5(true);
+
+            //    //    if (StartImmediately) DirectPostToController(dt);
+            //    //    else AddBinaryDataToTask(dt);
+
+                    
+            //    //}
+
+            //    //if (sLine == "M5" || sLine == "M05")
+            //    //{
+            //    //    byte[] dt = BinaryData.pack_B5(false);
+
+            //    //    if (StartImmediately) DirectPostToController(dt);
+            //    //    else AddBinaryDataToTask(dt);
+            //    //}
+
+
+            //    // Прерывание безостановочного движения
+            //    //if (sLine == "M201")
+            //    //{
+            //    //    byte[] buff = BinaryData.pack_BE("", 0,true);
+
+            //    //    buff[22] = 0x01;//TODO: разобраться для чего, этот байт
+
+            //    //    DirectPostToController(buff);
+            //    //    DirectPostToController(buff);
+            //    //    DirectPostToController(buff);
+            //    //}
+
+            //    //// Запуск безостановочного движения
+            //    //if (sLine.Substring(0, 4) == "M200")
+            //    //{
+            //    //    //string speed = GetValueFromGkomand(LCommand, "F").Replace(csourse, cdestination); ;
+            //    //    //string pX    = GetValueFromGkomand(LCommand, "X");
+            //    //    //string pY    = GetValueFromGkomand(LCommand, "Y");
+            //    //    //string pZ    = GetValueFromGkomand(LCommand, "Z");
+            //    //    //string pA    = GetValueFromGkomand(LCommand, "A");
+
+
+            //    //    //string direction = "";
+
+            //    //    //int ispeed = 100;
+            //    //    //int.TryParse(speed, out ispeed);
+
+            //    //    //switch (pX)
+            //    //    //{
+            //    //    //    case "+":
+            //    //    //        direction += "+";
+            //    //    //        break;
+            //    //    //    case "-":
+            //    //    //        direction += "-";
+            //    //    //        break;
+            //    //    //    default:
+            //    //    //        direction += "0";
+            //    //    //        break;
+            //    //    //}
+
+            //    //    //switch (pY)
+            //    //    //{
+            //    //    //    case "+":
+            //    //    //        direction += "+";
+            //    //    //        break;
+            //    //    //    case "-":
+            //    //    //        direction += "-";
+            //    //    //        break;
+            //    //    //    default:
+            //    //    //        direction += "0";
+            //    //    //        break;
+            //    //    //}
+
+            //    //    //switch (pZ)
+            //    //    //{
+            //    //    //    case "+":
+            //    //    //        direction += "+";
+            //    //    //        break;
+            //    //    //    case "-":
+            //    //    //        direction += "-";
+            //    //    //        break;
+            //    //    //    default:
+            //    //    //        direction += "0";
+            //    //    //        break;
+            //    //    //}
+
+            //    //    //switch (pA)
+            //    //    //{
+            //    //    //    case "+":
+            //    //    //        direction += "+";
+            //    //    //        break;
+            //    //    //    case "-":
+            //    //    //        direction += "-";
+            //    //    //        break;
+            //    //    //    default:
+            //    //    //        direction += "0";
+            //    //    //        break;
+            //    //    //}
+
+            //    //    //DirectPostToController(BinaryData.pack_BE(direction, ispeed));
+            //    //    return;
+            //    //}
+            //}
+
+            //// 3) Извлечем скороcть выполнения
+            //int spd = -1;  // значение из F (если -1 то значения в строке нет)
+            //int typeg = -1;// значение из g (если -1 то значения в строке нет)
+            ////int gsubspd = -1; //значение из g во втором актете, если он есть
+            //foreach (string sline in LCommand)
+            //{
+            //    if (sline.Substring(0, 1) != "G" && sline.Substring(0, 1) != "F") continue;
+                
+            //    if (sline == "G0" || sline == "G00") typeg = 0;
+
+            //    if (sline == "G1" || sline == "G01") typeg = 1;
+
+            //    if (sline.Substring(0, 1) == "F")
+            //    {
+            //        string svalue = sline.Substring(1).Replace(csourse, cdestination);
+            //        int.TryParse(svalue, out spd);
+            //    }
+
+            //    //todo: дабавить g0.39 и т.д.
+            //}
+
+            //// Данное значение будет послано в контроллер
+            //int speedToController = 100;
+
+            //// Ряд условий, связанных с тем что команда G0 G1 могут быть отдельно указаны от Fxxx
+            //if (typeg == 0) _lastSpeedIsWork = 0;
+
+            //if (typeg == 1) _lastSpeedIsWork = 1;
+
+            //if (spd != -1)
+            //{
+            //    if (_lastSpeedIsWork == 0) _lastSpeedG0 = spd;
+
+            //    if (_lastSpeedIsWork == 1) _lastSpeedG1 = spd;
+            //}
+
+            //if (_lastSpeedIsWork == 0) speedToController = _lastSpeedG0;
+
+            //if (_lastSpeedIsWork == 1) speedToController = _lastSpeedG1;
+            
+            //// 4) а теперь уже команды движения в точку
+            //bool needSendPos = false;
+            //foreach (string sLine in LCommand)
+            //{
+            //    if (sLine.Substring(0, 1) != "X" && sLine.Substring(0, 1) != "Y" && sLine.Substring(0, 1) != "Z" && sLine.Substring(0, 1) != "A") continue;
+
+            //    needSendPos = true;
+
+            //    //todo: тут получим координаты
+
+
+            //    if (sLine.Substring(0, 1) == "X") //координата
+            //    {
+            //        string svalue = sLine.Substring(1).Replace(csourse, cdestination);
+            //        decimal pos;
+            //        decimal.TryParse(svalue, out pos);
+
+            //        if (AbsolutlePosParsing) _lastTaskPosX = pos;
+            //        else _lastTaskPosX += pos;
+            //    }
+
+
+            //    if (sLine.Substring(0, 1) == "Y") //координата
+            //    {
+            //        string svalue = sLine.Substring(1).Replace(csourse, cdestination);
+            //        decimal pos;
+            //        decimal.TryParse(svalue, out pos);
+
+            //        if (AbsolutlePosParsing) _lastTaskPosY = pos;
+            //        else _lastTaskPosY += pos;
+            //    }
+
+
+            //    if (sLine.Substring(0, 1) == "Z") //координата
+            //    {
+            //        string svalue = sLine.Substring(1).Replace(csourse, cdestination); 
+            //        decimal pos;
+            //        decimal.TryParse(svalue, out pos);
+
+            //        if (AbsolutlePosParsing) _lastTaskPosZ = pos;
+            //        else _lastTaskPosZ += pos;
+            //    }
+
+
+            //    if (sLine.Substring(0, 1) == "A") //координата
+            //    {
+            //        string svalue = sLine.Substring(1);
+            //        decimal pos;
+            //        decimal.TryParse(svalue, out pos);
+
+            //        if (AbsolutlePosParsing) _lastTaskPosA = pos;
+            //        else _lastTaskPosA += pos;
+            //    }
+
+
+            //}
+
+            //// 5) 
+            //if (needSendPos)
+            //{
+            //    decimal deltaA = 0;
+            //    decimal deltaX = 0;
+            //    decimal deltaY = 0;
+            //    decimal deltaZ = 0;
+            //    //сюда необходимо добавить смещение
+            //    if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
+            //    {
+            //        deltaA = ControllerPlanetCNC.CorrectionPos.DeltaA;
+            //        deltaX = ControllerPlanetCNC.CorrectionPos.DeltaX;
+            //        deltaY = ControllerPlanetCNC.CorrectionPos.DeltaY;
+            //        deltaZ = ControllerPlanetCNC.CorrectionPos.DeltaZ;
+            //    }
+
+
+            //    byte[] dt = BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX + deltaX),
+            //                                                Info.CalcPosPulse("Y", _lastTaskPosY + deltaY),
+            //                                                Info.CalcPosPulse("Z", _lastTaskPosZ + deltaZ),
+            //                                                Info.CalcPosPulse("A", _lastTaskPosA + deltaA),
+            //                                                speedToController,
+            //                                                numbr);      
+
+            //    if (StartImmediately) DirectPostToController(dt);
+            //    else AddBinaryDataToTask(dt);
+            //}
         }
 
         //// ведения логов
