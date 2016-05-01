@@ -1468,19 +1468,19 @@ namespace CNC_Assist
                     float pointZ = (float)vv.Z;
 
                     //добавление смещения G-кода
-                    if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
+                    if (ControllerPlanetCNC.correctionPos.UseCorrection)
                     {
                         //применение смещения
-                        pointX += (float)ControllerPlanetCNC.CorrectionPos.DeltaX;
-                        pointY += (float)ControllerPlanetCNC.CorrectionPos.DeltaY;
+                        pointX += (float)ControllerPlanetCNC.correctionPos.DeltaX;
+                        pointY += (float)ControllerPlanetCNC.correctionPos.DeltaY;
 
                         //применение матрицы поверхности детали
-                        if (ControllerPlanetCNC.CorrectionPos.UseMatrix)
+                        if (ControllerPlanetCNC.correctionPos.UseMatrix)
                         {
                             pointZ += ScanSurface.GetPosZ(pointX, pointY);
                         }
 
-                        pointZ += (float)ControllerPlanetCNC.CorrectionPos.DeltaZ;
+                        pointZ += (float)ControllerPlanetCNC.correctionPos.DeltaZ;
 
                     }
 
@@ -1516,19 +1516,19 @@ namespace CNC_Assist
                     float pointZ = (float)vv.Z;
 
                     //добавление смещения G-кода
-                    if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
+                    if (ControllerPlanetCNC.correctionPos.UseCorrection)
                     {
                         //применение смещения
-                        pointX += (float)ControllerPlanetCNC.CorrectionPos.DeltaX;
-                        pointY += (float)ControllerPlanetCNC.CorrectionPos.DeltaY;
+                        pointX += (float)ControllerPlanetCNC.correctionPos.DeltaX;
+                        pointY += (float)ControllerPlanetCNC.correctionPos.DeltaY;
 
                         //применение матрицы поверхности детали
-                        if (ControllerPlanetCNC.CorrectionPos.UseMatrix)
+                        if (ControllerPlanetCNC.correctionPos.UseMatrix)
                         {
                             pointZ += ScanSurface.GetPosZ(pointX, pointY);
                         }
 
-                        pointZ += (float)ControllerPlanetCNC.CorrectionPos.DeltaZ;
+                        pointZ += (float)ControllerPlanetCNC.correctionPos.DeltaZ;
 
                     }
                     

@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -39,7 +38,10 @@ namespace CNC_Assist
         /// <summary>
         /// Информация о применении смещения
         /// </summary>
-        public static volatile CorrectionPos CorrectionPos = new CorrectionPos();
+        public static volatile CorrectionPos correctionPos = new CorrectionPos();
+
+        public static volatile CorrectionSpeed CorrectionSpeed = new CorrectionSpeed();
+
 
         /// <summary>
         /// Статус работы потока
@@ -688,7 +690,7 @@ namespace CNC_Assist
             // по циклу начинаем перебирать команды
             foreach (string sLine in LCommand)
             {
-                if (breakLoop) break; // если вдруг появится острая необходимость прервать цикл
+                
 
 
                 string parseLine = sLine.Trim().ToUpper();
@@ -735,10 +737,10 @@ namespace CNC_Assist
 
                         case 200:
                             string speed = GetValueFromGkomand(LCommand, "F").Replace(csourse, cdestination); 
-                            string pX    = GetValueFromGkomand(LCommand, "X").Replace(csourse, cdestination); ;
-                            string pY    = GetValueFromGkomand(LCommand, "Y").Replace(csourse, cdestination); ;
-                            string pZ    = GetValueFromGkomand(LCommand, "Z").Replace(csourse, cdestination); ;
-                            string pA    = GetValueFromGkomand(LCommand, "A").Replace(csourse, cdestination); ;
+                            string pX    = GetValueFromGkomand(LCommand, "X").Replace(csourse, cdestination); 
+                            string pY    = GetValueFromGkomand(LCommand, "Y").Replace(csourse, cdestination); 
+                            string pZ    = GetValueFromGkomand(LCommand, "Z").Replace(csourse, cdestination); 
+                            string pA    = GetValueFromGkomand(LCommand, "A").Replace(csourse, cdestination); 
 
                             string direction = "";
 
@@ -840,10 +842,10 @@ namespace CNC_Assist
 
 
                 // а так-же попробуем получить координаты XYZA
-                string ssX = GetValueFromGkomand(LCommand, "X").Replace(csourse, cdestination); ;
-                string ssY = GetValueFromGkomand(LCommand, "Y").Replace(csourse, cdestination); ;
-                string ssZ = GetValueFromGkomand(LCommand, "Z").Replace(csourse, cdestination); ;
-                string ssA = GetValueFromGkomand(LCommand, "A").Replace(csourse, cdestination); ;
+                string ssX = GetValueFromGkomand(LCommand, "X").Replace(csourse, cdestination); 
+                string ssY = GetValueFromGkomand(LCommand, "Y").Replace(csourse, cdestination); 
+                string ssZ = GetValueFromGkomand(LCommand, "Z").Replace(csourse, cdestination); 
+                string ssA = GetValueFromGkomand(LCommand, "A").Replace(csourse, cdestination); 
 
 
                 if (ssX == "" && ssY == "" && ssZ == "" && ssA == "") continue;
@@ -855,19 +857,6 @@ namespace CNC_Assist
                 if (ssA != "") decimal.TryParse(ssA, out _lastTaskPosA);
 
 
-                decimal deltaA = 0;
-                decimal deltaX = 0;
-                decimal deltaY = 0;
-                decimal deltaZ = 0;
-
-                //сюда необходимо добавить смещение
-                if (ControllerPlanetCNC.CorrectionPos.UseCorrection)
-                {
-                    deltaA = ControllerPlanetCNC.CorrectionPos.DeltaA;
-                    deltaX = ControllerPlanetCNC.CorrectionPos.DeltaX;
-                    deltaY = ControllerPlanetCNC.CorrectionPos.DeltaY;
-                    deltaZ = ControllerPlanetCNC.CorrectionPos.DeltaZ;
-                }
 
                 int speedToController = 100;
 
@@ -875,14 +864,10 @@ namespace CNC_Assist
 
                 if (_lastSpeedIsWork == 1) speedToController = _lastSpeedG1;
 
+
                 byte[] dtm = new byte[64];
 
-                dtm = BinaryData.pack_CA(Info.CalcPosPulse("X", _lastTaskPosX + deltaX),
-                                                            Info.CalcPosPulse("Y", _lastTaskPosY + deltaY),
-                                                            Info.CalcPosPulse("Z", _lastTaskPosZ + deltaZ),
-                                                            Info.CalcPosPulse("A", _lastTaskPosA + deltaA),
-                                                            speedToController,
-                                                            numbr);
+                dtm = BinaryData.pack_CA(_lastTaskPosX,_lastTaskPosY,_lastTaskPosZ,_lastTaskPosA,speedToController,numbr);
 
                 if (StartImmediately) DirectPostToController(dtm);
                 else AddBinaryDataToTask(dtm);
@@ -2445,12 +2430,27 @@ namespace CNC_Assist
         /// <param name="numberInstruction">Номер данной инструкции</param>
         /// <param name="pauseTimeOut">!!! НЕКАЯ - длительность паузы после выполнения данной команды</param>
         /// <returns>набор данных для посылки</returns>
-        public static byte[] pack_CA(int posX, int posY, int posZ, int posA, int speed, int numberInstruction = 0, byte pauseTimeOut = 0x39)
+        public static byte[] pack_CA(decimal posX, decimal posY, decimal posZ, decimal posA, int speed, int numberInstruction = 0, byte pauseTimeOut = 0x39)
         {
-            int newPosX = posX;
-            int newPosY = posY;
-            int newPosZ = posZ;
-            int newPosA = posA;
+
+            decimal deltaA = 0;
+            decimal deltaX = 0;
+            decimal deltaY = 0;
+            decimal deltaZ = 0;
+
+            //сюда необходимо добавить смещение
+            if (ControllerPlanetCNC.correctionPos.UseCorrection)
+            {
+                deltaA = ControllerPlanetCNC.correctionPos.DeltaA;
+                deltaX = ControllerPlanetCNC.correctionPos.DeltaX;
+                deltaY = ControllerPlanetCNC.correctionPos.DeltaY;
+                deltaZ = ControllerPlanetCNC.correctionPos.DeltaZ;
+            }
+
+            int newPosX = ControllerPlanetCNC.Info.CalcPosPulse("X", posX + deltaX);
+            int newPosY = ControllerPlanetCNC.Info.CalcPosPulse("Y", posY + deltaY);
+            int newPosZ = ControllerPlanetCNC.Info.CalcPosPulse("Z", posZ + deltaZ);
+            int newPosA = ControllerPlanetCNC.Info.CalcPosPulse("A", posA + deltaA);
             int newInst = numberInstruction;
 
             byte[] buf = new byte[64];
@@ -2534,7 +2534,18 @@ namespace CNC_Assist
                 koef = 4500;
             }
 
-            int iSpeed = (int)(koef / speed) * 1000;
+            int speed2 = speed;
+            if (ControllerPlanetCNC.CorrectionSpeed.UseCorrection)
+            {
+
+                speed2 = (speed2 / 100) * ControllerPlanetCNC.CorrectionSpeed.speed;
+            }
+
+            int iSpeed = (int)(koef / speed2) * 1000;
+
+
+
+
             //скорость ось х
             buf[43] = (byte)(iSpeed);
             buf[44] = (byte)(iSpeed >> 8);
@@ -2544,6 +2555,9 @@ namespace CNC_Assist
 
             return buf;
         }
+
+
+
 
         /// <summary>
         /// Завершение выполнения всех операций
@@ -2624,6 +2638,22 @@ namespace CNC_Assist
     ////}
 
 
+    /// <summary>
+    /// Для хранения информации о необходимости корректировки скорости
+    /// </summary>
+    public class CorrectionSpeed
+    {
+        public bool UseCorrection;
+
+        public int speed;
+
+        public CorrectionSpeed()
+        {
+            UseCorrection = false;
+            speed = 100;
+
+        }
+    }
 
 
     /// <summary>

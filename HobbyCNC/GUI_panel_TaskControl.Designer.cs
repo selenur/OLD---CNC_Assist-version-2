@@ -30,13 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBoxManualSpeedGkode = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.checkBoxManualSpeed = new System.Windows.Forms.CheckBox();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.label5 = new System.Windows.Forms.Label();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
-            this.label6 = new System.Windows.Forms.Label();
+            this.numericUpDownChangeSpeed = new System.Windows.Forms.NumericUpDown();
             this.groupBoxWorking = new System.Windows.Forms.GroupBox();
             this.labelStatusTask = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
@@ -49,9 +44,9 @@
             this.listGkodeCommand = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBoxManualSpeedGkode.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownChangeSpeed)).BeginInit();
             this.groupBoxWorking.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -59,117 +54,50 @@
             // groupBoxManualSpeedGkode
             // 
             this.groupBoxManualSpeedGkode.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.groupBoxManualSpeedGkode.Controls.Add(this.label2);
             this.groupBoxManualSpeedGkode.Controls.Add(this.label1);
             this.groupBoxManualSpeedGkode.Controls.Add(this.checkBoxManualSpeed);
-            this.groupBoxManualSpeedGkode.Controls.Add(this.numericUpDown1);
-            this.groupBoxManualSpeedGkode.Controls.Add(this.label5);
-            this.groupBoxManualSpeedGkode.Controls.Add(this.numericUpDown2);
-            this.groupBoxManualSpeedGkode.Controls.Add(this.label6);
+            this.groupBoxManualSpeedGkode.Controls.Add(this.numericUpDownChangeSpeed);
             this.groupBoxManualSpeedGkode.Location = new System.Drawing.Point(6, 245);
             this.groupBoxManualSpeedGkode.Name = "groupBoxManualSpeedGkode";
             this.groupBoxManualSpeedGkode.Size = new System.Drawing.Size(382, 74);
             this.groupBoxManualSpeedGkode.TabIndex = 13;
             this.groupBoxManualSpeedGkode.TabStop = false;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(178, 39);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(33, 20);
-            this.label2.TabIndex = 15;
-            this.label2.Text = "G1";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(3, 38);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(33, 20);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "G0";
-            // 
             // checkBoxManualSpeed
             // 
             this.checkBoxManualSpeed.AutoSize = true;
             this.checkBoxManualSpeed.Location = new System.Drawing.Point(7, 6);
             this.checkBoxManualSpeed.Name = "checkBoxManualSpeed";
-            this.checkBoxManualSpeed.Size = new System.Drawing.Size(130, 17);
+            this.checkBoxManualSpeed.Size = new System.Drawing.Size(124, 17);
             this.checkBoxManualSpeed.TabIndex = 9;
-            this.checkBoxManualSpeed.Text = "Применить скорсть:";
+            this.checkBoxManualSpeed.Text = "Изменить скорсть:";
             this.checkBoxManualSpeed.UseVisualStyleBackColor = true;
             this.checkBoxManualSpeed.CheckedChanged += new System.EventHandler(this.checkBoxManualSpeed_CheckedChanged);
             // 
-            // numericUpDown1
+            // numericUpDownChangeSpeed
             // 
-            this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.numericUpDown1.Location = new System.Drawing.Point(107, 33);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
-            7500,
+            this.numericUpDownChangeSpeed.Enabled = false;
+            this.numericUpDownChangeSpeed.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.numericUpDownChangeSpeed.Location = new System.Drawing.Point(22, 29);
+            this.numericUpDownChangeSpeed.Maximum = new decimal(new int[] {
+            10000,
             0,
             0,
             0});
-            this.numericUpDown1.Minimum = new decimal(new int[] {
+            this.numericUpDownChangeSpeed.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(65, 29);
-            this.numericUpDown1.TabIndex = 5;
-            this.numericUpDown1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            200,
+            this.numericUpDownChangeSpeed.Name = "numericUpDownChangeSpeed";
+            this.numericUpDownChangeSpeed.Size = new System.Drawing.Size(65, 29);
+            this.numericUpDownChangeSpeed.TabIndex = 5;
+            this.numericUpDownChangeSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.numericUpDownChangeSpeed.Value = new decimal(new int[] {
+            100,
             0,
             0,
             0});
-            // 
-            // label5
-            // 
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label5.Location = new System.Drawing.Point(42, 32);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(62, 30);
-            this.label5.TabIndex = 7;
-            this.label5.Text = "Скорость подачи:";
-            // 
-            // numericUpDown2
-            // 
-            this.numericUpDown2.Enabled = false;
-            this.numericUpDown2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.numericUpDown2.Location = new System.Drawing.Point(302, 34);
-            this.numericUpDown2.Maximum = new decimal(new int[] {
-            7500,
-            0,
-            0,
-            0});
-            this.numericUpDown2.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(65, 29);
-            this.numericUpDown2.TabIndex = 6;
-            this.numericUpDown2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.numericUpDown2.Value = new decimal(new int[] {
-            500,
-            0,
-            0,
-            0});
-            // 
-            // label6
-            // 
-            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label6.Location = new System.Drawing.Point(217, 34);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(79, 29);
-            this.label6.TabIndex = 8;
-            this.label6.Text = "Скорость перемещения:";
             // 
             // groupBoxWorking
             // 
@@ -307,6 +235,15 @@
             this.label3.TabIndex = 14;
             this.label3.Text = "label3";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(111, 30);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(15, 13);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "%";
+            // 
             // GuiPanelTaskControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -316,8 +253,7 @@
             this.Size = new System.Drawing.Size(400, 448);
             this.groupBoxManualSpeedGkode.ResumeLayout(false);
             this.groupBoxManualSpeedGkode.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownChangeSpeed)).EndInit();
             this.groupBoxWorking.ResumeLayout(false);
             this.groupBoxWorking.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -330,10 +266,7 @@
 
         private System.Windows.Forms.GroupBox groupBoxManualSpeedGkode;
         private System.Windows.Forms.CheckBox checkBoxManualSpeed;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.NumericUpDown numericUpDownChangeSpeed;
         private System.Windows.Forms.GroupBox groupBoxWorking;
         private System.Windows.Forms.TextBox textBoxNumberLine;
         private System.Windows.Forms.Button buttonPauseTask;
@@ -342,11 +275,10 @@
         private System.Windows.Forms.Timer TimerRefresh;
         public System.Windows.Forms.ListBox listGkodeCommand;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label labelStatusTask;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label1;
     }
 }

@@ -39,8 +39,10 @@ namespace CNC_Assist
         // флаг применять свою скорость движения
         private void checkBoxManualSpeed_CheckedChanged(object sender, EventArgs e)
         {
-            numericUpDown1.Enabled = checkBoxManualSpeed.Checked;
-            numericUpDown2.Enabled = checkBoxManualSpeed.Checked;
+            numericUpDownChangeSpeed.Enabled = checkBoxManualSpeed.Checked;
+
+            ControllerPlanetCNC.CorrectionSpeed.UseCorrection = checkBoxManualSpeed.Checked;
+            ControllerPlanetCNC.CorrectionSpeed.speed = (int)numericUpDownChangeSpeed.Value;
         }
 
         private void TaskTimer_Tick(object sender, EventArgs e)
@@ -113,6 +115,9 @@ namespace CNC_Assist
 
         private void buttonStartTask_Click(object sender, EventArgs e)
         {
+            ControllerPlanetCNC.CorrectionSpeed.UseCorrection = checkBoxManualSpeed.Checked;
+            ControllerPlanetCNC.CorrectionSpeed.speed = (int)numericUpDownChangeSpeed.Value;
+            
             ControllerPlanetCNC.TASK_CLEAR();
 
             ControllerPlanetCNC.TASK_SendStartData();
