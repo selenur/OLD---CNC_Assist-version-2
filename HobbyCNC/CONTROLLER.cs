@@ -653,6 +653,11 @@ namespace CNC_Assist
         public static int _lastSpeedIsWork = 0; //0-> G0 1->G1
         public static readonly bool AbsolutlePosParsing = true;
 
+        public static bool _chanel1ON = false;
+        public static bool _chanel2ON = false;
+        public static bool _chanel3ON = false;
+
+
         /// <summary>
         /// добавление команды в задание для выполнения
         /// </summary>
@@ -714,17 +719,51 @@ namespace CNC_Assist
                     switch (M_value)
                     {
                         case 3:
-
+                            _chanel1ON = true;
                             dt = BinaryData.pack_B5(true);
                             if (StartImmediately) DirectPostToController(dt);
                                 else AddBinaryDataToTask(dt); 
                             break;
 
                         case 5:
+                            _chanel1ON = false;
                             dt = BinaryData.pack_B5(false);
                             if (StartImmediately) DirectPostToController(dt);
-                                else AddBinaryDataToTask(dt);
+                            else AddBinaryDataToTask(dt);
                             break;
+
+
+
+                        case 7:
+                            _chanel2ON = true;
+                            dt = BinaryData.pack_B6(_chanel2ON, _chanel3ON);
+                            if (StartImmediately) DirectPostToController(dt);
+                            else AddBinaryDataToTask(dt);
+                            break;
+
+
+
+                        case 8:
+                            _chanel3ON = true;
+                            dt = BinaryData.pack_B6(_chanel2ON, _chanel3ON);
+                            if (StartImmediately) DirectPostToController(dt);
+                            else AddBinaryDataToTask(dt);
+                            break;
+
+
+
+                        case 9:
+                            _chanel2ON = false;
+                            _chanel3ON = false;
+                            dt = BinaryData.pack_B6(_chanel2ON, _chanel3ON);
+                            if (StartImmediately) DirectPostToController(dt);
+                            else AddBinaryDataToTask(dt);
+                            break;
+
+
+
+
+
 
                         case 201:
                             dt = BinaryData.pack_BE("", 0, true);

@@ -1138,6 +1138,38 @@ namespace CNC_Assist
                 toolStripStatusLabelG1.BackColor = Color.PaleGreen;
                 toolStripStatusLabelG0.BackColor = SystemColors.Control;
             }
+
+
+            if (ControllerPlanetCNC._chanel1ON)
+            {
+                toolStripStatusChanel1.BackColor = Color.PaleGreen;
+            }
+            else
+            {
+                toolStripStatusChanel1.BackColor = SystemColors.Control;
+            }
+
+
+            if (ControllerPlanetCNC._chanel2ON)
+            {
+                toolStripStatusChanel2.BackColor = Color.PaleGreen;
+            }
+            else
+            {
+                toolStripStatusChanel2.BackColor = SystemColors.Control;
+            }
+
+
+            if (ControllerPlanetCNC._chanel3ON)
+            {
+                toolStripStatusChanel3.BackColor = Color.PaleGreen;
+            }
+            else
+            {
+                toolStripStatusChanel3.BackColor = SystemColors.Control;
+            }
+
+            
             
             // обработка "тика" таймера - вызов функции отрисовки 
             _dtStart = DateTime.Now;

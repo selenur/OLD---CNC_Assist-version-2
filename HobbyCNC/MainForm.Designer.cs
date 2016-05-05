@@ -114,6 +114,9 @@
             this.panelCenter = new System.Windows.Forms.Panel();
             this.panelRight = new System.Windows.Forms.FlowLayoutPanel();
             this.panelLeft = new System.Windows.Forms.FlowLayoutPanel();
+            this.toolStripStatusChanel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusChanel2 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusChanel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.MainMenu.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.MainStatusStrip.SuspendLayout();
@@ -454,6 +457,9 @@
             this.MainStatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabelG0,
             this.toolStripStatusLabelG1,
+            this.toolStripStatusChanel1,
+            this.toolStripStatusChanel2,
+            this.toolStripStatusChanel3,
             this.toolStripStatusLabelFPS});
             this.MainStatusStrip.Location = new System.Drawing.Point(0, 582);
             this.MainStatusStrip.Name = "MainStatusStrip";
@@ -1033,6 +1039,24 @@
             this.panelLeft.Size = new System.Drawing.Size(204, 511);
             this.panelLeft.TabIndex = 10;
             // 
+            // toolStripStatusChanel1
+            // 
+            this.toolStripStatusChanel1.Name = "toolStripStatusChanel1";
+            this.toolStripStatusChanel1.Size = new System.Drawing.Size(49, 17);
+            this.toolStripStatusChanel1.Text = "Канал 1";
+            // 
+            // toolStripStatusChanel2
+            // 
+            this.toolStripStatusChanel2.Name = "toolStripStatusChanel2";
+            this.toolStripStatusChanel2.Size = new System.Drawing.Size(49, 17);
+            this.toolStripStatusChanel2.Text = "Канал 2";
+            // 
+            // toolStripStatusChanel3
+            // 
+            this.toolStripStatusChanel3.Name = "toolStripStatusChanel3";
+            this.toolStripStatusChanel3.Size = new System.Drawing.Size(49, 17);
+            this.toolStripStatusChanel3.Text = "Канал 3";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1163,6 +1187,9 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelG0;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelG1;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusChanel1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusChanel2;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusChanel3;
     }
 }
 

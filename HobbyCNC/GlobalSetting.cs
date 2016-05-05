@@ -259,7 +259,6 @@ namespace CNC_Assist
         }
 
 
-
         private bool _allowMotorUse = true;
         /// <summary>
         /// Использование концевика
