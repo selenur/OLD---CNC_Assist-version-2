@@ -868,15 +868,16 @@ namespace CNC_Assist
 
                 if (sCommand == "F")
                 {
-                    int F_value = -1;
+                    float F_value = -1;
 
-                    int.TryParse(sValue, out F_value);
+                    float.TryParse(sValue, out F_value);
+
 
                     if (F_value == -1) continue;
 
-                    if (_lastSpeedIsWork == 0) _lastSpeedG0 = F_value;
+                    if (_lastSpeedIsWork == 0) _lastSpeedG0 = (int)F_value;
 
-                    if (_lastSpeedIsWork == 1) _lastSpeedG1 = F_value;
+                    if (_lastSpeedIsWork == 1) _lastSpeedG1 = (int)F_value;
                 }
 
 

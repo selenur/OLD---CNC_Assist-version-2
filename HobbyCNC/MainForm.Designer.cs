@@ -63,6 +63,9 @@
             this.MainStatusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabelG0 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelG1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusChanel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusChanel2 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusChanel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelFPS = new System.Windows.Forms.ToolStripStatusLabel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage3D = new System.Windows.Forms.TabPage();
@@ -114,9 +117,9 @@
             this.panelCenter = new System.Windows.Forms.Panel();
             this.panelRight = new System.Windows.Forms.FlowLayoutPanel();
             this.panelLeft = new System.Windows.Forms.FlowLayoutPanel();
-            this.toolStripStatusChanel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusChanel2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusChanel3 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button4 = new System.Windows.Forms.Button();
             this.MainMenu.SuspendLayout();
             this.MainToolStrip.SuspendLayout();
             this.MainStatusStrip.SuspendLayout();
@@ -132,6 +135,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).BeginInit();
             this.panelCenter.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainMenu
@@ -479,6 +483,24 @@
             this.toolStripStatusLabelG1.Size = new System.Drawing.Size(51, 17);
             this.toolStripStatusLabelG1.Text = "   G1:100";
             // 
+            // toolStripStatusChanel1
+            // 
+            this.toolStripStatusChanel1.Name = "toolStripStatusChanel1";
+            this.toolStripStatusChanel1.Size = new System.Drawing.Size(49, 17);
+            this.toolStripStatusChanel1.Text = "Канал 1";
+            // 
+            // toolStripStatusChanel2
+            // 
+            this.toolStripStatusChanel2.Name = "toolStripStatusChanel2";
+            this.toolStripStatusChanel2.Size = new System.Drawing.Size(49, 17);
+            this.toolStripStatusChanel2.Text = "Канал 2";
+            // 
+            // toolStripStatusChanel3
+            // 
+            this.toolStripStatusChanel3.Name = "toolStripStatusChanel3";
+            this.toolStripStatusChanel3.Size = new System.Drawing.Size(49, 17);
+            this.toolStripStatusChanel3.Text = "Канал 3";
+            // 
             // toolStripStatusLabelFPS
             // 
             this.toolStripStatusLabelFPS.AutoSize = false;
@@ -490,6 +512,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage3D);
             this.tabControl1.Controls.Add(this.tabPageSupp);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
@@ -1039,23 +1062,35 @@
             this.panelLeft.Size = new System.Drawing.Size(204, 511);
             this.panelLeft.TabIndex = 10;
             // 
-            // toolStripStatusChanel1
+            // tabPage1
             // 
-            this.toolStripStatusChanel1.Name = "toolStripStatusChanel1";
-            this.toolStripStatusChanel1.Size = new System.Drawing.Size(49, 17);
-            this.toolStripStatusChanel1.Text = "Канал 1";
+            this.tabPage1.Controls.Add(this.button4);
+            this.tabPage1.Controls.Add(this.textBox1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(430, 484);
+            this.tabPage1.TabIndex = 3;
+            this.tabPage1.Text = "tabPage1";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // toolStripStatusChanel2
+            // textBox1
             // 
-            this.toolStripStatusChanel2.Name = "toolStripStatusChanel2";
-            this.toolStripStatusChanel2.Size = new System.Drawing.Size(49, 17);
-            this.toolStripStatusChanel2.Text = "Канал 2";
+            this.textBox1.Location = new System.Drawing.Point(37, 30);
+            this.textBox1.Multiline = true;
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(310, 149);
+            this.textBox1.TabIndex = 0;
             // 
-            // toolStripStatusChanel3
+            // button4
             // 
-            this.toolStripStatusChanel3.Name = "toolStripStatusChanel3";
-            this.toolStripStatusChanel3.Size = new System.Drawing.Size(49, 17);
-            this.toolStripStatusChanel3.Text = "Канал 3";
+            this.button4.Location = new System.Drawing.Point(46, 195);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(284, 24);
+            this.button4.TabIndex = 1;
+            this.button4.Text = "send kode";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // MainForm
             // 
@@ -1096,6 +1131,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).EndInit();
             this.panelCenter.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1190,6 +1227,9 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusChanel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusChanel2;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusChanel3;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

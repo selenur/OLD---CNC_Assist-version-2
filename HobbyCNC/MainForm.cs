@@ -2092,6 +2092,11 @@ namespace CNC_Assist
             ControllerPlanetCNC.DirectPostToController(BinaryData.pack_FF());
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+            ControllerPlanetCNC.ANALIZE_Command(textBox1.Text, 0);
+        }
+
     }
 
     /// <summary>
