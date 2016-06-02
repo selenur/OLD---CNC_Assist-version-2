@@ -133,6 +133,7 @@
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.labelZoomSize = new System.Windows.Forms.Label();
             this.pictureBoxPreview = new Cyotek.Windows.Forms.ImageBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownKoefPalitra)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -374,6 +375,7 @@
             // 
             // tabPageStep2
             // 
+            this.tabPageStep2.Controls.Add(this.label1);
             this.tabPageStep2.Controls.Add(this.groupBoxFilter3);
             this.tabPageStep2.Controls.Add(this.groupBoxFilter2);
             this.tabPageStep2.Controls.Add(this.groupBoxFilter1);
@@ -503,7 +505,7 @@
             this.label12.ForeColor = System.Drawing.Color.Maroon;
             this.label12.Location = new System.Drawing.Point(429, 232);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(133, 33);
+            this.label12.Size = new System.Drawing.Size(188, 33);
             this.label12.TabIndex = 20;
             this.label12.Text = "<<-- пока не оптимизировал....";
             // 
@@ -1417,6 +1419,18 @@
             this.pictureBoxPreview.ImageChanged += new System.EventHandler(this.pictureBoxPreview_ImageChanged);
             this.pictureBoxPreview.ZoomChanged += new System.EventHandler(this.pictureBoxPreview_ZoomChanged);
             // 
+            // label1
+            // 
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label1.ForeColor = System.Drawing.Color.DarkBlue;
+            this.label1.Location = new System.Drawing.Point(438, 29);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(179, 162);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "Данный раздел доступен только если источником является рисунок, или текст из шриф" +
+    "та извлекается как рисунок";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1589,6 +1603,7 @@
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.RadioButton radioButtonTypeSourcePLT;
+        private System.Windows.Forms.Label label1;
     }
 }
 

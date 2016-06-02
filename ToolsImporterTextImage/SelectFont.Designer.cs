@@ -60,9 +60,9 @@
             this.radioButtonFontBitmap.AutoSize = true;
             this.radioButtonFontBitmap.Location = new System.Drawing.Point(6, 40);
             this.radioButtonFontBitmap.Name = "radioButtonFontBitmap";
-            this.radioButtonFontBitmap.Size = new System.Drawing.Size(125, 17);
+            this.radioButtonFontBitmap.Size = new System.Drawing.Size(103, 17);
             this.radioButtonFontBitmap.TabIndex = 69;
-            this.radioButtonFontBitmap.Text = "Получать как растр";
+            this.radioButtonFontBitmap.Text = "В виде рисунка";
             this.radioButtonFontBitmap.UseVisualStyleBackColor = true;
             this.radioButtonFontBitmap.CheckedChanged += new System.EventHandler(this.radioButtonFontBitmap_CheckedChanged);
             // 
@@ -72,10 +72,10 @@
             this._UseFontVector.Checked = true;
             this._UseFontVector.Location = new System.Drawing.Point(6, 18);
             this._UseFontVector.Name = "_UseFontVector";
-            this._UseFontVector.Size = new System.Drawing.Size(269, 17);
+            this._UseFontVector.Size = new System.Drawing.Size(207, 17);
             this._UseFontVector.TabIndex = 68;
             this._UseFontVector.TabStop = true;
-            this._UseFontVector.Text = "Получить векторные данные (шаг 2 недоступен)";
+            this._UseFontVector.Text = "В виде отрезков (шаг 2 недоступен)";
             this._UseFontVector.UseVisualStyleBackColor = true;
             this._UseFontVector.CheckedChanged += new System.EventHandler(this.radioButtonFontVector_CheckedChanged);
             // 
